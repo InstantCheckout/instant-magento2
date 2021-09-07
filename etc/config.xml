@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <instant>
+                <active>1</active>
+                <model>Instant\Checkout\Model\Payment\Instant</model>
+                <order_status>pending</order_status>
+                <title>Instant Pay</title>
+                <allowspecific>0</allowspecific>
+                <group>Offline</group>
+                <enable_catalog>1</enable_catalog>
+            </instant>
+        </payment>
+        <instant>
+            <general>
+                <enable_catalog>0</enable_catalog>
+                <enable_minicart>0</enable_minicart>
+                <enable_checkout_summary>0</enable_checkout_summary>
+                <enable_checkout_page>0</enable_checkout_page>
+            </general>
+        </instant>
+    </default>
+</config>

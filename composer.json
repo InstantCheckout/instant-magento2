@@ -1,0 +1,31 @@
+{
+    "name": "instant/instant-checkout",
+    "description": "Instant Checkout Module",
+    "homepage": "http://instant.one",
+    "type": "magento2-module",
+    "version": "1.3.0",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Instant",
+            "email": "hello@instant.one"
+        }
+    ],
+    "support": {
+        "issues": "http://instant.one"
+    },
+    "require": {
+        "magento/module-payment": "100.1.*",
+        "magento/module-checkout": "100.1.*",
+        "magento/module-sales": "100.1.*",
+        "magento/module-catalog": "100.1.*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Instant\\Checkout\\": ""
+        }
+    }
+}
