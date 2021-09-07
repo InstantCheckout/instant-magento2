@@ -1,4 +1,4 @@
-# Copy below code to add Buy Now button in custom product sliders, widget, static blocks etc.
+# Copy below code to add Instant button in custom product sliders, widget, static blocks etc.
 
 ``````
 $buyNowHtml = $this->getLayout()
