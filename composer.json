@@ -8,10 +8,10 @@
         "issues": "http://instant.one"
     },
     "require": {
-        "magento/module-payment": "100.*|101.*|102.*|103.*",
-        "magento/module-checkout": "100.*|101.*|102.*|103.*",
-        "magento/module-sales": "100.*|101.*|102.*|103.*",
-        "magento/module-catalog": "100.*|101.*|102.*|103.*"
+        "magento/module-payment": "100.*|101.*|102.*|103.*|104.*",
+        "magento/module-checkout": "100.*|101.*|102.*|103.*|104.*",
+        "magento/module-sales": "100.*|101.*|102.*|103.*|104.*",
+        "magento/module-catalog": "100.*|101.*|102.*|103.*|104.*"
     },
     "autoload": {
         "files": [
