@@ -2,7 +2,6 @@
     "name": "instant/instant-checkout",
     "description": "Instant Checkout Module",
     "type": "magento2-module",
-    "version": "2.23.0",
     "license": "MIT",
     "support": {
         "issues": "http://instant.one"
