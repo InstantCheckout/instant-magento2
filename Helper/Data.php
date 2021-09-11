@@ -10,7 +10,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const INSTANT_APP_ID_PATH = 'instant/general/app_id';
 
     /**
-     * Addtocart button form id
+     * Default addtocart button form id
      */
     const PRODUCT_ADDTOCART_FORM_ID = 'product_addtocart_form';
 
@@ -56,7 +56,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $minicartBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_MINICART_BTN_PATH);
         return $minicartBtnEnabled;
     }
-
 
     /**
      * Get product page addtocart form id

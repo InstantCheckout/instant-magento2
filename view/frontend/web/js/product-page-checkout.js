@@ -55,7 +55,7 @@ define([
                                     $('#product-page-instant-btn-lock-icon').show();
                                     $('#product-page-instant-btn').css('font-size', '19px');
                                     $('#product-page-instant-backdrop').css('display', 'none');
-
+                                    $('#product-page-instant-btn').attr('data-tooltip', 'Instant Checkout')
                                     clearInterval(loop);
                                 }
                             }, 500);
