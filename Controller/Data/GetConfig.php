@@ -41,10 +41,7 @@ class GetConfig extends Action implements HttpGetActionInterface
      * - App ID 
      * - Store Code
      * - EnableMinicartBtn admin configuration
-     *
-     * @return \Magento\Framework\Controller\Result\Redirect
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
+    */
     public function execute()
     {
         $result = $this->jsonResultFactory->create();

@@ -69,8 +69,6 @@ class GetProduct extends Action implements HttpPostActionInterface
 
     /**
      * Get Store code
-     *
-     * @return string
      */
     public function getStoreCode()
     {
@@ -79,10 +77,6 @@ class GetProduct extends Action implements HttpPostActionInterface
 
     /**
      * Get product object based on requested product information
-     *
-     * @param   Product|int|string $productInfo
-     * @return  Product
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getProduct($productInfo)
     {
@@ -121,10 +115,6 @@ class GetProduct extends Action implements HttpPostActionInterface
 
     /**
      * Get request quantity
-     *
-     * @param Product $product
-     * @param \Magento\Framework\DataObject|int|array $request
-     * @return int|DataObject
      */
     private function getQtyRequest($product, $request = 0)
     {
@@ -145,7 +135,6 @@ class GetProduct extends Action implements HttpPostActionInterface
 
     /**
      * Initialise product
-     * @return \Magento\Catalog\Model\Product
      */
     protected function initProduct()
     {
@@ -166,8 +155,6 @@ class GetProduct extends Action implements HttpPostActionInterface
 
     /**
      * Getter for RequestInfoFilter
-     *
-     * @return \Magento\Checkout\Model\Cart\RequestInfoFilterInterface
      */
     private function getRequestInfoFilter()
     {
@@ -180,10 +167,6 @@ class GetProduct extends Action implements HttpPostActionInterface
 
     /**
      * Get request for product add to cart procedure
-     *
-     * @param  \Magento\Framework\DataObject|int|array $requestInfo
-     * @return \Magento\Framework\DataObject
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getProductRequest($requestInfo)
     {

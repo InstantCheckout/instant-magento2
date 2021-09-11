@@ -20,10 +20,7 @@ class Clear extends Action implements HttpPutActionInterface
 
     /**
      * Clears the cart of the current session.
-     *
-     * @return \Magento\Framework\Controller\Result\Redirect
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
+    */
     public function execute()
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();

@@ -6,9 +6,6 @@ define([
     "use strict";
 
     return function (config, element) {
-        /**
-         * Load Instant Checkout for customer cart
-         */
         $(element).click(function () {
             try {
                 var form = $(config.form);
