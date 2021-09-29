@@ -45,8 +45,10 @@ define([
                 "#minicart-instant-btn-loading-indicator",
                 "#minicart-instant-btn-text",
                 "#minicart-instant-btn-lock-icon",
-                "#minicart-instant-backdrop",
-                "#minicart-back-to-checkout"
+                "#desktop-minicart-instant-backdrop",
+                "#mobile-minicart-instant-backdrop",
+                "#desktop-minicart-back-to-checkout",
+                "#mobile-minicart-back-to-checkout"
             );
         }
     });

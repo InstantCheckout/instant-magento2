@@ -18,8 +18,10 @@ define([
                 "#checkout-page-instant-btn-loading-indicator",
                 "#checkout-page-instant-btn-text",
                 "#checkout-page-instant-btn-lock-icon",
-                "#checkout-page-instant-backdrop",
-                "#checkout-page-back-to-checkout"
+                "#desktop-checkout-page-instant-backdrop",
+                "#mobile-checkout-page-instant-backdrop",
+                "#desktop-checkout-page-back-to-checkout",
+                "#mobile-checkout-page-back-to-checkout"
             );
         },
     });

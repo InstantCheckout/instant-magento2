@@ -4,15 +4,11 @@ namespace Instant\Checkout\Controller\Data;
 
 use Magento\Backend\App\Action\Context;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Model\Product;
-use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\Convert\DataObject;
-use Magento\Framework\Event\ManagerInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 class GetProduct extends Action implements HttpPostActionInterface
 {
@@ -27,24 +23,14 @@ class GetProduct extends Action implements HttpPostActionInterface
     protected $jsonResultFactory;
 
     /**
-     * @var StoreManagerInterface
+     * @var RequestInterface
      */
-    protected $storeManager;
+    private $request;
 
     /**
-     * @var \Magento\Checkout\Model\Cart\RequestInfoFilterInterface
+     * @var Configurable
      */
-    private $requestInfoFilter;
-
-    /**
-     * @var \Magento\CatalogInventory\Api\StockRegistryInterface
-     */
-    protected $stockRegistry;
-
-    /**
-     * @var \Magento\Framework\Event\ManagerInterface
-     */
-    protected $eventManager;
+    private $configurableProduct;
 
     /**
      * Constructor.
@@ -52,138 +38,17 @@ class GetProduct extends Action implements HttpPostActionInterface
      */
     public function __construct(
         Context $context,
+        RequestInterface $request,
         JsonFactory $jsonResultFactory,
         ProductRepositoryInterface $productRepository,
-        StoreManagerInterface $storeManager,
-        StockRegistryInterface $stockRegistry,
-        ManagerInterface $eventManager
+        Configurable $configurableProduct
     ) {
         $this->productRepository = $productRepository;
         $this->jsonResultFactory = $jsonResultFactory;
-        $this->storeManager = $storeManager;
-        $this->stockRegistry = $stockRegistry;
-        $this->eventManager = $eventManager;
+        $this->request = $request;
+        $this->configurableProduct = $configurableProduct;
 
         return parent::__construct($context);
-    }
-
-    /**
-     * Get Store code
-     */
-    public function getStoreCode()
-    {
-        return $this->storeManager->getStore()->getCode();
-    }
-
-    /**
-     * Get product object based on requested product information
-     */
-    protected function getProduct($productInfo)
-    {
-        $product = null;
-        if ($productInfo instanceof Product) {
-            $product = $productInfo;
-            if (!$product->getId()) {
-                throw new \Magento\Framework\Exception\LocalizedException(
-                    __("The product wasn't found. Verify the product and try again.")
-                );
-            }
-        } elseif (is_int($productInfo) || is_string($productInfo)) {
-            $storeId = $this->storeManager->getStore()->getId();
-            try {
-                $product = $this->productRepository->getById($productInfo, false, $storeId);
-            } catch (NoSuchEntityException $e) {
-                throw new \Magento\Framework\Exception\LocalizedException(
-                    __("The product wasn't found. Verify the product and try again."),
-                    $e
-                );
-            }
-        } else {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __("The product wasn't found. Verify the product and try again.")
-            );
-        }
-        $currentWebsiteId = $this->storeManager->getStore()->getWebsiteId();
-        if (!is_array($product->getWebsiteIds()) || !in_array($currentWebsiteId, $product->getWebsiteIds())) {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __("The product wasn't found. Verify the product and try again.")
-            );
-        }
-        return $product;
-    }
-
-
-    /**
-     * Get request quantity
-     */
-    private function getQtyRequest($product, $request = 0)
-    {
-        $request = $this->getProductRequest($request);
-        $stockItem = $this->stockRegistry->getStockItem($product->getId(), $product->getStore()->getWebsiteId());
-        $minimumQty = $stockItem->getMinSaleQty();
-
-        if (
-            $minimumQty
-            && $minimumQty > 0
-            && !$request->getQty()
-        ) {
-            $request->setQty($minimumQty);
-        }
-
-        return $request;
-    }
-
-    /**
-     * Initialise product
-     */
-    protected function initProduct()
-    {
-        $productId = (int)$this->getRequest()->getParam('product');
-
-        if ($productId) {
-            $storeId = $this->_objectManager->get(
-                \Magento\Store\Model\StoreManagerInterface::class
-            )->getStore()->getId();
-            try {
-                return $this->productRepository->getById($productId, false, $storeId);
-            } catch (NoSuchEntityException $e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Getter for RequestInfoFilter
-     */
-    private function getRequestInfoFilter()
-    {
-        if ($this->requestInfoFilter === null) {
-            $this->requestInfoFilter = \Magento\Framework\App\ObjectManager::getInstance()
-                ->get(\Magento\Checkout\Model\Cart\RequestInfoFilterInterface::class);
-        }
-        return $this->requestInfoFilter;
-    }
-
-    /**
-     * Get request for product add to cart procedure
-     */
-    protected function getProductRequest($requestInfo)
-    {
-        if ($requestInfo instanceof \Magento\Framework\DataObject) {
-            $request = $requestInfo;
-        } elseif (is_numeric($requestInfo)) {
-            $request = new \Magento\Framework\DataObject(['qty' => $requestInfo]);
-        } elseif (is_array($requestInfo)) {
-            $request = new \Magento\Framework\DataObject($requestInfo);
-        } else {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('We found an invalid request for adding product to quote.')
-            );
-        }
-        $this->getRequestInfoFilter()->filter($request);
-
-        return $request;
     }
 
     /**
@@ -191,60 +56,32 @@ class GetProduct extends Action implements HttpPostActionInterface
      */
     public function execute()
     {
-        $params = $this->getRequest()->getParams();
+        $params = $this->request->getPost();
 
-        if (isset($params['qty'])) {
-            $filter = new \Zend_Filter_LocalizedToNormalized(
-                ['locale' => $this->_objectManager->get(
-                    \Magento\Framework\Locale\ResolverInterface::class
-                )->getLocale()]
-            );
-            $params['qty'] = $filter->filter($params['qty']);
-        }
+        $productId = $params['productId'];
+        $selectedOptions = $params['selectedOptions'];
 
-        $product = $this->initProduct();
-        $product = $this->getProduct($product);
-        $request = $this->getQtyRequest($product, $params);
+        $options = [];
+        $product = NULL;
 
-        if ($request === null) {
-            $request = 1;
-        }
-        if (is_numeric($request)) {
-            $request = $this->objectFactory->create(['qty' => $request]);
-        }
+        if (is_countable($selectedOptions) && count($selectedOptions) > 0) {
+            // If selectedOptions is populated, then we have a configurable product
+            $product = $this->productRepository->getById($productId);
+            foreach ($selectedOptions as $selectedOption) {
+                $attributeId = $selectedOption['attributeId'];
+                $optionValue = $selectedOption['optionValue'];
+                $options[$attributeId] = $optionValue;
+            }
 
-        $cartCandidates = $product->getTypeInstance()->prepareForCartAdvanced($request, $product, null);
-
-        if (!is_array($cartCandidates)) {
-            $cartCandidates = [$cartCandidates];
-        }
-
-        $parentItem = null;
-        $skuQtyPairs = [];
-
-        foreach ($cartCandidates as $candidate) {
-            $skuQtyPair = [];
-
-            $stickWithinParent = $candidate->getParentProductId() ? $parentItem : null;
-            $candidate->setStickWithinParent($stickWithinParent);
-
-            $product->setOptions($candidate->getCustomOptions());
-            $product->setProduct($candidate);
-
-            $skuQtyPair['sku'] = $product->getSku();
-            $skuQtyPair['qty'] = $product->getQty();
-
-            array_push($skuQtyPairs, $skuQtyPair);
+            $product = $this->configurableProduct->getProductByAttributes($options, $product);
+        } else {
+            // If selectedOptions is not populated, then we have a simple product with no config
+            $product = $this->productRepository->getById($productId);
         }
 
         $result = $this->jsonResultFactory->create();
-        $storeCode = $this->getStoreCode();
-        $instantHelper = $this->_objectManager->create(\Instant\Checkout\Helper\Data::class);
-
         $data = [];
-        $data['skuQtyPairs'] = $skuQtyPairs;
-        $data['storeCode'] = $storeCode;
-        $data['appId'] = $instantHelper->getInstantAppId();
+        $data['sku'] = $product->getSku();
 
         $result->setData($data);
 

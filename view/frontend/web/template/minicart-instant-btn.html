@@ -1,23 +1,34 @@
 <!-- INSTANT BUTTON START -->
-<div id="minicart-instant-btn-container" class="instant-btn-container">
-    <fieldset class="instant-btn-wrapper">
-        <legend class="instant-buy-one-tap">Buy in 1-tap</legend>
-        <button id="minicart-instant-btn" data-bind="click: checkoutCart, afterRender: render" class="instant-btn"
-            type="button">
-            <div id="minicart-instant-btn-loading-indicator" class='instant-btn-loading'></div>
-            <svg id="minicart-instant-btn-lock-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="15"
-                style="margin-right:7px;" viewBox="0 0 22 22">
-                <path style="fill:white"
-                    d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z" />
-            </svg>
-            <div id="minicart-instant-btn-text">Instant Checkout</div>
-        </button>
-        <div id="minicart-instant-backdrop" class="instant-backdrop">
-            <h4 id="minicart-back-to-checkout" class="instant-back-to-checkout">Back to checkout</h4>
+<link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+
+<div class='instant-reset-css'>
+    <div id="minicart-instant-btn-container" class="instant-btn-container">
+        <fieldset class="minicart-instant-btn-wrapper">
+            <legend class="instant-buy-now">Buy now</legend>
+            <button id="minicart-instant-btn" data-bind="click: checkoutCart, afterRender: render" class="instant-minicart-btn"
+                type="button">
+                <div id="minicart-instant-btn-loading-indicator" class='instant-btn-loading'></div>
+                <svg id="minicart-instant-btn-lock-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="15"
+                    style="margin-right:7px;" viewBox="0 0 22 22">
+                    <path style="fill:white"
+                        d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z" />
+                </svg>
+                <div id="minicart-instant-btn-text">Instant Checkout</div>
+            </button>
+            <div id="desktop-minicart-instant-backdrop" class="instant-backdrop">
+                <h4 id="desktop-minicart-back-to-checkout" class="instant-back-to-checkout">Back to checkout</h4>
+            </div>
+            <div id="mobile-minicart-instant-backdrop" class="instant-backdrop">
+                <div class="mobile-instant-back-to-checkout-backdrop-inner-container">
+                    <div class="mobile-instant-back-to-checkout-text">Finish reviewing your order</div>
+                    <div class="mobile-instant-back-to-checkout-text">or</div>
+                    <div id="mobile-minicart-back-to-checkout" class="mobile-instant-back-to-shopping-text">Go back to shopping</div>
+                </div>
+            </div>
+        </fieldset>
+        <div class="instant-strike">
+            <span>or</span>
         </div>
-    </fieldset>
-    <div class="instant-strike">
-        <span>or</span>
     </div>
 </div>
 <!-- INSTANT BUTTON END -->
