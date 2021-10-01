@@ -18,6 +18,7 @@
                 <enable_minicart>0</enable_minicart>
                 <enable_checkout_summary>0</enable_checkout_summary>
                 <enable_checkout_page>0</enable_checkout_page>
+                <enable_sandbox>0</enable_sandbox>
             </general>
         </instant>
     </default>

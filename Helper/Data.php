@@ -25,6 +25,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const ENABLE_INSTANT_MINICART_BTN_PATH = 'instant/general/enable_minicart';
 
     /**
+     * Enable sandbox mode path
+     */
+    const ENABLE_INSTANT_SANDBOX_MODE_PATH = 'instant/general/enable_sandbox';
+
+    /**
      * Retrieve config value
      *
      * @return string
@@ -65,5 +70,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $addToCartFormId = $this->getConfig(self::PRODUCT_ADDTOCART_FORM_ID_PATH);
         return $addToCartFormId ? $addToCartFormId : self::PRODUCT_ADDTOCART_FORM_ID;
+    }
+
+    /**
+     * Get staging config
+     * @return string
+     */
+    public function getSandboxEnabledConfig()
+    {
+        $sandboxEnabled = $this->getConfig(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
+        return $sandboxEnabled ? $sandboxEnabled : false;
     }
 }

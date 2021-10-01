@@ -22,7 +22,6 @@ define([
          * @return {String}
          */
         getCheckoutUrl: function (skuQtyPairs, confirm, callback) {
-            const baseUrl = 'https://checkout.instant.one/';
             const confirmParam = 'confirm=' + confirm;
             const skuQtyPairQueryParams = _.map(skuQtyPairs, function (skuQtyPair) {
                 return 'sku=' + skuQtyPair.sku + ',' + skuQtyPair.qty;
@@ -35,7 +34,8 @@ define([
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    const { storeCode, appId } = data;
+                    const { storeCode, appId, enableSandbox } = data;
+                    const baseUrl = `https://${enableSandbox ? 'staging.' : ''}checkout.instant.one/`;
 
                     const merchantIdParam = 'merchantId=' + appId;
                     const storeCodeParam = 'storeCode=' + storeCode;

@@ -19,6 +19,11 @@
                     <label>ID of the Form containing Add to Cart button on product page</label>
                     <comment>Enter addtocart form ID for product view page (default: product_addtocart_form)</comment>
                 </field>
+                <field id="enable_sandbox" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Is in Sandbox/Staging Environment</label>
+                    <comment>Defaults to NO. CRITICAL: Set to NO if in LIVE/PRODUCTION environment. Set to YES if this site is a SANDBOX/STAGING environment. </comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="enable_catalog" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Product Catalog Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

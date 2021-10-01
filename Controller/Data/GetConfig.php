@@ -41,7 +41,7 @@ class GetConfig extends Action implements HttpGetActionInterface
      * - App ID 
      * - Store Code
      * - EnableMinicartBtn admin configuration
-    */
+     */
     public function execute()
     {
         $result = $this->jsonResultFactory->create();
@@ -51,6 +51,7 @@ class GetConfig extends Action implements HttpGetActionInterface
 
         $data['enableMinicartBtn'] = $instantHelper->getInstantMinicartBtnEnabled();
         $data['appId'] = $instantHelper->getInstantAppId();
+        $data['enableSandbox'] = $instantHelper->getSandboxEnabledConfig();
         $data['storeCode'] = $storeCode;
 
         $result->setData($data);
