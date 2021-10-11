@@ -60,7 +60,7 @@ define([
             const posY = window.outerHeight / 2 + window.screenY - (windowHeight / 2);
             const posX = window.outerWidth / 2 + window.screenX - (windowWidth / 2);
 
-            return window.open(url || '', 'instant_checkout', 'location=yes,height=' + windowHeight + ',width=' + windowWidth + ',top=' + posY + ',left=' + posX + ',scrollbars=yes,status=yes');
+            return window.open(url || '', '', 'location=yes,height=' + windowHeight + ',width=' + windowWidth + ',top=' + posY + ',left=' + posX + ',scrollbars=yes,status=yes');
         },
 
         showErrorAlert: function () {
