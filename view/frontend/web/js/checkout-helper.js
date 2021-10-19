@@ -154,20 +154,16 @@ define([
 
             const loop = setInterval(function () {
                 if (checkoutWindow.closed) {
-                    jQuery.ajax({
-                        url: window.location.origin + "/instant/cart/clear",
-                        type: 'PUT',
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        success: function () {
-                            document.location.reload();
-                        },
-                        error: function () {
-                            this.showErrorAlert();
-                            return;
-                        }
-                    })
+                    $(checkoutButtonSelector).attr('disabled', false);
+                    $(checkoutButtonTextSelector).show();
+                    $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
+                    $(checkoutButtonLockIconSelector).show();
+
+                    if (isMobile) {
+                        $(mobileBackdropSelector).css('display', 'none');
+                    } else {
+                        $(desktopBackdropSelector).css('display', 'none');
+                    }
                     clearInterval(loop);
                 }
             }, 200);

@@ -5,9 +5,14 @@
 <?php $helper = $this->helper(\Instant\Checkout\Helper\Data::class); ?>
 <?php $formId = $helper->getProductPageAddToCartFormId(); ?>
 <!-- INSTANT BUTTON START -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap" rel="stylesheet">
+
 <div class='instant-reset-css'>
     <fieldset class="instant-btn-wrapper">
-        <legend class="instant-buy-now">Buy now</legend>
+        <legend class="instant-buy-now">Buy Now</legend>
         <h4 id="product-page-select-required-options-msg" class="instant-error-text">Please select required options</h4>
         <button id="product-page-instant-btn" type="button" title="Instant Checkout" class="instant-btn" data-mage-init='
                     {

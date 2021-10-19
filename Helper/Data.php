@@ -19,6 +19,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     const PRODUCT_ADDTOCART_FORM_ID_PATH = 'instant/general/product_addtocart_form_id';
 
+
+    /**
+     * Enable minicart button path
+     */
+    const ENABLE_INSTANT_CHECKOUT_PAGE_PATH = 'instant/general/enable_checkout_page';
+
     /**
      * Enable minicart button path
      */
@@ -70,6 +76,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $addToCartFormId = $this->getConfig(self::PRODUCT_ADDTOCART_FORM_ID_PATH);
         return $addToCartFormId ? $addToCartFormId : self::PRODUCT_ADDTOCART_FORM_ID;
+    }
+
+    /**
+     * Get checkout page enabled
+     * @return string
+     */
+    public function getInstantBtnCheckoutPageEnabled()
+    {
+        $checkoutPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH);
+        return $checkoutPageBtnEnabled;
     }
 
     /**

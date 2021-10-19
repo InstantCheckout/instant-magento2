@@ -22,9 +22,11 @@ class CheckoutPageInstantButtonDisable
         array $jsLayout
     ) {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $enable = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue('instant/general/enable_checkout_page');
+        $instantHelper = $objectManager->create(\Instant\Checkout\Helper\Data::class);
 
-        if (!$enable) {
+        $enabled = $instantHelper->getInstantBtnCheckoutPageEnabled();
+
+        if (!$enabled) {
             $jsLayout['components']['checkout']['children']['steps']['children']['checkout-page-instant-btn']['componentDisabled'] = true;
         }
 

@@ -1,9 +1,14 @@
 <!-- INSTANT BUTTON START -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap" rel="stylesheet">
+
 <div class='instant-reset-css'>
     <div id="minicart-instant-btn-container" class="instant-btn-container">
         <fieldset class="minicart-instant-btn-wrapper">
-            <legend class="instant-buy-now">Buy now</legend>
-            <button id="minicart-instant-btn" data-bind="click: checkoutCart, afterRender: render" class="instant-minicart-btn"
+            <legend class="instant-buy-now">Buy Now</legend>
+            <button id="minicart-instant-btn" data-bind="click: checkoutCart, afterRender: render" class="instant-btn"
                 type="button">
                 <div id="minicart-instant-btn-loading-indicator" class='instant-btn-loading'></div>
                 <svg id="minicart-instant-btn-lock-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="15"
@@ -11,7 +16,7 @@
                     <path style="fill:white"
                         d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z" />
                 </svg>
-                <div id="minicart-instant-btn-text">Instant Checkout</div>
+                <h4 id="minicart-instant-btn-text" class="instant-checkout-text">Instant Checkout</h4>
             </button>
             <div id="desktop-minicart-instant-backdrop" class="instant-backdrop">
                 <h4 id="desktop-minicart-back-to-checkout" class="instant-back-to-checkout">Back to checkout</h4>
