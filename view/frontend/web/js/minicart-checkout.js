@@ -1,9 +1,13 @@
 define([
+    'ko',
     'jquery',
     'uiComponent',
-    'checkoutHelper'
-], function ($, Component, checkoutHelper) {
+    'checkoutHelper',
+    'Magento_Customer/js/customer-data',
+], function (ko, $, Component, checkoutHelper, customerData) {
     'use strict';
+
+    let enableMinicartBtn = false;
 
     return Component.extend({
         defaults: {
@@ -13,27 +17,17 @@ define([
         initialize: function () {
             this._super();
 
+            ko.computed(function () {
+                return ko.toJSON(customerData.get('cart')().subtotal);
+            }).subscribe(function () {
+                checkoutHelper.handleMinicartBtnRender();
+            });
+
             return this;
         },
 
         render: function () {
-            jQuery.ajax({
-                url: window.location.origin + "/instant/data/getconfig",
-                type: 'GET',
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function (data) {
-                    const { enableMinicartBtn } = data;
-                    if (parseInt(enableMinicartBtn) === 1) {
-                        $('#minicart-instant-btn-container').css('display', 'flex');
-                    }
-                },
-                error: function (jqXHR, textStatus, error) {
-                    console.log(jqXHR)
-                    alert("Whoops! An error occurred during checkout.");
-                }
-            })
+            checkoutHelper.handleMinicartBtnRender();
         },
 
         /**

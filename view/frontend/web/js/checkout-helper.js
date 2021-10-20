@@ -1,11 +1,37 @@
 define([
     'jquery',
-    'Magento_Customer/js/customer-data',
-    'Magento_Catalog/js/product/view/product-info'
-], function ($, customerData, productInfo) {
+    'Magento_Customer/js/customer-data'
+], function ($, customerData) {
     'use strict';
 
     return {
+        handleMinicartBtnRender: function () {
+            jQuery.ajax({
+                url: window.location.origin + "/instant/data/getconfig",
+                type: 'GET',
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    console.log(data);
+                    const { enableMinicartBtn } = data;
+
+                    const customerDataCart = customerData.get('cart');
+                    const cartData = customerDataCart();
+
+                    if (cartData && cartData.items && cartData.items.length > 0 && parseInt(enableMinicartBtn) === 1) {
+                        $('#minicart-instant-btn-container').css('display', 'flex');
+                    } else {
+                        $('#minicart-instant-btn-container').css('display', 'none');
+                    }
+                },
+                error: function (jqXHR, textStatus, error) {
+                    console.log(jqXHR)
+                    alert("Whoops! An error occurred during checkout.");
+                }
+            })
+        },
+
         /**
          * @return {String}
          */
