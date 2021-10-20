@@ -13,7 +13,6 @@ define([
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    console.log(data);
                     const { enableMinicartBtn } = data;
 
                     const customerDataCart = customerData.get('cart');
