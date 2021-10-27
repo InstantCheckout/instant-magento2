@@ -8,7 +8,7 @@ define([
     return function (config, element) {
         $(element).click(function () {
             try {
-                const onClose = (isMobile) => {
+                const onClose = () => {
                     $('#product-page-instant-btn').attr('disabled', false);
                     $('#product-page-instant-btn-text').show();
                     $('#product-page-instant-btn-loading-indicator').css('display', 'none');
@@ -16,12 +16,8 @@ define([
                     $('#product-page-instant-btn-lock-icon').show();
                     $('#product-page-instant-btn').css('font-size', '19px');
                     $('#product-page-instant-btn').attr('data-tooltip', 'Instant Checkout')
-
-                    if (isMobile) {
-                        $('#mobile-product-page-instant-backdrop').css('display', 'none');
-                    } else {
-                        $('#desktop-product-page-instant-backdrop').css('display', 'none');
-                    }
+                    $('#mobile-product-page-instant-backdrop').css('display', 'none');
+                    $('#desktop-product-page-instant-backdrop').css('display', 'none');
                 };
 
                 let formProductId;
@@ -84,7 +80,6 @@ define([
                     }
                 }
 
-
                 $('#product-page-select-required-options-msg').css('display', 'none');
                 $('#product-page-instant-btn-loading-indicator').css('display', 'unset');
                 $('#product-page-instant-btn-lock-icon').hide();
@@ -100,11 +95,10 @@ define([
                     success: function (data) {
                         checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, (url) => {
                             if (checkoutWindow) {
-                                checkoutWindow.location.replace(url);
+                                checkoutWindow.location = url;
                             } else {
                                 window.location = url;
                             }
-
 
                             const loop = setInterval(function () {
                                 if (checkoutWindow.closed) {

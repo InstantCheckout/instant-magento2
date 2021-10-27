@@ -122,13 +122,11 @@ define([
 
             var ua = navigator.userAgent || navigator.vendor || window.opera;
             const isFbOrInstaBrowser = (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1) || navigator.userAgent.includes("Instagram");
-
+            const isMobile = this.mobileAndTabletCheck();
 
             let checkoutWindow;
             if (!isFbOrInstaBrowser) {
                 checkoutWindow = this.openCheckoutWindow("https://checkout.instant.one/");
-
-                const isMobile = this.mobileAndTabletCheck();
 
                 if (isMobile) {
                     $(mobileBackdropSelector).css('display', 'unset');
@@ -148,7 +146,6 @@ define([
                     });
                 }
             }
-
 
             const cartData = customerDataCart();
             if (!cartData || !cartData.items) {
@@ -179,27 +176,26 @@ define([
                 }
 
                 if (checkoutWindow) {
-                    checkoutWindow.location.replace(url);
+                    checkoutWindow.location = url;
                 } else {
                     window.location = url;
                 }
             });
 
-            const loop = setInterval(function () {
-                if (checkoutWindow.closed) {
-                    $(checkoutButtonSelector).attr('disabled', false);
-                    $(checkoutButtonTextSelector).show();
-                    $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
-                    $(checkoutButtonLockIconSelector).show();
-
-                    if (isMobile) {
+            if (!isFbOrInstaBrowser) {
+                const loop = setInterval(function () {
+                    if (checkoutWindow.closed) {
+                        $(checkoutButtonSelector).attr('disabled', false);
+                        $(checkoutButtonTextSelector).show();
+                        $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
+                        $(checkoutButtonLockIconSelector).show();
                         $(mobileBackdropSelector).css('display', 'none');
-                    } else {
                         $(desktopBackdropSelector).css('display', 'none');
+
+                        clearInterval(loop);
                     }
-                    clearInterval(loop);
-                }
-            }, 200);
+                }, 500);
+            }
         }
     };
 });
