@@ -123,14 +123,11 @@ define([
             var ua = navigator.userAgent || navigator.vendor || window.opera;
             const isFbOrInstaBrowser = (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1) || navigator.userAgent.includes("Instagram");
 
-
             let checkoutWindow;
             if (!isFbOrInstaBrowser) {
                 checkoutWindow = this.openCheckoutWindow("https://checkout.instant.one/");
 
-                const isMobile = this.mobileAndTabletCheck();
-
-                if (isMobile) {
+                if (this.mobileAndTabletCheck()) {
                     $(mobileBackdropSelector).css('display', 'unset');
                     $(mobileBackToShoppingSelector).css('display', 'unset');
                     $(mobileBackToShoppingSelector).on('click', function () {
@@ -185,21 +182,23 @@ define([
                 }
             });
 
-            const loop = setInterval(function () {
-                if (checkoutWindow.closed) {
-                    $(checkoutButtonSelector).attr('disabled', false);
-                    $(checkoutButtonTextSelector).show();
-                    $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
-                    $(checkoutButtonLockIconSelector).show();
+            if (checkoutWIndow) {
+                const loop = setInterval(function () {
+                    if (checkoutWindow.closed) {
+                        $(checkoutButtonSelector).attr('disabled', false);
+                        $(checkoutButtonTextSelector).show();
+                        $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
+                        $(checkoutButtonLockIconSelector).show();
 
-                    if (isMobile) {
-                        $(mobileBackdropSelector).css('display', 'none');
-                    } else {
-                        $(desktopBackdropSelector).css('display', 'none');
+                        if (this.mobileAndTabletCheck()) {
+                            $(mobileBackdropSelector).css('display', 'none');
+                        } else {
+                            $(desktopBackdropSelector).css('display', 'none');
+                        }
+                        clearInterval(loop);
                     }
-                    clearInterval(loop);
-                }
-            }, 200);
+                }, 500);
+            }
         }
     };
 });
