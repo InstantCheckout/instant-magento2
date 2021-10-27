@@ -120,11 +120,35 @@ define([
                 return;
             }
 
-            const checkoutWindow = this.openCheckoutWindow("https://checkout.instant.one/");
-            if (!checkoutWindow) {
-                this.showErrorAlert();
-                return;
+            var ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isFbOrInstaBrowser = (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1) || navigator.userAgent.includes("Instagram");
+
+
+            let checkoutWindow;
+            if (!isFbOrInstaBrowser) {
+                checkoutWindow = this.openCheckoutWindow("https://checkout.instant.one/");
+
+                const isMobile = this.mobileAndTabletCheck();
+
+                if (isMobile) {
+                    $(mobileBackdropSelector).css('display', 'unset');
+                    $(mobileBackToShoppingSelector).css('display', 'unset');
+                    $(mobileBackToShoppingSelector).on('click', function () {
+                        $(mobileBackdropSelector).css('display', 'none');
+                        $(checkoutButtonSelector).attr('disabled', false);
+                        $(checkoutButtonTextSelector).show();
+                        $(checkoutButtonLockIconSelector).show();
+                        $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
+                    });
+                } else {
+                    $(desktopBackdropSelector).css('display', 'unset');
+                    $(desktopBackToCheckoutTextElementSelector).css('display', 'unset');
+                    $(desktopBackToCheckoutTextElementSelector).on('click', function () {
+                        checkoutWindow.focus();
+                    });
+                }
             }
+
 
             const cartData = customerDataCart();
             if (!cartData || !cartData.items) {
@@ -148,33 +172,17 @@ define([
             $(checkoutButtonTextSelector).hide();
             $(checkoutButtonLockIconSelector).hide();
 
-            const isMobile = this.mobileAndTabletCheck();
-
-            if (isMobile) {
-                $(mobileBackdropSelector).css('display', 'unset');
-                $(mobileBackToShoppingSelector).css('display', 'unset');
-                $(mobileBackToShoppingSelector).on('click', function () {
-                    $(mobileBackdropSelector).css('display', 'none');
-                    $(checkoutButtonSelector).attr('disabled', false);
-                    $(checkoutButtonTextSelector).show();
-                    $(checkoutButtonLockIconSelector).show();
-                    $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
-                });
-            } else {
-                $(desktopBackdropSelector).css('display', 'unset');
-                $(desktopBackToCheckoutTextElementSelector).css('display', 'unset');
-                $(desktopBackToCheckoutTextElementSelector).on('click', function () {
-                    checkoutWindow.focus();
-                });
-            }
-
             this.getCheckoutUrl(skuQtyPairs, true, (url) => {
                 if (!url) {
                     this.showErrorAlert();
                     return;
                 }
 
-                checkoutWindow.location = url;
+                if (checkoutWindow) {
+                    checkoutWindow.location.replace(url);
+                } else {
+                    window.location = url;
+                }
             });
 
             const loop = setInterval(function () {
