@@ -61,7 +61,29 @@ define([
                     return;
                 }
 
-                const checkoutWindow = checkoutHelper.openCheckoutWindow("https://checkout.instant.one/");
+                var ua = navigator.userAgent || navigator.vendor || window.opera;
+                const isFbOrInstaBrowser = (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1) || navigator.userAgent.includes("Instagram");
+
+                let checkoutWindow;
+                if (!isFbOrInstaBrowser) {
+                    checkoutWindow = checkoutHelper.openCheckoutWindow("https://checkout.instant.one/");
+
+                    const isMobile = checkoutHelper.mobileAndTabletCheck();
+                    if (isMobile) {
+                        $('#mobile-product-page-instant-backdrop').css('display', 'unset');
+                        $('#mobile-product-page-back-to-shopping').css('display', 'unset');
+                        $('#mobile-product-page-back-to-shopping').on('click', function () {
+                            onClose(isMobile);
+                        });
+                    } else {
+                        $('#desktop-product-page-instant-backdrop').css('display', 'unset');
+                        $('#desktop-product-page-back-to-checkout').css('display', 'unset');
+                        $('#desktop-product-page-back-to-checkout').on('click', function () {
+                            checkoutWindow.focus();
+                        });
+                    }
+                }
+
 
                 $('#product-page-select-required-options-msg').css('display', 'none');
                 $('#product-page-instant-btn-loading-indicator').css('display', 'unset');
@@ -70,21 +92,6 @@ define([
                 $('#product-page-instant-btn').attr('disabled', true);
                 $('#product-page-instant-btn-text').hide();
 
-                const isMobile = checkoutHelper.mobileAndTabletCheck();
-                if (isMobile) {
-                    $('#mobile-product-page-instant-backdrop').css('display', 'unset');
-                    $('#mobile-product-page-back-to-shopping').css('display', 'unset');
-                    $('#mobile-product-page-back-to-shopping').on('click', function () {
-                        onClose(isMobile);
-                    });
-                } else {
-                    $('#desktop-product-page-instant-backdrop').css('display', 'unset');
-                    $('#desktop-product-page-back-to-checkout').css('display', 'unset');
-                    $('#desktop-product-page-back-to-checkout').on('click', function () {
-                        checkoutWindow.focus();
-                    });
-                }
-
                 $.ajax({
                     type: 'POST',
                     url: window.location.origin + "/instant/data/getproduct",
@@ -92,7 +99,12 @@ define([
                     dataType: 'json',
                     success: function (data) {
                         checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, (url) => {
-                            checkoutWindow.location = url;
+                            if (checkoutWindow) {
+                                checkoutWindow.location.replace(url);
+                            } else {
+                                window.location = url;
+                            }
+
 
                             const loop = setInterval(function () {
                                 if (checkoutWindow.closed) {
