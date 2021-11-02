@@ -57,11 +57,8 @@ define([
                     return;
                 }
 
-                var ua = navigator.userAgent || navigator.vendor || window.opera;
-                const isFbOrInstaBrowser = (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1) || navigator.userAgent.includes("Instagram");
-
                 let checkoutWindow;
-                if (!isFbOrInstaBrowser) {
+                if (!checkoutHelper.canBrowserSetWindowLocation()) {
                     checkoutWindow = checkoutHelper.openCheckoutWindow("https://checkout.instant.one/");
 
                     const isMobile = checkoutHelper.mobileAndTabletCheck();
@@ -92,6 +89,7 @@ define([
                     url: window.location.origin + "/instant/data/getproduct",
                     data: { productId: formProductId, selectedOptions: formSelectedOptions },
                     dataType: 'json',
+                    retryLimit: 3,
                     success: function (data) {
                         checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, (url) => {
                             if (checkoutWindow) {
@@ -108,12 +106,15 @@ define([
                             }, 500);
                         })
                     },
-                    error: function (err) {
-                        alert("An error occurred. Please try again.");
+                    error: function () {
+                        this.retryLimit--;
+                        if (this.retryLimit) {
+                            jQuery.ajax(this);
+                        }
                     }
                 })
             } catch (err) {
-                alert("An error occurred. Please try again.");
+                checkoutHelper.showErrorAlert();
             }
 
             return false;

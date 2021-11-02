@@ -5,6 +5,16 @@ define([
     'use strict';
 
     return {
+        /**
+         * Show error alert.
+         */
+        showErrorAlert: function () {
+            alert("An error occurred during checkout. Please try again.")
+        },
+
+        /**
+         * Run on render of minicart. Determines whether Instant button should show or not.
+         */
         handleMinicartBtnRender: function () {
             jQuery.ajax({
                 url: window.location.origin + "/instant/data/getconfig",
@@ -24,14 +34,15 @@ define([
                         $('#minicart-instant-btn-container').css('display', 'none');
                     }
                 },
-                error: function (jqXHR, textStatus, error) {
-                    console.log(jqXHR)
-                    alert("Whoops! An error occurred during checkout.");
+                error: function () {
+                    this.showErrorAlert();
                 }
             })
         },
 
         /**
+         * Check if the current browser is run in a mobile or tablet.
+         * 
          * @return {String}
          */
         mobileAndTabletCheck: function () {
@@ -41,6 +52,8 @@ define([
         },
 
         /**
+         * Given sku // qty pairs, generate checkout URL and call a specified callback.
+         * 
          * @param {String} skuQtyPairs
          * @param {Boolean} confirm
          * @param {Function} callback
@@ -56,6 +69,7 @@ define([
                 url: window.location.origin + "/instant/data/getconfig",
                 type: 'GET',
                 cache: false,
+                retryLimit: 3,
                 contentType: false,
                 processData: false,
                 success: function (data) {
@@ -69,14 +83,18 @@ define([
 
                     callback(url);
                 },
-                error: function (jqXHR) {
-                    console.log(jqXHR)
-                    alert("Whoops! An error occurred during checkout.");
+                error: function () {
+                    this.retryLimit--;
+                    if (this.retryLimit) {
+                        jQuery.ajax(this);
+                    }
                 }
             })
         },
 
         /**
+         * Given a URL, open a popup window with window.open.
+         * 
          * @return {Window}
          */
         openCheckoutWindow: function (url = null) {
@@ -88,11 +106,22 @@ define([
             return window.open(url || '', '', 'location=yes,height=' + windowHeight + ',width=' + windowWidth + ',top=' + posY + ',left=' + posX + ',scrollbars=yes,status=yes');
         },
 
-        showErrorAlert: function () {
-            alert("An error occurred during checkout. Please try again.")
+        /**
+         * Check whether the current browser can set window.location of an opened window object.
+         * Currently, this only detects whether the users browser is running on a Facebook or Instagram in app browser.
+         * 
+         * @return {Boolean}
+         */
+        canBrowserSetWindowLocation: function () {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isFbOrInstaBrowser = (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1) || navigator.userAgent.includes("Instagram");
+            return isFbOrInstaBrowser;
         },
 
         /**
+         * Loads checkout window for entire customer cart.
+         * Upon close of the window, clears the customer cart.
+         * 
          * @param {String} checkoutBannerSelector
          * @param {String} checkoutButtonLoadingIndicatorSelector
          * @param {String} checkoutButtonTextSelector
@@ -101,9 +130,6 @@ define([
          * @param {String} mobileBackdropSelector
          * @param {String} desktopBackToCheckoutTextElementSelector
          * @param {String} mobileBackToShoppingSelector
-         * 
-         * Loads checkout window for entire customer cart.
-         * Upon close of the window, clears the customer cart.
          */
         checkoutCustomerCart: function (
             checkoutButtonSelector,
@@ -120,12 +146,11 @@ define([
                 return;
             }
 
-            var ua = navigator.userAgent || navigator.vendor || window.opera;
-            const isFbOrInstaBrowser = (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1) || navigator.userAgent.includes("Instagram");
             const isMobile = this.mobileAndTabletCheck();
+            const canBrowserSetWindowLocation = this.canBrowserSetWindowLocation();
 
             let checkoutWindow;
-            if (!isFbOrInstaBrowser) {
+            if (!canBrowserSetWindowLocation) {
                 checkoutWindow = this.openCheckoutWindow("https://checkout.instant.one/");
 
                 if (isMobile) {
@@ -176,26 +201,28 @@ define([
                 }
 
                 if (checkoutWindow) {
-                    checkoutWindow.location = url;
+                    setTimeout(function () { checkoutWindow.location = url; }, 5);
                 } else {
                     window.location = url;
                 }
+
+                if (checkoutWindow) {
+                    const loop = setInterval(function () {
+                        console.log(checkoutWindow.location.href);
+                        if (checkoutWindow.closed) {
+                            $(checkoutButtonSelector).attr('disabled', false);
+                            $(checkoutButtonTextSelector).show();
+                            $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
+                            $(checkoutButtonLockIconSelector).show();
+                            $(mobileBackdropSelector).css('display', 'none');
+                            $(desktopBackdropSelector).css('display', 'none');
+
+                            clearInterval(loop);
+                        }
+                    }, 500);
+                }
             });
 
-            if (!isFbOrInstaBrowser) {
-                const loop = setInterval(function () {
-                    if (checkoutWindow.closed) {
-                        $(checkoutButtonSelector).attr('disabled', false);
-                        $(checkoutButtonTextSelector).show();
-                        $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
-                        $(checkoutButtonLockIconSelector).show();
-                        $(mobileBackdropSelector).css('display', 'none');
-                        $(desktopBackdropSelector).css('display', 'none');
-
-                        clearInterval(loop);
-                    }
-                }, 500);
-            }
         }
     };
 });

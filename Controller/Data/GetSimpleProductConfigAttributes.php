@@ -66,6 +66,7 @@ class GetSimpleProductConfigAttributes extends Action implements HttpGetActionIn
         // Get product attributes for this configurable product
         $product = $objectManager->get('\Magento\Catalog\Model\Product')->load($parentId);
         $productAttributeOptions = $productTypeInstance->getConfigurableAttributesAsArray($product);
+        $productName = $product->getName();
 
         // Get product model for child product
         $childProduct = $objectManager->get('\Magento\Catalog\Model\Product')->load($childProduct->getId());
@@ -90,7 +91,10 @@ class GetSimpleProductConfigAttributes extends Action implements HttpGetActionIn
             array_push($frontendLabelOptionPairs, $frontendLabelOptionPair);
         }
 
-        $result->setData($frontendLabelOptionPairs);
+        $data['optionPairs'] = $frontendLabelOptionPairs;
+        $data['name'] = $productName;
+
+        $result->setData($data);
 
         return $result;
     }
