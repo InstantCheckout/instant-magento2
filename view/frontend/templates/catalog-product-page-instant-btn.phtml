@@ -14,27 +14,29 @@
     <fieldset class="instant-btn-wrapper">
         <legend class="instant-buy-now" align="center">Buy Now</legend>
         <h4 id="product-page-select-required-options-msg" class="instant-error-text">Please select required options</h4>
-        <button id="product-page-instant-btn" type="button" title="Instant Checkout" class="instant-btn" data-mage-init='
+        <div class="flex-inner-wrapper">
+            <button id="product-page-instant-btn" type="button" title="Instant Checkout" class="instant-btn" data-mage-init='
                     {
                         "Instant_Checkout/js/product-page-checkout": {
                             "form": "#<?= $block->escapeHtml($formId); ?>"
                         }            
                     }
                     '>
-            <div id="product-page-instant-btn-loading-indicator" class='instant-btn-loading'></div>
-            <svg id="product-page-instant-btn-lock-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="15" style="margin-right:7px" viewBox="0 0 22 22">
-                <path style="fill:white" d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z" />
-            </svg>
-            <h4 id="product-page-instant-btn-text" class="instant-checkout-text">Instant Checkout</h4>
-        </button>
-        <div id="desktop-product-page-instant-backdrop" class="instant-backdrop">
-            <h4 id="desktop-product-page-back-to-checkout" class="instant-back-to-checkout">Back to checkout</h4>
-        </div>
-        <div id="mobile-product-page-instant-backdrop" class="instant-backdrop">
-            <div class="mobile-instant-back-to-checkout-backdrop-inner-container">
-                <div class="mobile-instant-back-to-checkout-text">Finish reviewing your order</div>
-                <div class="mobile-instant-back-to-checkout-text">or</div>
-                <div id="mobile-product-page-back-to-shopping" class="mobile-instant-back-to-shopping-text">Go back to shopping</div>
+                <div id="product-page-instant-btn-loading-indicator" class='instant-btn-loading'></div>
+                <svg id="product-page-instant-btn-lock-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="15" style="margin-right:7px" viewBox="0 0 22 22">
+                    <path style="fill:white" d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z" />
+                </svg>
+                <h4 id="product-page-instant-btn-text" class="instant-checkout-text">Instant Checkout</h4>
+            </button>
+            <div id="desktop-product-page-instant-backdrop" class="instant-backdrop">
+                <h4 id="desktop-product-page-back-to-checkout" class="instant-back-to-checkout">Back to checkout</h4>
+            </div>
+            <div id="mobile-product-page-instant-backdrop" class="instant-backdrop">
+                <div class="mobile-instant-back-to-checkout-backdrop-inner-container">
+                    <div class="mobile-instant-back-to-checkout-text">Finish reviewing your order</div>
+                    <div class="mobile-instant-back-to-checkout-text">or</div>
+                    <div id="mobile-product-page-back-to-shopping" class="mobile-instant-back-to-shopping-text">Go back to shopping</div>
+                </div>
             </div>
         </div>
     </fieldset>
