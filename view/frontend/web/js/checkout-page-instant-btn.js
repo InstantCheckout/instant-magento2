@@ -21,7 +21,8 @@ define([
                 "#desktop-checkout-page-instant-backdrop",
                 "#mobile-checkout-page-instant-backdrop",
                 "#desktop-checkout-page-back-to-checkout",
-                "#mobile-checkout-page-back-to-checkout"
+                "#mobile-checkout-page-back-to-checkout",
+                "checkoutPage"
             );
         },
     });

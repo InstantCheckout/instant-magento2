@@ -16,6 +16,25 @@ define([
          * Run on render of minicart. Determines whether Instant button should show or not.
          */
         handleMinicartBtnRender: function () {
+            window.onmessage = function (e) {
+                if (e.data === 'clearCart') {
+                    jQuery.ajax({
+                        url: window.location.origin + "/instant/cart/clear",
+                        type: 'PUT',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function () {
+                            document.location.reload();
+                        },
+                        error: function () {
+                            this.showErrorAlert();
+                            return;
+                        }
+                    })
+                }
+            }
+
             jQuery.ajax({
                 url: window.location.origin + "/instant/data/getconfig",
                 type: 'GET',
@@ -59,7 +78,7 @@ define([
          * @param {Function} callback
          * @return {String}
          */
-        getCheckoutUrl: function (skuQtyPairs, confirm, callback) {
+        getCheckoutUrl: function (skuQtyPairs, confirm, sourceLocation, callback) {
             const confirmParam = 'confirm=' + confirm;
             const skuQtyPairQueryParams = _.map(skuQtyPairs, function (skuQtyPair) {
                 return 'sku=' + skuQtyPair.sku + ',' + skuQtyPair.qty;
@@ -78,8 +97,9 @@ define([
 
                     const merchantIdParam = 'merchantId=' + appId;
                     const storeCodeParam = 'storeCode=' + storeCode;
+                    const srcLocation = "src=" + sourceLocation;
 
-                    const url = baseUrl + '?' + confirmParam + '&' + storeCodeParam + '&' + merchantIdParam + '&' + skuQtyPairQueryParams;
+                    const url = baseUrl + '?' + confirmParam + '&' + storeCodeParam + '&' + merchantIdParam + '&' + skuQtyPairQueryParams + '&' + srcLocation;
 
                     callback(url);
                 },
@@ -139,7 +159,8 @@ define([
             desktopBackdropSelector,
             mobileBackdropSelector,
             desktopBackToCheckoutTextElementSelector,
-            mobileBackToShoppingSelector) {
+            mobileBackToShoppingSelector,
+            sourceLocation) {
             const customerDataCart = customerData.get('cart');
             if (!customerDataCart) {
                 this.showErrorAlert();
@@ -194,7 +215,7 @@ define([
             $(checkoutButtonTextSelector).hide();
             $(checkoutButtonLockIconSelector).hide();
 
-            this.getCheckoutUrl(skuQtyPairs, true, (url) => {
+            this.getCheckoutUrl(skuQtyPairs, true, sourceLocation, (url) => {
                 if (!url) {
                     this.showErrorAlert();
                     return;

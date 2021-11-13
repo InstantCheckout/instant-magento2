@@ -91,7 +91,7 @@ define([
                     dataType: 'json',
                     retryLimit: 3,
                     success: function (data) {
-                        checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, (url) => {
+                        checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, "pdp", (url) => {
                             if (checkoutWindow) {
                                 checkoutWindow.location = url;
                             } else {

@@ -17,7 +17,8 @@ define([
                 "#desktop-checkout-index-page-instant-backdrop",
                 "#mobile-checkout-index-page-instant-backdrop",
                 "#desktop-checkout-index-page-back-to-checkout",
-                "#mobile-checkout-index-page-back-to-checkout"
+                "#mobile-checkout-index-page-back-to-checkout",
+                "checkoutIndex"
             );
         });
     }

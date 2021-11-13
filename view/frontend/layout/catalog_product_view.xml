@@ -5,7 +5,7 @@
             <block class="Instant\Checkout\Block\CatalogPageBlock" name="instant-catalog-page-instant-btn" before="-" template="Instant_Checkout::catalog-product-page-instant-btn.phtml" />
         </referenceBlock>
         <referenceBlock name="product.info.addtocart.additional">
-            <block class="Instant\Checkout\Block\CatalogPageBlock" name="instant-config-catalog-page-instant-btn" before="-" template="Instant_Checkout::catalog-product-page-instant-btn.phtml" />
+            <block class="Instant\Checkout\Block\CatalogPageBlock" name="instant-catalog-page-additional-instant-btn" before="-" template="Instant_Checkout::catalog-product-page-instant-btn.phtml" />
         </referenceBlock>
     </body>
 </page>

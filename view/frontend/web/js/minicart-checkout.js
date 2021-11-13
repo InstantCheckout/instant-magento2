@@ -7,8 +7,6 @@ define([
 ], function (ko, $, Component, checkoutHelper, customerData) {
     'use strict';
 
-    let enableMinicartBtn = false;
-
     return Component.extend({
         defaults: {
             template: 'Instant_Checkout/minicart-instant-btn',
@@ -33,7 +31,7 @@ define([
         /**
          * Load Instant Checkout for customer cart
          */
-        checkoutCart: function (element) {
+        checkoutCart: function () {
             checkoutHelper.checkoutCustomerCart(
                 "#minicart-instant-btn",
                 "#minicart-instant-btn-loading-indicator",
@@ -42,7 +40,8 @@ define([
                 "#desktop-minicart-instant-backdrop",
                 "#mobile-minicart-instant-backdrop",
                 "#desktop-minicart-back-to-checkout",
-                "#mobile-minicart-back-to-checkout"
+                "#mobile-minicart-back-to-checkout",
+                "minicart"
             );
         }
     });
