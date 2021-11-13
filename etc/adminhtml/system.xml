@@ -24,6 +24,10 @@
                     <comment>Defaults to NO. CRITICAL: Set to NO if in LIVE/PRODUCTION environment. Set to YES if this site is a SANDBOX/STAGING environment. </comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="disabled_customer_group_ids" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable Instant for Customer Group IDs</label>
+                    <comment>Enter Customer Group IDs that Instant should be disabled for. Provide a comma delimited list (e.g. 1,2,3)</comment>
+                </field>
                 <field id="enable_catalog" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Product Catalog Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

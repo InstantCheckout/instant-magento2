@@ -25,9 +25,10 @@ class CheckoutPageInstantButtonDisable
         $instantHelper = $objectManager->create(\Instant\Checkout\Helper\Data::class);
 
         $enabled = $instantHelper->getInstantBtnCheckoutPageEnabled();
+        $shouldShowForUser = $instantHelper->getShouldShowInstantBtnForCurrentUser();
 
-        if (!$enabled) {
-            $jsLayout['components']['checkout']['children']['steps']['children']['checkout-page-instant-btn']['componentDisabled'] = true;
+        if (!$enabled || !$shouldShowForUser) {
+            $jsLayout['components']['checkout']['children']['checkout-page-instant-btn']['componentDisabled'] = true;
         }
 
         return $jsLayout;

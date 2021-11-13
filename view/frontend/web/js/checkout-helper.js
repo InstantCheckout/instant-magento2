@@ -23,12 +23,12 @@ define([
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    const { enableMinicartBtn } = data;
+                    const { enableMinicartBtn, shouldShowInstantBtnForCurrentUser } = data;
 
                     const customerDataCart = customerData.get('cart');
                     const cartData = customerDataCart();
 
-                    if (cartData && cartData.items && cartData.items.length > 0 && parseInt(enableMinicartBtn) === 1) {
+                    if (cartData && cartData.items && cartData.items.length > 0 && enableMinicartBtn && shouldShowInstantBtnForCurrentUser) {
                         $('#minicart-instant-btn-container').css('display', 'flex');
                     } else {
                         $('#minicart-instant-btn-container').css('display', 'none');

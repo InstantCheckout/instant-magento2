@@ -2,6 +2,9 @@
 
 namespace Instant\Checkout\Helper;
 
+use Magento\Framework\App\Helper\Context;
+use \Magento\Customer\Model\Session;
+
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
@@ -19,7 +22,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     const PRODUCT_ADDTOCART_FORM_ID_PATH = 'instant/general/product_addtocart_form_id';
 
-
     /**
      * Enable minicart button path
      */
@@ -36,6 +38,35 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const ENABLE_INSTANT_SANDBOX_MODE_PATH = 'instant/general/enable_sandbox';
 
     /**
+     * Enable catalog page path
+     */
+    const ENABLE_INSTANT_CATALOG_PAGE_PATH = 'instant/general/enable_catalog';
+
+    /**
+     * Enable cart summary path
+     */
+    const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
+
+    /**
+     * Enable sandbox mode path
+     */
+    const DISABLED_CUSTOMER_GROUP_IDS = 'instant/general/disabled_customer_group_ids';
+
+    /**
+     * Constructor.
+     * @param Context $context
+     * @param Session $customerSession
+     * */
+    public function __construct(
+        Context $context,
+        Session $customerSession
+    ) {
+        $this->customerSession = $customerSession;
+
+        return parent::__construct($context);
+    }
+
+    /**
      * Retrieve config value
      *
      * @return string
@@ -46,6 +77,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $config,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+    }
+
+    /**
+     * Get Customer Group ID 
+     */
+    public function getCurrentCustomerGroupId()
+    {
+        if ($this->customerSession->isLoggedIn()) {
+            return $this->customerSession->getCustomer()->getGroupId();
+        }
+
+        return -1;
+    }
+
+    /**
+     * Get customer group ids that Instant should be disabled for
+     * @return array
+     */
+    public function getDisabledCustomerGroupIds()
+    {
+        $disabledCustomerGroupIds = $this->getConfig(self::DISABLED_CUSTOMER_GROUP_IDS);
+        return explode(',', $disabledCustomerGroupIds);
     }
 
     /**
@@ -65,7 +118,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getInstantMinicartBtnEnabled()
     {
         $minicartBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_MINICART_BTN_PATH);
-        return $minicartBtnEnabled;
+        return $minicartBtnEnabled === "1";
     }
 
     /**
@@ -85,16 +138,53 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getInstantBtnCheckoutPageEnabled()
     {
         $checkoutPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH);
-        return $checkoutPageBtnEnabled;
+        return $checkoutPageBtnEnabled === "1";
     }
 
     /**
+     * Get checkout page enabled
+     * @return string
+     */
+    public function getInstantBtnCheckoutSummaryEnabled()
+    {
+        $checkoutSummaryEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_SUMMARY);
+        return $checkoutSummaryEnabled === "1";
+    }
+
+    /**
+     * Get catalog page enabled
+     * @return string
+     */
+    public function getInstantBtnCatalogPageEnabled()
+    {
+        $catalogPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CATALOG_PAGE_PATH);
+        return $catalogPageBtnEnabled === "1";
+    }
+
+    /**vv
      * Get staging config
      * @return string
      */
     public function getSandboxEnabledConfig()
     {
         $sandboxEnabled = $this->getConfig(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
-        return $sandboxEnabled ? $sandboxEnabled : false;
+        return $sandboxEnabled === "1";
+    }
+
+    /**
+     * Get staging config
+     * @return string
+     */
+    public function getShouldShowInstantBtnForCurrentUser()
+    {
+        $disabledCustomerGroupIds = $this->getDisabledCustomerGroupIds();
+        $customerGroupId = $this->getCurrentCustomerGroupId();
+        $enabledForCustomer = true;
+
+        if (in_array($customerGroupId, $disabledCustomerGroupIds)) {
+            $enabledForCustomer = false;
+        }
+
+        return $enabledForCustomer;
     }
 }

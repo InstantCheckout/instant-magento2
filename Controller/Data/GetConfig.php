@@ -8,6 +8,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Store\Model\StoreManagerInterface;
+use \Magento\Customer\Model\Session;
 
 class GetConfig extends Action implements HttpGetActionInterface
 {
@@ -28,10 +29,12 @@ class GetConfig extends Action implements HttpGetActionInterface
     public function __construct(
         Context $context,
         JsonFactory $jsonResultFactory,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        Session $customerSession
     ) {
         $this->jsonResultFactory = $jsonResultFactory;
         $this->storeManager = $storeManager;
+        $this->customerSession = $customerSession;
 
         return parent::__construct($context);
     }
@@ -52,6 +55,7 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['enableMinicartBtn'] = $instantHelper->getInstantMinicartBtnEnabled();
         $data['appId'] = $instantHelper->getInstantAppId();
         $data['enableSandbox'] = $instantHelper->getSandboxEnabledConfig();
+        $data['shouldShowInstantBtnForCurrentUser'] = $instantHelper->getShouldShowInstantBtnForCurrentUser();
         $data['storeCode'] = $storeCode;
 
         $result->setData($data);
