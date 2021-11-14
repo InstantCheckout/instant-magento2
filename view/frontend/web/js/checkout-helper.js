@@ -229,7 +229,6 @@ define([
 
                 if (checkoutWindow) {
                     const loop = setInterval(function () {
-                        console.log(checkoutWindow.location.href);
                         if (checkoutWindow.closed) {
                             $(checkoutButtonSelector).attr('disabled', false);
                             $(checkoutButtonTextSelector).show();
