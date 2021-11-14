@@ -80,7 +80,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get Customer Group ID 
+     * Get current Customer Group ID 
      */
     public function getCurrentCustomerGroupId()
     {
@@ -142,7 +142,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get checkout page enabled
+     * Get checkout summary page enabled
      * @return string
      */
     public function getInstantBtnCheckoutSummaryEnabled()
@@ -161,7 +161,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $catalogPageBtnEnabled === "1";
     }
 
-    /**vv
+    /**
      * Get staging config
      * @return string
      */
@@ -172,7 +172,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get staging config
+     * Get whether Instant button should be displayed for current user
      * @return string
      */
     public function getShouldShowInstantBtnForCurrentUser()
