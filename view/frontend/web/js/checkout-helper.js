@@ -81,7 +81,7 @@ define([
         getCheckoutUrl: function (skuQtyPairs, confirm, sourceLocation, callback) {
             const confirmParam = 'confirm=' + confirm;
             const skuQtyPairQueryParams = _.map(skuQtyPairs, function (skuQtyPair) {
-                return 'sku=' + skuQtyPair.sku + ',' + skuQtyPair.qty;
+                return 'sku=' + encodeURIComponent(skuQtyPair.sku) + ',' + skuQtyPair.qty;
             }).join('&');
 
             jQuery.ajax({
