@@ -48,7 +48,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
 
     /**
-     * Enable sandbox mode path
+     * Disabled customer group ids (list of id's, delimited by commas)
      */
     const DISABLED_CUSTOMER_GROUP_IDS = 'instant/general/disabled_customer_group_ids';
 
@@ -90,7 +90,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get Customer Group ID 
+     * Get current Customer Group ID 
      */
     public function getCurrentCustomerGroupId()
     {
@@ -152,7 +152,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get checkout page enabled
+     * Get checkout summary page enabled
      * @return string
      */
     public function getInstantBtnCheckoutSummaryEnabled()
@@ -202,7 +202,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get staging config
+     * Get whether Instant button should be displayed for current user
      * @return string
      */
     public function getShouldShowInstantBtnForCurrentUser()
