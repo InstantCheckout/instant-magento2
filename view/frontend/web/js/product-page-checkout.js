@@ -14,29 +14,15 @@ define([
         });
     }
 
-    return function (config, element) {
-        const formData = parseFormEntries(config.form);
-        const product = formData.find(d => d.attribute === 'product');
-
+    function getProduct(productId, selectedOptions, onSuccess) {
         $.ajax({
             type: 'POST',
             url: window.location.origin + "/instant/data/getproduct",
-            data: { productId: product.value },
+            data: { productId, selectedOptions },
             dataType: 'json',
             retryLimit: 3,
             success: function (data) {
-                const { sku, disabledForSkusContaining } = data;
-
-                let skuIsDisabled = false;
-
-                disabledForSkusContaining.forEach(x => {
-                    if (x && sku.indexOf(x) !== -1) {
-                        skuIsDisabled = true;
-                    }
-                })
-
-                $('#instant-btn-product-page-container').css('display', skuIsDisabled ? 'none' : 'flex');
-                $('#instant-btn-product-page-container').css('flex-direction', 'column');
+                onSuccess(data);
             },
             error: function () {
                 this.retryLimit--;
@@ -44,6 +30,27 @@ define([
                     jQuery.ajax(this);
                 }
             }
+        })
+    }
+
+    return function (config, element) {
+        const formData = parseFormEntries(config.form);
+        const product = formData.find(d => d.attribute === 'product');
+
+        getProduct(product.value, null, (data) => {
+            const { sku, disabledForSkusContaining } = data;
+
+            let skuIsDisabled = false;
+
+            disabledForSkusContaining.forEach(x => {
+                if (x && sku.indexOf(x) !== -1) {
+                    skuIsDisabled = true;
+                }
+            })
+
+            $('#instant-btn-product-page-container').css('display', skuIsDisabled ? 'none' : 'flex');
+            $('#instant-btn-product-page-container').css('flex-direction', 'column');
+
         })
 
         $(element).click(function () {
@@ -119,34 +126,21 @@ define([
                 $('#product-page-instant-btn').attr('disabled', true);
                 $('#product-page-instant-btn-text').hide();
 
-                $.ajax({
-                    type: 'POST',
-                    url: window.location.origin + "/instant/data/getproduct",
-                    data: { productId: formProductId, selectedOptions: formSelectedOptions },
-                    dataType: 'json',
-                    retryLimit: 3,
-                    success: function (data) {
-                        checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, "pdp", (url) => {
-                            if (checkoutWindow) {
-                                checkoutWindow.location = url;
-                            } else {
-                                window.location = url;
-                            }
-
-                            const loop = setInterval(function () {
-                                if (checkoutWindow.closed) {
-                                    onClose();
-                                    clearInterval(loop);
-                                }
-                            }, 500);
-                        })
-                    },
-                    error: function () {
-                        this.retryLimit--;
-                        if (this.retryLimit) {
-                            jQuery.ajax(this);
+                getProduct(formProductId, formSelectedOptions, (data) => {
+                    checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, "pdp", (url) => {
+                        if (checkoutWindow) {
+                            checkoutWindow.location = url;
+                        } else {
+                            window.location = url;
                         }
-                    }
+
+                        const loop = setInterval(function () {
+                            if (checkoutWindow.closed) {
+                                onClose();
+                                clearInterval(loop);
+                            }
+                        }, 500);
+                    })
                 })
             } catch (err) {
                 checkoutHelper.showErrorAlert();
