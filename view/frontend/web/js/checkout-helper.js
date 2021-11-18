@@ -13,28 +13,9 @@ define([
         },
 
         /**
-         * Run on render of minicart. Determines whether Instant button should show or not.
+         * Run on render, and when cart totals are changed. Determines whether Instant button should show or not.
          */
-        handleMinicartBtnRender: function () {
-            window.onmessage = function (e) {
-                if (e.data === 'clearCart') {
-                    jQuery.ajax({
-                        url: window.location.origin + "/instant/cart/clear",
-                        type: 'PUT',
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        success: function () {
-                            document.location.reload();
-                        },
-                        error: function () {
-                            this.showErrorAlert();
-                            return;
-                        }
-                    })
-                }
-            }
-
+        handleCartTotalChanged: function () {
             jQuery.ajax({
                 url: window.location.origin + "/instant/data/getconfig",
                 type: 'GET',
@@ -42,16 +23,28 @@ define([
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    const { enableMinicartBtn, shouldShowInstantBtnForCurrentUser } = data;
+                    const { enableMinicartBtn, shouldShowInstantBtnForCurrentUser, disabledForSkusContaining } = data;
+                    let { disabledTotalThreshold } = data;
 
                     const customerDataCart = customerData.get('cart');
                     const cartData = customerDataCart();
 
-                    if (cartData && cartData.items && cartData.items.length > 0 && enableMinicartBtn && shouldShowInstantBtnForCurrentUser) {
-                        $('#minicart-instant-btn-container').css('display', 'flex');
-                    } else {
-                        $('#minicart-instant-btn-container').css('display', 'none');
-                    }
+                    const cartTotalExceedsThreshold = parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold;
+                    let cartContainsBlacklistedSku = false;
+
+                    cartData.items.forEach(item => {
+                        disabledForSkusContaining.forEach(x => {
+                            if (x && item.product_sku.indexOf(x) !== -1) {
+                                cartContainsBlacklistedSku = true;
+                            }
+                        })
+                    })
+
+                    const shouldShowMinicartBtn = cartData && cartData.items && cartData.items.length > 0 && enableMinicartBtn && shouldShowInstantBtnForCurrentUser && !cartTotalExceedsThreshold && !cartContainsBlacklistedSku;
+
+                    $('#minicart-instant-btn-container').css('display', shouldShowMinicartBtn ? 'flex' : 'none');
+                    $('#checkout-index-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
+                    $('#checkout-page-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
                 },
                 error: function () {
                     this.showErrorAlert();
@@ -81,7 +74,7 @@ define([
         getCheckoutUrl: function (skuQtyPairs, confirm, sourceLocation, callback) {
             const confirmParam = 'confirm=' + confirm;
             const skuQtyPairQueryParams = _.map(skuQtyPairs, function (skuQtyPair) {
-                return 'sku=' + skuQtyPair.sku + ',' + skuQtyPair.qty;
+                return 'sku=' + encodeURIComponent(skuQtyPair.sku) + ',' + skuQtyPair.qty;
             }).join('&');
 
             jQuery.ajax({

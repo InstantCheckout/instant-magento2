@@ -53,6 +53,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const DISABLED_CUSTOMER_GROUP_IDS = 'instant/general/disabled_customer_group_ids';
 
     /**
+     * Threshold for cart total where Instant should be disabled
+     */
+    const DISABLED_CART_TOTAL_THRESHOLD = 'instant/general/disabled_total_threshold';
+
+    /**
+     * SKUs containing any phrase in comma delimited list where Instant should be disabled
+     */
+    const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
+
+    /**
      * Constructor.
      * @param Context $context
      * @param Session $customerSession
@@ -161,7 +171,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $catalogPageBtnEnabled === "1";
     }
 
-    /**vv
+    /**
      * Get staging config
      * @return string
      */
@@ -169,6 +179,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $sandboxEnabled = $this->getConfig(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
         return $sandboxEnabled === "1";
+    }
+
+    /**
+     * Get Instant disabled cart total threshold
+     * @return string
+     */
+    public function getDisabledCartTotalThreshold()
+    {
+        $threshold = $this->getConfig(self::DISABLED_CART_TOTAL_THRESHOLD);
+        return $threshold;
+    }
+
+    /**
+     * Get disabled SKU phrases
+     * @return string
+     */
+    public function getDisabledForSkusContaining()
+    {
+        $disableForSkusContaining = $this->getConfig(self::DISABLED_FOR_SKUS_CONTAINING);
+        return explode(',', $disableForSkusContaining);
     }
 
     /**

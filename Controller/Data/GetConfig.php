@@ -40,10 +40,7 @@ class GetConfig extends Action implements HttpGetActionInterface
     }
 
     /**
-     * Get 
-     * - App ID 
-     * - Store Code
-     * - EnableMinicartBtn admin configuration
+     * Get configuration
      */
     public function execute()
     {
@@ -56,6 +53,8 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['appId'] = $instantHelper->getInstantAppId();
         $data['enableSandbox'] = $instantHelper->getSandboxEnabledConfig();
         $data['shouldShowInstantBtnForCurrentUser'] = $instantHelper->getShouldShowInstantBtnForCurrentUser();
+        $data['disabledTotalThreshold'] = $instantHelper->getDisabledCartTotalThreshold();
+        $data['disabledForSkusContaining'] = $instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $storeCode;
 
         $result->setData($data);

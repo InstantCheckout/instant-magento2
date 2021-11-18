@@ -79,9 +79,12 @@ class GetProduct extends Action implements HttpPostActionInterface
             $product = $this->productRepository->getById($productId);
         }
 
+        $instantHelper = $this->_objectManager->create(\Instant\Checkout\Helper\Data::class);
+
         $result = $this->jsonResultFactory->create();
         $data = [];
         $data['sku'] = $product->getSku();
+        $data['disabledForSkusContaining'] = $instantHelper->getDisabledForSkusContaining();
 
         $result->setData($data);
 

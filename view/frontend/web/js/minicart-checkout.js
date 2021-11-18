@@ -16,16 +16,35 @@ define([
             this._super();
 
             ko.computed(function () {
-                return ko.toJSON(customerData.get('cart')().subtotal);
+                return ko.toJSON(customerData.get('cart')().subtotalAmount);
             }).subscribe(function () {
-                checkoutHelper.handleMinicartBtnRender();
+                checkoutHelper.handleCartTotalChanged();
             });
 
             return this;
         },
 
         render: function () {
-            checkoutHelper.handleMinicartBtnRender();
+            window.onmessage = function (e) {
+                if (e.data === 'clearCart') {
+                    jQuery.ajax({
+                        url: window.location.origin + "/instant/cart/clear",
+                        type: 'PUT',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function () {
+                            document.location.reload();
+                        },
+                        error: function () {
+                            this.showErrorAlert();
+                            return;
+                        }
+                    })
+                }
+            }
+
+            checkoutHelper.handleCartTotalChanged();
         },
 
         /**
