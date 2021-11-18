@@ -32,6 +32,41 @@ define([
         },
 
         /**
+        * Parse form entries
+        */
+        parseFormEntries: function (formSelector) {
+            const formEntries = [...(new FormData($(formSelector)[0]).entries())].map(function (e) {
+                return {
+                    attribute: e[0],
+                    value: e[1],
+                }
+            });
+            return formEntries;
+        },
+
+        /**
+        * Get product
+        */
+        getProduct: function (productId, selectedOptions, onSuccess) {
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + "/instant/data/getproduct",
+                data: { productId, selectedOptions },
+                dataType: 'json',
+                retryLimit: 3,
+                success: function (data) {
+                    onSuccess(data);
+                },
+                error: function () {
+                    this.retryLimit--;
+                    if (this.retryLimit) {
+                        jQuery.ajax(this);
+                    }
+                }
+            })
+        },
+
+        /**
         * Get config. Can specify a callback on success that takes data as a parameter.
         */
         getConfig: function (onSuccess) {

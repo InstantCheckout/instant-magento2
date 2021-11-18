@@ -5,54 +5,7 @@ define([
 ], function ($, _, checkoutHelper) {
     "use strict";
 
-    function parseFormEntries(formSelector) {
-        return [...(new FormData($(formSelector)[0]).entries())].map(function (e) {
-            return {
-                attribute: e[0],
-                value: e[1],
-            }
-        });
-    }
-
-    function getProduct(productId, selectedOptions, onSuccess) {
-        $.ajax({
-            type: 'POST',
-            url: window.location.origin + "/instant/data/getproduct",
-            data: { productId, selectedOptions },
-            dataType: 'json',
-            retryLimit: 3,
-            success: function (data) {
-                onSuccess(data);
-            },
-            error: function () {
-                this.retryLimit--;
-                if (this.retryLimit) {
-                    jQuery.ajax(this);
-                }
-            }
-        })
-    }
-
     return function (config, element) {
-        const formData = parseFormEntries(config.form);
-        const product = formData.find(d => d.attribute === 'product');
-
-        getProduct(product.value, null, (data) => {
-            const { sku, disabledForSkusContaining } = data;
-
-            let skuIsDisabled = false;
-
-            disabledForSkusContaining.forEach(x => {
-                if (x && sku.indexOf(x) !== -1) {
-                    skuIsDisabled = true;
-                }
-            })
-
-            $('#instant-btn-product-page-container').css('display', skuIsDisabled ? 'none' : 'flex');
-            $('#instant-btn-product-page-container').css('flex-direction', 'column');
-
-        })
-
         $(element).click(function () {
             try {
                 const onClose = () => {
@@ -71,7 +24,7 @@ define([
                 let qty;
 
                 const formSelectedOptions = [];
-                const formData = parseFormEntries(config.form);
+                const formData = checkoutHelper.parseFormEntries(config.form);
 
                 formData.forEach((entry) => {
                     const { attribute, value } = entry;
@@ -126,7 +79,7 @@ define([
                 $('#product-page-instant-btn').attr('disabled', true);
                 $('#product-page-instant-btn-text').hide();
 
-                getProduct(formProductId, formSelectedOptions, (data) => {
+                checkoutHelper.getProduct(formProductId, formSelectedOptions, (data) => {
                     checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, "pdp", (url) => {
                         if (checkoutWindow) {
                             checkoutWindow.location = url;

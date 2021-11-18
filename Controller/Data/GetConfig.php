@@ -56,6 +56,7 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['disabledTotalThreshold'] = $instantHelper->getDisabledCartTotalThreshold();
         $data['disabledForSkusContaining'] = $instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $storeCode;
+        $data['productPageAddToCartFormId'] = $instantHelper->getProductPageAddToCartFormId();
 
         $result->setData($data);
 
