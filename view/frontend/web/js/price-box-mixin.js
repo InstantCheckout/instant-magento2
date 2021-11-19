@@ -16,22 +16,26 @@ define(['jquery', 'checkoutHelper',
                     }, price.amount);
 
                     const formData = checkoutHelper.parseFormEntries('#product_addtocart_form');
-                    const product = formData.find(d => d.attribute === 'product');
-                    checkoutHelper.getProduct(product.value, null, (data) => {
-                        const { sku, disabledForSkusContaining, disabledTotalThreshold } = data;
+                    if (formData) {
+                        const product = formData.find(d => d.attribute === 'product');
+                        if (product) {
+                            checkoutHelper.getProduct(product.value, null, (data) => {
+                                const { sku, disabledForSkusContaining, disabledTotalThreshold } = data;
 
-                        let isBlacklistedSku = false;
-                        disabledForSkusContaining.forEach(x => {
-                            if (x && sku.indexOf(x) !== -1) {
-                                isBlacklistedSku = true;
-                            }
-                        })
-                        const productPriceExceedsThreshold = disabledTotalThreshold && parseFloat(disabledTotalThreshold) > 0 && parseFloat(price.final) > disabledTotalThreshold;
-                        const skuIsDisabled = isBlacklistedSku || productPriceExceedsThreshold;
+                                let isBlacklistedSku = false;
+                                disabledForSkusContaining.forEach(x => {
+                                    if (x && sku.indexOf(x) !== -1) {
+                                        isBlacklistedSku = true;
+                                    }
+                                })
+                                const productPriceExceedsThreshold = disabledTotalThreshold && parseFloat(disabledTotalThreshold) > 0 && parseFloat(price.final) > disabledTotalThreshold;
+                                const skuIsDisabled = isBlacklistedSku || productPriceExceedsThreshold;
 
-                        $('#instant-btn-product-page-container').css('display', skuIsDisabled ? 'none' : 'flex');
-                        $('#instant-btn-product-page-container').css('flex-direction', 'column');
-                    })
+                                $('#instant-btn-product-page-container').css('display', skuIsDisabled ? 'none' : 'flex');
+                                $('#instant-btn-product-page-container').css('flex-direction', 'column');
+                            })
+                        }
+                    }
                 }, this);
             },
         });
