@@ -1,13 +1,14 @@
-define(['jquery', 'checkoutHelper',
-], function ($, checkoutHelper) {
+define(['jquery', 'checkoutHelper', 'Magento_Catalog/js/price-utils',
+], function ($, checkoutHelper, utils) {
     'use strict';
     return function (widget) {
         $.widget('mage.priceBox', widget, {
             _init: function initPriceBox() {
                 this._super();
-                
                 var box = this.element;
+
                 box.trigger('updatePrice');
+                this.cache.displayPrices = utils.deepClone(this.options.prices);
             },
 
             reloadPrice: function reDrawPrices() {
