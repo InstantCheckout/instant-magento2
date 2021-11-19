@@ -5,11 +5,6 @@ define(['jquery', 'checkoutHelper',
         $.widget('mage.priceBox', widget, {
             _init: function initPriceBox() {
                 this._super();
-
-                var box = this.element;
-
-                box.trigger('updatePrice');
-                this.cache.displayPrices = utils.deepClone(this.options.prices);
             },
 
             reloadPrice: function reDrawPrices() {

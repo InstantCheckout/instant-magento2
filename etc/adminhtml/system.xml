@@ -26,14 +26,14 @@
                 </field>
                 <field id="disabled_customer_group_ids" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Disable Instant for Customer Group IDs</label>
-                    <comment>Defaults to empty. Provide a comma delimited list of customer group IDs (e.g. 1,2,3) that Instant should be disabled for. To enable Instant for all customer groups, leave empty.</comment>
+                    <comment>Defaults to empty. Enter a comma delimited of Customer Group IDs that Instant should be disabled for. Provide a comma delimited list of customer group IDs (e.g. 1,2,3). To enable Instant for all customer groups, leave empty.</comment>
                 </field>
                 <field id="disabled_total_threshold" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Disable Instant for products and carts where the total is above X amount</label>
                     <comment>Defaults to empty. Enter a number representing the threshold for product or cart sub-total at which Instant should be disabled. (e.g. Entering 150 will ensure Instant will be disabled for products or carts with sub-totals above 150 units of currency.) To enable Instant for all carts and products, leave empty.</comment>
                 </field>
                 <field id="disabled_for_skus_containing" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Disable Instant for product, or carts containing products where the SKU contains the following specified phrases (provide a comma delimited list)</label>
+                    <label>Disable Instant for products and carts containing products where the SKU contains the following specified phrases (provide a comma delimited list)</label>
                     <comment>Defaults to empty. Enter a comma delimited list. If a product's SKU contains any of phrases in this comma delimited list, then Instant will be disabled. (e.g. ABC,DEF will ensure Instant is disabled for all products where the SKU contains either ABC or DEF.) To enable Instant for all products, leave empty.</comment>
                 </field>
                 <field id="enable_catalog" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
