@@ -13,108 +13,42 @@ define([
         },
 
         /**
-        * Get customer cart data
-        */
-        getCustomerCartData: function () {
-            const customerDataCart = customerData.get('cart');
-            if (!customerDataCart) {
-                this.showErrorAlert();
-                return;
-            }
-
-            const cartData = customerDataCart();
-            if (!cartData) {
-                this.showErrorAlert();
-                return;
-            }
-
-            return cartData;
-        },
-
-        /**
-        * Parse form entries
-        */
-        parseFormEntries: function (formSelector) {
-            const formEntries = [...(new FormData($(formSelector)[0]).entries())].map(function (e) {
-                return {
-                    attribute: e[0],
-                    value: e[1],
-                }
-            });
-            return formEntries;
-        },
-
-        /**
-        * Get product
-        */
-        getProduct: function (productId, selectedOptions, onSuccess) {
-            $.ajax({
-                type: 'POST',
-                url: window.location.origin + "/instant/data/getproduct",
-                data: { productId, selectedOptions },
-                dataType: 'json',
-                retryLimit: 3,
-                success: function (data) {
-                    onSuccess(data);
-                },
-                error: function () {
-                    this.retryLimit--;
-                    if (this.retryLimit) {
-                        jQuery.ajax(this);
-                    }
-                }
-            })
-        },
-
-        /**
-        * Get config. Can specify a callback on success that takes data as a parameter.
-        */
-        getConfig: function (onSuccess) {
+         * Run on render, and when cart totals are changed. Determines whether Instant button should show or not.
+         */
+        handleCartTotalChanged: function () {
             jQuery.ajax({
                 url: window.location.origin + "/instant/data/getconfig",
                 type: 'GET',
                 cache: false,
-                retryLimit: 3,
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    onSuccess(data);
+                    const { enableMinicartBtn, shouldShowInstantBtnForCurrentUser, disabledForSkusContaining } = data;
+                    let { disabledTotalThreshold } = data;
+
+                    const customerDataCart = customerData.get('cart');
+                    const cartData = customerDataCart();
+
+                    const cartTotalExceedsThreshold = parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold;
+                    let cartContainsBlacklistedSku = false;
+
+                    cartData.items.forEach(item => {
+                        disabledForSkusContaining.forEach(x => {
+                            if (x && item.product_sku.indexOf(x) !== -1) {
+                                cartContainsBlacklistedSku = true;
+                            }
+                        })
+                    })
+
+                    const shouldShowMinicartBtn = cartData && cartData.items && cartData.items.length > 0 && enableMinicartBtn && shouldShowInstantBtnForCurrentUser && !cartTotalExceedsThreshold && !cartContainsBlacklistedSku;
+
+                    $('#minicart-instant-btn-container').css('display', shouldShowMinicartBtn ? 'flex' : 'none');
+                    $('#checkout-index-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
+                    $('#checkout-page-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
                 },
                 error: function () {
-                    this.retryLimit--;
-                    if (this.retryLimit) {
-                        jQuery.ajax(this);
-                    }
+                    this.showErrorAlert();
                 }
-            })
-        },
-
-        /**
-         * Run on render, and when cart totals are changed. Determines whether Instant button should show or not.
-         */
-        handleCartTotalChanged: function () {
-            this.getConfig((data) => {
-                const { enableMinicartBtn, shouldShowInstantBtnForCurrentUser, disabledForSkusContaining } = data;
-                let { disabledTotalThreshold } = data;
-
-                const cartData = this.getCustomerCartData();
-
-                const cartTotalExceedsThreshold = disabledTotalThreshold && parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold;
-                let cartContainsBlacklistedSku = false;
-
-                cartData.items.forEach(item => {
-                    disabledForSkusContaining.forEach(x => {
-                        if (x && item.product_sku.indexOf(x) !== -1) {
-                            cartContainsBlacklistedSku = true;
-                        }
-                    })
-                })
-
-                const shouldShowMinicartBtn = cartData && cartData.items && cartData.items.length > 0 && enableMinicartBtn && shouldShowInstantBtnForCurrentUser && !cartTotalExceedsThreshold && !cartContainsBlacklistedSku;
-
-                $('#minicart-instant-btn-container').css('display', shouldShowMinicartBtn ? 'flex' : 'none');
-                $('#checkout-index-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
-                $('#checkout-page-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
             })
         },
 
@@ -143,17 +77,31 @@ define([
                 return 'sku=' + encodeURIComponent(skuQtyPair.sku) + ',' + skuQtyPair.qty;
             }).join('&');
 
-            this.getConfig((data) => {
-                const { storeCode, appId, enableSandbox } = data;
-                const baseUrl = `https://${enableSandbox ? 'staging.' : ''}checkout.instant.one/`;
+            jQuery.ajax({
+                url: window.location.origin + "/instant/data/getconfig",
+                type: 'GET',
+                cache: false,
+                retryLimit: 3,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    const { storeCode, appId, enableSandbox } = data;
+                    const baseUrl = `https://${enableSandbox ? 'staging.' : ''}checkout.instant.one/`;
 
-                const merchantIdParam = 'merchantId=' + appId;
-                const storeCodeParam = 'storeCode=' + storeCode;
-                const srcLocation = "src=" + sourceLocation;
+                    const merchantIdParam = 'merchantId=' + appId;
+                    const storeCodeParam = 'storeCode=' + storeCode;
+                    const srcLocation = "src=" + sourceLocation;
 
-                const url = baseUrl + '?' + confirmParam + '&' + storeCodeParam + '&' + merchantIdParam + '&' + skuQtyPairQueryParams + '&' + srcLocation;
+                    const url = baseUrl + '?' + confirmParam + '&' + storeCodeParam + '&' + merchantIdParam + '&' + skuQtyPairQueryParams + '&' + srcLocation;
 
-                callback(url);
+                    callback(url);
+                },
+                error: function () {
+                    this.retryLimit--;
+                    if (this.retryLimit) {
+                        jQuery.ajax(this);
+                    }
+                }
             })
         },
 
@@ -206,6 +154,12 @@ define([
             desktopBackToCheckoutTextElementSelector,
             mobileBackToShoppingSelector,
             sourceLocation) {
+            const customerDataCart = customerData.get('cart');
+            if (!customerDataCart) {
+                this.showErrorAlert();
+                return;
+            }
+
             const isMobile = this.mobileAndTabletCheck();
             const canBrowserSetWindowLocation = this.canBrowserSetWindowLocation();
 
@@ -232,7 +186,12 @@ define([
                 }
             }
 
-            const cartData = this.getCustomerCartData();
+            const cartData = customerDataCart();
+            if (!cartData || !cartData.items) {
+                this.showErrorAlert();
+                return;
+            }
+
             const { items } = cartData;
 
             const skuQtyPairs = items.map(item => {

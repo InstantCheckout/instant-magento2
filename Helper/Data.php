@@ -23,7 +23,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const PRODUCT_ADDTOCART_FORM_ID_PATH = 'instant/general/product_addtocart_form_id';
 
     /**
-     * Enable checkout page button path
+     * Enable minicart button path
      */
     const ENABLE_INSTANT_CHECKOUT_PAGE_PATH = 'instant/general/enable_checkout_page';
 
@@ -48,17 +48,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
 
     /**
-     * Disabled customer group ids path
+     * Disabled customer group ids (list of id's, delimited by commas)
      */
     const DISABLED_CUSTOMER_GROUP_IDS = 'instant/general/disabled_customer_group_ids';
 
     /**
-     * Threshold for cart total where Instant should be disabled path
+     * Threshold for cart total where Instant should be disabled
      */
     const DISABLED_CART_TOTAL_THRESHOLD = 'instant/general/disabled_total_threshold';
 
     /**
-     * Disable Instant for skus containing path
+     * SKUs containing any phrase in comma delimited list where Instant should be disabled
      */
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
 
@@ -90,7 +90,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get Customer Group ID 
+     * Get current Customer Group ID 
      */
     public function getCurrentCustomerGroupId()
     {
@@ -152,7 +152,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get cart summary enabled
+     * Get checkout summary page enabled
      * @return string
      */
     public function getInstantBtnCheckoutSummaryEnabled()
@@ -172,7 +172,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get staging/sandbox or live/production environment config
+     * Get staging config
      * @return string
      */
     public function getSandboxEnabledConfig()
@@ -202,7 +202,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get should show Instant for current user (currently based on customer group ID)
+     * Get whether Instant button should be displayed for current user
      * @return string
      */
     public function getShouldShowInstantBtnForCurrentUser()

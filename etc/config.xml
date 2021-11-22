@@ -20,7 +20,7 @@
                 <enable_checkout_page>0</enable_checkout_page>
                 <enable_sandbox>1</enable_sandbox>
                 <disabled_customer_group_ids></disabled_customer_group_ids>
-                <disabled_total_threshold></disabled_total_threshold>
+                <disabled_total_threshold>-1</disabled_total_threshold>
                 <disabled_for_skus_containing></disabled_for_skus_containing>
             </general>
         </instant>

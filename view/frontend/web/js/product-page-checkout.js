@@ -5,7 +5,47 @@ define([
 ], function ($, _, checkoutHelper) {
     "use strict";
 
+    function parseFormEntries(formSelector) {
+        return [...(new FormData($(formSelector)[0]).entries())].map(function (e) {
+            return {
+                attribute: e[0],
+                value: e[1],
+            }
+        });
+    }
+
     return function (config, element) {
+        const formData = parseFormEntries(config.form);
+        const product = formData.find(d => d.attribute === 'product');
+
+        $.ajax({
+            type: 'POST',
+            url: window.location.origin + "/instant/data/getproduct",
+            data: { productId: product.value },
+            dataType: 'json',
+            retryLimit: 3,
+            success: function (data) {
+                const { sku, disabledForSkusContaining } = data;
+
+                let skuIsDisabled = false;
+
+                disabledForSkusContaining.forEach(x => {
+                    if (x && sku.indexOf(x) !== -1) {
+                        skuIsDisabled = true;
+                    }
+                })
+
+                $('#instant-btn-product-page-container').css('display', skuIsDisabled ? 'none' : 'flex');
+                $('#instant-btn-product-page-container').css('flex-direction', 'column');
+            },
+            error: function () {
+                this.retryLimit--;
+                if (this.retryLimit) {
+                    jQuery.ajax(this);
+                }
+            }
+        })
+
         $(element).click(function () {
             try {
                 const onClose = () => {
@@ -79,6 +119,7 @@ define([
                 $('#product-page-instant-btn').attr('disabled', true);
                 $('#product-page-instant-btn-text').hide();
 
+<<<<<<< HEAD
                 checkoutHelper.getProduct(formProductId, formSelectedOptions, (data) => {
                     checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, "pdp", (url) => {
                         if (checkoutWindow) {
@@ -91,9 +132,36 @@ define([
                             if (checkoutWindow.closed) {
                                 onClose();
                                 clearInterval(loop);
+=======
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.origin + "/instant/data/getproduct",
+                    data: { productId: formProductId, selectedOptions: formSelectedOptions },
+                    dataType: 'json',
+                    retryLimit: 3,
+                    success: function (data) {
+                        checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], true, "pdp", (url) => {
+                            if (checkoutWindow) {
+                                checkoutWindow.location = url;
+                            } else {
+                                window.location = url;
+>>>>>>> parent of 242dfa6 (Visual fixes)
                             }
-                        }, 500);
-                    })
+
+                            const loop = setInterval(function () {
+                                if (checkoutWindow.closed) {
+                                    onClose();
+                                    clearInterval(loop);
+                                }
+                            }, 500);
+                        })
+                    },
+                        error: function () {
+                            this.retryLimit--;
+                            if (this.retryLimit) {
+                                jQuery.ajax(this);
+                            }
+                        }
                 })
             } catch (err) {
                 checkoutHelper.showErrorAlert();
