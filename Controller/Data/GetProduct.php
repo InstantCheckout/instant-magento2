@@ -85,8 +85,6 @@ class GetProduct extends Action implements HttpPostActionInterface
         $data = [];
         $data['sku'] = $product->getSku();
         $data['disabledForSkusContaining'] = $instantHelper->getDisabledForSkusContaining();
-        $data['disabledTotalThreshold'] = $instantHelper->getDisabledCartTotalThreshold();
-        $data['productPageAddToCartFormId'] = $instantHelper->getProductPageAddToCartFormId();
 
         $result->setData($data);
 

@@ -13,42 +13,73 @@ define([
         },
 
         /**
-         * Run on render, and when cart totals are changed. Determines whether Instant button should show or not.
-         */
-        handleCartTotalChanged: function () {
+        * Get customer cart data
+        */
+        getCustomerCartData: function () {
+            const customerDataCart = customerData.get('cart');
+            if (!customerDataCart) {
+                this.showErrorAlert();
+                return;
+            }
+
+            const cartData = customerDataCart();
+            if (!cartData) {
+                this.showErrorAlert();
+                return;
+            }
+
+            return cartData;
+        },
+
+        /**
+        * Get config. Can specify a callback on success that takes data as a parameter.
+        */
+        getConfig: function (onSuccess) {
             jQuery.ajax({
                 url: window.location.origin + "/instant/data/getconfig",
                 type: 'GET',
                 cache: false,
+                retryLimit: 3,
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    const { enableMinicartBtn, shouldShowInstantBtnForCurrentUser, disabledForSkusContaining } = data;
-                    let { disabledTotalThreshold } = data;
-
-                    const customerDataCart = customerData.get('cart');
-                    const cartData = customerDataCart();
-
-                    const cartTotalExceedsThreshold = parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold;
-                    let cartContainsBlacklistedSku = false;
-
-                    cartData.items.forEach(item => {
-                        disabledForSkusContaining.forEach(x => {
-                            if (x && item.product_sku.indexOf(x) !== -1) {
-                                cartContainsBlacklistedSku = true;
-                            }
-                        })
-                    })
-
-                    const shouldShowMinicartBtn = cartData && cartData.items && cartData.items.length > 0 && enableMinicartBtn && shouldShowInstantBtnForCurrentUser && !cartTotalExceedsThreshold && !cartContainsBlacklistedSku;
-
-                    $('#minicart-instant-btn-container').css('display', shouldShowMinicartBtn ? 'flex' : 'none');
-                    $('#checkout-index-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
-                    $('#checkout-page-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
+                    onSuccess(data);
                 },
                 error: function () {
-                    this.showErrorAlert();
+                    this.retryLimit--;
+                    if (this.retryLimit) {
+                        jQuery.ajax(this);
+                    }
                 }
+            })
+        },
+
+        /**
+         * Run on render, and when cart totals are changed. Determines whether Instant button should show or not.
+         */
+        handleCartTotalChanged: function () {
+            this.getConfig((data) => {
+                const { enableMinicartBtn, shouldShowInstantBtnForCurrentUser, disabledForSkusContaining } = data;
+                let { disabledTotalThreshold } = data;
+
+                const cartData = this.getCustomerCartData();
+
+                const cartTotalExceedsThreshold = disabledTotalThreshold && parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold;
+                let cartContainsBlacklistedSku = false;
+
+                cartData.items.forEach(item => {
+                    disabledForSkusContaining.forEach(x => {
+                        if (x && item.product_sku.indexOf(x) !== -1) {
+                            cartContainsBlacklistedSku = true;
+                        }
+                    })
+                })
+
+                const shouldShowMinicartBtn = cartData && cartData.items && cartData.items.length > 0 && enableMinicartBtn && shouldShowInstantBtnForCurrentUser && !cartTotalExceedsThreshold && !cartContainsBlacklistedSku;
+
+                $('#minicart-instant-btn-container').css('display', shouldShowMinicartBtn ? 'flex' : 'none');
+                $('#checkout-index-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
+                $('#checkout-page-instant-btn-container').css('display', cartTotalExceedsThreshold || cartContainsBlacklistedSku ? 'none' : 'flex')
             })
         },
 
@@ -77,31 +108,17 @@ define([
                 return 'sku=' + encodeURIComponent(skuQtyPair.sku) + ',' + skuQtyPair.qty;
             }).join('&');
 
-            jQuery.ajax({
-                url: window.location.origin + "/instant/data/getconfig",
-                type: 'GET',
-                cache: false,
-                retryLimit: 3,
-                contentType: false,
-                processData: false,
-                success: function (data) {
-                    const { storeCode, appId, enableSandbox } = data;
-                    const baseUrl = `https://${enableSandbox ? 'staging.' : ''}checkout.instant.one/`;
+            this.getConfig((data) => {
+                const { storeCode, appId, enableSandbox } = data;
+                const baseUrl = `https://${enableSandbox ? 'staging.' : ''}checkout.instant.one/`;
 
-                    const merchantIdParam = 'merchantId=' + appId;
-                    const storeCodeParam = 'storeCode=' + storeCode;
-                    const srcLocation = "src=" + sourceLocation;
+                const merchantIdParam = 'merchantId=' + appId;
+                const storeCodeParam = 'storeCode=' + storeCode;
+                const srcLocation = "src=" + sourceLocation;
 
-                    const url = baseUrl + '?' + confirmParam + '&' + storeCodeParam + '&' + merchantIdParam + '&' + skuQtyPairQueryParams + '&' + srcLocation;
+                const url = baseUrl + '?' + confirmParam + '&' + storeCodeParam + '&' + merchantIdParam + '&' + skuQtyPairQueryParams + '&' + srcLocation;
 
-                    callback(url);
-                },
-                error: function () {
-                    this.retryLimit--;
-                    if (this.retryLimit) {
-                        jQuery.ajax(this);
-                    }
-                }
+                callback(url);
             })
         },
 
@@ -154,12 +171,6 @@ define([
             desktopBackToCheckoutTextElementSelector,
             mobileBackToShoppingSelector,
             sourceLocation) {
-            const customerDataCart = customerData.get('cart');
-            if (!customerDataCart) {
-                this.showErrorAlert();
-                return;
-            }
-
             const isMobile = this.mobileAndTabletCheck();
             const canBrowserSetWindowLocation = this.canBrowserSetWindowLocation();
 
@@ -186,12 +197,7 @@ define([
                 }
             }
 
-            const cartData = customerDataCart();
-            if (!cartData || !cartData.items) {
-                this.showErrorAlert();
-                return;
-            }
-
+            const cartData = this.getCustomerCartData();
             const { items } = cartData;
 
             const skuQtyPairs = items.map(item => {
