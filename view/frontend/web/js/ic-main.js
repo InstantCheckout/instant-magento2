@@ -5,7 +5,7 @@ define([
 
     window.Instant = {};
 
-    const instantUrl = 'localhost:3000'
+    const instantUrl = 'checkout.instant.one'
 
     $.ajax({
         url: window.location.origin + "/instant/data/getconfig",
@@ -64,7 +64,7 @@ define([
     }
 
     const getCheckoutUrl = function (skuQtyPairs, cartId, source) {
-        const baseUrl = `http://${window.Instant.config.enableSandbox ? 'staging.' : ''}${instantUrl}/`;
+        const baseUrl = `https://${window.Instant.config.enableSandbox ? 'staging.' : ''}${instantUrl}/`;
 
         const merchantIdParam = 'merchantId=' + window.Instant.config.appId;
         const storeCodeParam = 'storeCode=' + window.Instant.config.storeCode;
