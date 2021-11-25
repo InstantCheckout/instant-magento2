@@ -5,16 +5,22 @@ namespace Instant\Checkout\Controller\Cart;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\HttpPutActionInterface;
+use Magento\Checkout\Model\Session;
 
 class Clear extends Action implements HttpPutActionInterface
 {
+    private $session;
+
     /**
      * Constructor.
      * @param Context $context
      */
     public function __construct(
-        Context $context
+        Context $context,
+        Session $session
     ) {
+        $this->session = $session;
+
         return parent::__construct($context);
     }
 
@@ -23,8 +29,6 @@ class Clear extends Action implements HttpPutActionInterface
      */
     public function execute()
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $cartObject = $objectManager->create('Magento\Checkout\Model\Cart')->truncate();
-        $cartObject->saveQuote();
+        $this->session->setQuoteId(null);
     }
 }

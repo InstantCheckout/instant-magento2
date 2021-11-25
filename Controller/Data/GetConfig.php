@@ -3,7 +3,6 @@
 namespace Instant\Checkout\Controller\Data;
 
 use Magento\Backend\App\Action\Context;
-use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
@@ -12,19 +11,11 @@ use \Magento\Customer\Model\Session;
 
 class GetConfig extends Action implements HttpGetActionInterface
 {
-    /**
-     * @var JsonFactory
-     */
     protected $jsonResultFactory;
-
-    /**
-     * @var StoreManagerInterface
-     */
     protected $storeManager;
 
     /**
      * Constructor.
-     * @param ProductRepositoryInterface $productRepository
      */
     public function __construct(
         Context $context,
@@ -39,9 +30,6 @@ class GetConfig extends Action implements HttpGetActionInterface
         return parent::__construct($context);
     }
 
-    /**
-     * Get configuration
-     */
     public function execute()
     {
         $result = $this->jsonResultFactory->create();
@@ -52,10 +40,11 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['enableMinicartBtn'] = $instantHelper->getInstantMinicartBtnEnabled();
         $data['appId'] = $instantHelper->getInstantAppId();
         $data['enableSandbox'] = $instantHelper->getSandboxEnabledConfig();
-        $data['shouldShowInstantBtnForCurrentUser'] = $instantHelper->getShouldShowInstantBtnForCurrentUser();
+        $data['isGuest'] = $instantHelper->getIsGuest();
         $data['disabledTotalThreshold'] = $instantHelper->getDisabledCartTotalThreshold();
         $data['disabledForSkusContaining'] = $instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $storeCode;
+        $data['checkoutConfig'] = json_decode($instantHelper->getSerializedCheckoutConfig(), true);
 
         $result->setData($data);
 

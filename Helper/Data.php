@@ -48,11 +48,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
 
     /**
-     * Disabled customer group ids path
-     */
-    const DISABLED_CUSTOMER_GROUP_IDS = 'instant/general/disabled_customer_group_ids';
-
-    /**
      * Threshold for cart total where Instant should be disabled path
      */
     const DISABLED_CART_TOTAL_THRESHOLD = 'instant/general/disabled_total_threshold';
@@ -63,15 +58,30 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
 
     /**
+     * @var \Magento\Checkout\Model\CompositeConfigProvider
+     */
+    protected $configProvider;
+
+    /**
+     * @var \Magento\Framework\Serialize\SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * Constructor.
      * @param Context $context
      * @param Session $customerSession
      * */
     public function __construct(
         Context $context,
-        Session $customerSession
+        Session $customerSession,
+        \Magento\Checkout\Model\CompositeConfigProvider $configProvider,
+        \Magento\Framework\Serialize\SerializerInterface $serializerInterface = null
     ) {
         $this->customerSession = $customerSession;
+        $this->configProvider = $configProvider;
+        $this->serializer = $serializerInterface ?: \Magento\Framework\App\ObjectManager::getInstance()
+            ->get(\Magento\Framework\Serialize\Serializer\JsonHexTag::class);
 
         return parent::__construct($context);
     }
@@ -90,25 +100,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get Customer Group ID 
+     * Get whether customer is logged in 
      */
-    public function getCurrentCustomerGroupId()
+    public function getIsGuest()
     {
-        if ($this->customerSession->isLoggedIn()) {
-            return $this->customerSession->getCustomer()->getGroupId();
-        }
-
-        return -1;
-    }
-
-    /**
-     * Get customer group ids that Instant should be disabled for
-     * @return array
-     */
-    public function getDisabledCustomerGroupIds()
-    {
-        $disabledCustomerGroupIds = $this->getConfig(self::DISABLED_CUSTOMER_GROUP_IDS);
-        return explode(',', $disabledCustomerGroupIds);
+        return !$this->customerSession->isLoggedIn();
     }
 
     /**
@@ -202,19 +198,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get should show Instant for current user (currently based on customer group ID)
-     * @return string
+     * Retrieve checkout configuration
+     *
+     * @return array
+     * @codeCoverageIgnore
      */
-    public function getShouldShowInstantBtnForCurrentUser()
+    public function getCheckoutConfig()
     {
-        $disabledCustomerGroupIds = $this->getDisabledCustomerGroupIds();
-        $customerGroupId = $this->getCurrentCustomerGroupId();
-        $enabledForCustomer = true;
+        return $this->configProvider->getConfig();
+    }
 
-        if (in_array($customerGroupId, $disabledCustomerGroupIds)) {
-            $enabledForCustomer = false;
+    /**
+     * Retrieve serialized checkout config.
+     *
+     * @return bool|string
+     * @since 100.2.0
+     */
+    public function getSerializedCheckoutConfig()
+    {
+        try {
+            return  $this->serializer->serialize($this->getCheckoutConfig());
+        } catch (\Exception $e) {
+            return null;
         }
-
-        return $enabledForCustomer;
     }
 }

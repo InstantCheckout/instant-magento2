@@ -5,11 +5,11 @@ namespace Instant\Checkout\Plugin;
 use Magento\Checkout\Block\Checkout\LayoutProcessor;
 
 /**
- * Class CheckoutPageInstantButtonDisable
+ * Class CPageBtnDisable
  *
  * @package Magento\Checkout\Plugin
  */
-class CheckoutPageInstantButtonDisable
+class CPageBtnDisable
 {
     /**
      * @param \Magento\Checkout\Block\Checkout\LayoutProcessor $processor
@@ -25,10 +25,10 @@ class CheckoutPageInstantButtonDisable
         $instantHelper = $objectManager->create(\Instant\Checkout\Helper\Data::class);
 
         $enabled = $instantHelper->getInstantBtnCheckoutPageEnabled();
-        $shouldShowForUser = $instantHelper->getShouldShowInstantBtnForCurrentUser();
+        $isGuest = $instantHelper->getIsGuest();
 
-        if (!$enabled || !$shouldShowForUser) {
-            $jsLayout['components']['checkout']['children']['checkout-page-instant-btn']['componentDisabled'] = true;
+        if (!$enabled || !$isGuest) {
+            $jsLayout['components']['checkout']['children']['cpage-btn']['componentDisabled'] = true;
         }
 
         return $jsLayout;

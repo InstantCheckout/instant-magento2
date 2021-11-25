@@ -6,10 +6,10 @@
                     <item name="components" xsi:type="array">
                         <item name="checkout" xsi:type="array">
                             <item name="children" xsi:type="array">
-                                <item name="checkout-page-instant-btn" xsi:type="array">
+                                <item name="cpage-btn" xsi:type="array">
                                     <item name="displayArea" xsi:type="string">progressBar</item>
                                     <item name="sortOrder" xsi:type="string">0</item>
-                                    <item name="component" xsi:type="string">Instant_Checkout/js/checkout-page-instant-btn</item>
+                                    <item name="component" xsi:type="string">Instant_Checkout/js/ic-cpage-checkout</item>
                                 </item>
                             </item>
                         </item>

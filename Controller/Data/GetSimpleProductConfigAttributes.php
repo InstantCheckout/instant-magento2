@@ -11,19 +11,8 @@ use \Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 class GetSimpleProductConfigAttributes extends Action implements HttpGetActionInterface
 {
-    /**
-     * @var JsonFactory
-     */
     protected $jsonResultFactory;
-
-    /**
-     * @var ProductRepositoryInterface
-     */
     protected $productRepository;
-
-    /**
-     * @var Configurable
-     */
     protected $configurableProduct;
 
     /**
@@ -42,9 +31,6 @@ class GetSimpleProductConfigAttributes extends Action implements HttpGetActionIn
         return parent::__construct($context);
     }
 
-    /**
-     * Given a simple product sku, return config attributes
-     */
     public function execute()
     {
         $result = $this->jsonResultFactory->create();

@@ -1,7 +1,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="checkout.cart.totals.container">
-            <block class="Instant\Checkout\Block\CheckoutSummaryBlock" name="instant-checkout-summary-instant-btn" after="-" template="Instant_Checkout::checkout-index-page-instant-btn.phtml" />
+            <block class="Instant\Checkout\Block\CIndexBlock" name="ic-cindex-btn" after="-" template="Instant_Checkout::ic-cindex-btn.phtml" />
         </referenceBlock>
     </body>
 </page>

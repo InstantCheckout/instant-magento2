@@ -2,7 +2,7 @@
 
 namespace Instant\Checkout\Block;
 
-class CheckoutSummaryBlock extends \Magento\Framework\View\Element\Template
+class CIndexBlock extends \Magento\Framework\View\Element\Template
 {
 
     public function _toHtml()
@@ -10,10 +10,10 @@ class CheckoutSummaryBlock extends \Magento\Framework\View\Element\Template
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $instantHelper = $objectManager->create(\Instant\Checkout\Helper\Data::class);
 
-        $shouldShowInstantBtnForCurrentUser = $instantHelper->getShouldShowInstantBtnForCurrentUser();
+        $isGuest = $instantHelper->getIsGuest();
         $checkoutSummaryEnabled = $instantHelper->getInstantBtnCheckoutSummaryEnabled();
 
-        if ($shouldShowInstantBtnForCurrentUser && $checkoutSummaryEnabled) {
+        if ($isGuest && $checkoutSummaryEnabled) {
             return parent::_toHtml();
         }
 

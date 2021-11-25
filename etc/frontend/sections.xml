@@ -3,4 +3,7 @@
     <action name="instant/cart/clear">
         <section name="cart" />
     </action>
+    <action name="instant/cart/merge">
+        <section name="cart" />
+    </action>
 </config>

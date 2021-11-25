@@ -12,29 +12,13 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 class GetProduct extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
     protected $productRepository;
-
-    /**
-     * @var JsonFactory
-     */
     protected $jsonResultFactory;
-
-    /**
-     * @var RequestInterface
-     */
     private $request;
-
-    /**
-     * @var Configurable
-     */
     private $configurableProduct;
 
     /**
      * Constructor.
-     * @param ProductRepositoryInterface $productRepository
      */
     public function __construct(
         Context $context,
@@ -51,9 +35,6 @@ class GetProduct extends Action implements HttpPostActionInterface
         return parent::__construct($context);
     }
 
-    /**
-     * Get skuQtyPairs for product page form
-     */
     public function execute()
     {
         $params = $this->request->getPost();
