@@ -114,9 +114,11 @@ define([
                 }
 
                 let checkoutWindow;
-                if (window.Instant.canSetWindowLocation()) {
-                    checkoutWindow = window.Instant.init();
-                    if (window.Instant.isClientMobileOrTablet()) {
+
+                if (checkoutHelper.canSetWindowLocation()) {
+                    checkoutWindow = checkoutHelper.init();
+
+                    if (checkoutHelper.isClientMobileOrTablet()) {
                         $(pdpMobileBackdrop).css('display', 'unset');
                         $(pdpMobileBackToShopping).css('display', 'unset');
                         $(pdpMobileBackToShopping).on('click', function () {
@@ -139,20 +141,22 @@ define([
                 $(pdpBtnText).hide();
 
                 getProduct(formProductId, formSelectedOptions, (data) => {
-                    const url = window.Instant.getCheckoutUrl([{ sku: data.sku, qty }], null, "pdp");
+                    checkoutHelper.handleInstantAwareFunc(() => {
+                        const url = checkoutHelper.getCheckoutUrl([{ sku: data.sku, qty }], null, "pdp");
 
-                    if (checkoutWindow) {
-                        setTimeout(function () { checkoutWindow.location = url; }, 5);
-                    } else {
-                        window.location = url;
-                    }
+                        if (checkoutWindow) {
+                            checkoutWindow.location = url;
 
-                    const loop = setInterval(function () {
-                        if (checkoutWindow.closed) {
-                            onClose();
-                            clearInterval(loop);
+                            const loop = setInterval(function () {
+                                if (checkoutWindow.closed) {
+                                    onClose();
+                                    clearInterval(loop);
+                                }
+                            }, 500);
+                        } else {
+                            window.location = url;
                         }
-                    }, 500);
+                    })
                 })
             } catch (err) {
                 checkoutHelper.showErrorAlert();

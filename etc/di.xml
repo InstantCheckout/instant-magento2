@@ -1,0 +1,4 @@
+<config>
+    <preference for="Instant\Checkout\Api\CartsManagementInterface" type="Instant\Checkout\Model\CartsManagement" />
+    <preference for="Instant\Checkout\Api\ProductsManagementInterface" type="Instant\Checkout\Model\ProductsManagement" />
+</config>

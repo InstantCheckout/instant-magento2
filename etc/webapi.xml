@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <route url="/V1/instant/:storeCode/cart/merge" method="POST">
+        <service class="Instant\Checkout\Api\CartsManagementInterface" method="merge" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/:storeCode/product/price/:sku" method="GET">
+        <service class="Instant\Checkout\Api\ProductsManagementInterface" method="getPrice" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+</routes>
