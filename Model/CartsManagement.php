@@ -47,66 +47,23 @@ class CartsManagement implements CartsManagementInterface
         $this->productFactory = $productFactory;
     }
 
-    // public function getProductPrice($productId, $storeCode)
-    // {
-    //     $storeId = NULL;
-    //     try {
-    //         $store = $this->storeRepository->get($storeCode);
-    //         $storeId = $store->getId();
-    //     } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
-    //         $storeId = NULL;
-    //     }
+    /**
+     * Retrieves simple products of quote items (yes, this is different than Magento's method)
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return array
+     */
+    public function getAllVisibleItems($quote)
+    {
+        $items = [];
+        foreach ($quote->getItemsCollection() as $item) {
+            if ($item->getProductType() === 'simple') {
+                $items[] = $item;
+            }
+        }
 
-    //     $product = $this->productFactory->create();
-    //     if ($storeId) {
-    //         $product = $product->setStoreId($storeId);
-    //     }
-
-
-    //     $product = $product->load($productId);
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug($product->getSku());
-
-    //     $originalPrice = $product->getPrice();
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug('originalPrice');
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug($originalPrice);
-
-
-    //     $specialPrice = $product->getSpecialPrice();
-    //     $specialFromDate = $product->getSpecialFromDate();
-    //     $specialToDate = $product->getSpecialToDate();
-    //     $today = time();
-
-    //     $finalPrice = $originalPrice;
-
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug('specialFromDate');
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug($specialFromDate);
-
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug('specialToDate');
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug($specialToDate);
-
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug('today');
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug($today);
-
-    //     if (($specialFromDate || $specialToDate) && ($today >= strtotime($specialFromDate) && is_null($specialToDate)) || ($today <= strtotime($specialToDate) && is_null($specialFromDate)) || ($today >= strtotime($specialFromDate) && $today <= strtotime($specialToDate))) {
-    //         $finalPrice = $specialPrice;
-    //     }
-
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug('finalPrice');
-    //     \Magento\Framework\App\ObjectManager::getInstance()
-    //         ->get(\Psr\Log\LoggerInterface::class)->debug($finalPrice);
-
-    //     return $finalPrice;
-    // }
+        return $items;
+    }
 
     /*
     * @param string $storeCode
@@ -123,18 +80,20 @@ class CartsManagement implements CartsManagementInterface
         $toCartId = $this->maskedQuoteIdToQuoteId->execute($targetCartId);
 
         $fromQuote = $this->quoteFactory->create()->load($fromCartId, 'entity_id');
-        $finalQuote = $this->quoteFactory->create()->load($toCartId, 'entity_id');
+        $fromQuoteItems = $this->getAllVisibleItems($fromQuote);
 
-        foreach ($fromQuote->getItemsCollection() as $item) {
+        $finalQuote = $this->quoteFactory->create()->load($toCartId, 'entity_id');
+        $finalQuoteItems = $this->getAllVisibleItems($finalQuote);
+
+        foreach ($fromQuoteItems as $item) {
             $found = false;
-            foreach ($finalQuote->getItemsCollection() as $quoteItem) {
-                if ($quoteItem->getProductType() === 'simple' && $quoteItem->compare($item)) {
+
+            foreach ($finalQuoteItems as $quoteItem) {
+                if ($item->getProduct()->getData('sku') === $quoteItem->getProduct()->getData('sku')) {
                     $found = false;
 
-                    // $productId = $quoteItem->getProductId();
-
-                    $fromQuoteItemPrice = floatval($item->getParentItemId() ? $item->getParentItem()->getPrice() : $item->getPrice());
-                    $quoteItemPrice = floatval($quoteItem->getParentItemId() ? $quoteItem->getParentItem()->getPrice() : $quoteItem->getPrice());
+                    $fromQuoteItemPrice = $item->getParentItemId() ? floatval($item->getParentItem()->getPrice()) : floatval($item->getPrice());
+                    $quoteItemPrice = $quoteItem->getParentItemId() ? floatval($quoteItem->getParentItem()->getPrice()) : floatval($quoteItem->getPrice());
 
                     $comparator = new FloatComparator();
 
@@ -142,16 +101,20 @@ class CartsManagement implements CartsManagementInterface
                         $found = true;
 
                         $quoteItem = $quoteItem->getParentItemId() ? $quoteItem->getParentItem() : $quoteItem;
+                        $item = $item->getParentItemId() ? $item->getParentItem() : $item;
+
                         $quoteItem->setQty($quoteItem->getQty() + $item->getQty());
                         $quoteItem->save();
-                        $finalQuote->itemProcessor->merge($item, $quoteItem);
                     }
-                    break;
                 }
             }
-
             if (!$found) {
                 $newItem = clone $item;
+
+                if ($item->getParentItemId()) {
+                    $newItem = clone $item->getParentItem();
+                }
+
                 $finalQuote->addItem($newItem);
                 if ($item->getHasChildren()) {
                     foreach ($item->getChildren() as $child) {
@@ -160,6 +123,7 @@ class CartsManagement implements CartsManagementInterface
                         $finalQuote->addItem($newChild);
                     }
                 }
+                $newItem->save();
             }
         }
 
