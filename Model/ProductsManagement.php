@@ -15,7 +15,7 @@ use Magento\Quote\Model\QuoteFactory;
 use Magento\Quote\Model\MaskedQuoteIdToQuoteId;
 
 /**
- * Class for management of totals information.
+ * Class for management of products.
  */
 class ProductsManagement implements ProductsManagementInterface
 {
