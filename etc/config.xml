@@ -8,7 +8,7 @@
                 <order_status>pending</order_status>
                 <title>Instant Pay</title>
                 <allowspecific>0</allowspecific>
-                <group>Offline</group>
+                <group>offline</group>
                 <enable_catalog>1</enable_catalog>
             </instant>
         </payment>

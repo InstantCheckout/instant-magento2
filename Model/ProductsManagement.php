@@ -73,12 +73,14 @@ class ProductsManagement implements ProductsManagementInterface
         $specialToDate = $product->getSpecialToDate();
         $today = time();
 
-        $finalPrice = NULL;
+        $finalPrice = $originalPrice;
 
-        if ((is_null($specialFromDate) && is_null($specialToDate)) || ($today >= strtotime($specialFromDate) && is_null($specialToDate)) || ($today <= strtotime($specialToDate) && is_null($specialFromDate)) || ($today >= strtotime($specialFromDate) && $today <= strtotime($specialToDate))) {
+        $originalPrice = $product->getPrice();
+
+        if (($specialFromDate || $specialToDate) && ($today >= strtotime($specialFromDate) && is_null($specialToDate)) || ($today <= strtotime($specialToDate) && is_null($specialFromDate)) || ($today >= strtotime($specialFromDate) && $today <= strtotime($specialToDate))) {
             $finalPrice = $specialPrice;
         }
 
-        return $finalPrice ? $finalPrice : $originalPrice;
+        return $finalPrice;
     }
 }

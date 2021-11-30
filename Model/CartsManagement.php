@@ -47,37 +47,66 @@ class CartsManagement implements CartsManagementInterface
         $this->productFactory = $productFactory;
     }
 
-    public function getProductPrice($productId, $storeCode)
-    {
-        $storeId = NULL;
-        try {
-            $store = $this->storeRepository->get($storeCode);
-            $storeId = $store->getId();
-        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
-            $storeId = NULL;
-        }
+    // public function getProductPrice($productId, $storeCode)
+    // {
+    //     $storeId = NULL;
+    //     try {
+    //         $store = $this->storeRepository->get($storeCode);
+    //         $storeId = $store->getId();
+    //     } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+    //         $storeId = NULL;
+    //     }
 
-        $product = $this->productFactory->create();
-        if ($storeId) {
-            $product = $product->setStoreId($storeId);
-        }
+    //     $product = $this->productFactory->create();
+    //     if ($storeId) {
+    //         $product = $product->setStoreId($storeId);
+    //     }
 
-        $product = $product->load($productId);
 
-        $originalPrice = $product->getPrice();
-        $specialPrice = $product->getSpecialPrice();
-        $specialFromDate = $product->getSpecialFromDate();
-        $specialToDate = $product->getSpecialToDate();
-        $today = time();
+    //     $product = $product->load($productId);
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug($product->getSku());
 
-        $finalPrice = NULL;
+    //     $originalPrice = $product->getPrice();
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug('originalPrice');
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug($originalPrice);
 
-        if ((is_null($specialFromDate) && is_null($specialToDate)) || ($today >= strtotime($specialFromDate) && is_null($specialToDate)) || ($today <= strtotime($specialToDate) && is_null($specialFromDate)) || ($today >= strtotime($specialFromDate) && $today <= strtotime($specialToDate))) {
-            $finalPrice = $specialPrice;
-        }
 
-        return $finalPrice ? $finalPrice : $originalPrice;
-    }
+    //     $specialPrice = $product->getSpecialPrice();
+    //     $specialFromDate = $product->getSpecialFromDate();
+    //     $specialToDate = $product->getSpecialToDate();
+    //     $today = time();
+
+    //     $finalPrice = $originalPrice;
+
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug('specialFromDate');
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug($specialFromDate);
+
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug('specialToDate');
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug($specialToDate);
+
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug('today');
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug($today);
+
+    //     if (($specialFromDate || $specialToDate) && ($today >= strtotime($specialFromDate) && is_null($specialToDate)) || ($today <= strtotime($specialToDate) && is_null($specialFromDate)) || ($today >= strtotime($specialFromDate) && $today <= strtotime($specialToDate))) {
+    //         $finalPrice = $specialPrice;
+    //     }
+
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug('finalPrice');
+    //     \Magento\Framework\App\ObjectManager::getInstance()
+    //         ->get(\Psr\Log\LoggerInterface::class)->debug($finalPrice);
+
+    //     return $finalPrice;
+    // }
 
     /*
     * @param string $storeCode
@@ -96,20 +125,23 @@ class CartsManagement implements CartsManagementInterface
         $fromQuote = $this->quoteFactory->create()->load($fromCartId, 'entity_id');
         $finalQuote = $this->quoteFactory->create()->load($toCartId, 'entity_id');
 
-        foreach ($fromQuote->getAllVisibleItems() as $item) {
+        foreach ($fromQuote->getItemsCollection() as $item) {
             $found = false;
-            foreach ($finalQuote->getAllItems() as $quoteItem) {
-                if ($quoteItem->compare($item)) {
+            foreach ($finalQuote->getItemsCollection() as $quoteItem) {
+                if ($quoteItem->getProductType() === 'simple' && $quoteItem->compare($item)) {
                     $found = false;
 
-                    $productId = $quoteItem->getProductId();
-                    $quoteItemPrice = floatval($item->getPrice());
-                    $productPrice = floatval($this->getProductPrice($productId, $storeCode));
+                    // $productId = $quoteItem->getProductId();
+
+                    $fromQuoteItemPrice = floatval($item->getParentItemId() ? $item->getParentItem()->getPrice() : $item->getPrice());
+                    $quoteItemPrice = floatval($quoteItem->getParentItemId() ? $quoteItem->getParentItem()->getPrice() : $quoteItem->getPrice());
 
                     $comparator = new FloatComparator();
 
-                    if ($comparator->equal($quoteItemPrice, $productPrice)) {
+                    if ($comparator->equal($quoteItemPrice, $fromQuoteItemPrice)) {
                         $found = true;
+
+                        $quoteItem = $quoteItem->getParentItemId() ? $quoteItem->getParentItem() : $quoteItem;
                         $quoteItem->setQty($quoteItem->getQty() + $item->getQty());
                         $quoteItem->save();
                         $finalQuote->itemProcessor->merge($item, $quoteItem);
