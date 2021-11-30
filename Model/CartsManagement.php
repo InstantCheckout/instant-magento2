@@ -17,7 +17,7 @@ use Magento\Framework\Math\FloatComparator;
 use \Magento\Store\Api\StoreRepositoryInterface;
 
 /**
- * Class for management of totals information.
+ * Class for management of carts information.
  */
 class CartsManagement implements CartsManagementInterface
 {
