@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
-
 namespace Instant\Checkout\Model;
 
 use Instant\Checkout\Api\CartsManagementInterface;
@@ -56,8 +51,9 @@ class CartsManagement implements CartsManagementInterface
     public function getAllVisibleItems($quote)
     {
         $items = [];
-        foreach ($quote->getItemsCollection() as $item) {
-            if ($item->getProductType() === 'simple') {
+
+        foreach ($quote->getAllVisibleItems() as $item) {
+            if ($item->getTypeId() != 'configurable') {
                 $items[] = $item;
             }
         }
@@ -80,18 +76,18 @@ class CartsManagement implements CartsManagementInterface
         $toCartId = $this->maskedQuoteIdToQuoteId->execute($targetCartId);
 
         $fromQuote = $this->quoteFactory->create()->load($fromCartId, 'entity_id');
-        $fromQuoteItems = $this->getAllVisibleItems($fromQuote);
-
         $finalQuote = $this->quoteFactory->create()->load($toCartId, 'entity_id');
+
+
+        $fromQuoteItems = $this->getAllVisibleItems($fromQuote);
         $finalQuoteItems = $this->getAllVisibleItems($finalQuote);
 
         foreach ($fromQuoteItems as $item) {
             $found = false;
 
             foreach ($finalQuoteItems as $quoteItem) {
-                if ($item->getProduct()->getData('sku') === $quoteItem->getProduct()->getData('sku')) {
-                    $found = false;
-
+                $found = false;
+                if ($item->getProduct()->getSku() === $quoteItem->getProduct()->getSku()) {
                     $fromQuoteItemPrice = $item->getParentItemId() ? floatval($item->getParentItem()->getPrice()) : floatval($item->getPrice());
                     $quoteItemPrice = $quoteItem->getParentItemId() ? floatval($quoteItem->getParentItem()->getPrice()) : floatval($quoteItem->getPrice());
 
@@ -105,9 +101,11 @@ class CartsManagement implements CartsManagementInterface
 
                         $quoteItem->setQty($quoteItem->getQty() + $item->getQty());
                         $quoteItem->save();
+                        break;
                     }
                 }
             }
+
             if (!$found) {
                 $newItem = clone $item;
 

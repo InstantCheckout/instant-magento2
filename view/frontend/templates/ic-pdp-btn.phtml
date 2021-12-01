@@ -19,7 +19,8 @@
         <button id="ic-pdp-btn" type="button" title="Instant Checkout" class="ic-pdp-btn" data-mage-init='
                     {
                         "Instant_Checkout/js/ic-pdp-checkout": {
-                            "form": "#<?= $block->escapeHtml($formId); ?>"
+                            "form": "#<?= $block->escapeHtml($formId); ?>",
+                            "sku": "<?= $block->escapeHtmlAttr($block->getProduct()->getSku()) ?>"
                         }            
                     }
                     '>
