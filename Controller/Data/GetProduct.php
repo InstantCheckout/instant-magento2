@@ -14,6 +14,7 @@ class GetProduct extends Action implements HttpGetActionInterface
     protected $jsonResultFactory;
     protected $productRepository;
     protected $configurableProduct;
+    protected $storeRepository;
 
     /**
      * Constructor.
@@ -22,11 +23,13 @@ class GetProduct extends Action implements HttpGetActionInterface
         Context $context,
         JsonFactory $jsonResultFactory,
         ProductRepositoryInterface $productRepository,
-        Configurable $configurableProduct
+        Configurable $configurableProduct,
+        \Magento\Store\Api\StoreRepositoryInterface $storeRepository
     ) {
         $this->jsonResultFactory = $jsonResultFactory;
         $this->productRepository = $productRepository;
         $this->configurableProduct = $configurableProduct;
+        $this->storeRepository = $storeRepository;
 
         return parent::__construct($context);
     }
@@ -37,9 +40,14 @@ class GetProduct extends Action implements HttpGetActionInterface
         $params = $this->getRequest()->getParams();
 
         $options = NULL;
+        $storeId = NULL;
 
         if (!isset($params['sku'])) {
             return "Please provide sku in query params";
+        }
+
+        if (!isset($params['storeCode'])) {
+            return "Please provide storeCode in query params";
         }
 
         if (isset($params['options'])) {
@@ -47,10 +55,17 @@ class GetProduct extends Action implements HttpGetActionInterface
             $options = json_decode(urldecode($options), true);
         }
 
+        try {
+            $store = $this->storeRepository->get($params['storeCode']);
+            $storeId = $store->getId();
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            $storeId = NULL;
+        }
+
         if (is_countable($options) && count($options) > 0) {
             $productOptions = [];
 
-            $product = $this->productRepository->get($params['sku']);
+            $product = $this->productRepository->get($params['sku'], false, $storeId);
             foreach ($options as $option) {
                 $id = $option['id'];
                 $value = $option['value'];
@@ -60,7 +75,7 @@ class GetProduct extends Action implements HttpGetActionInterface
             $product = $this->configurableProduct->getProductByAttributes($productOptions, $product);
         } else {
             // If selectedOptions is not populated, then we have a simple product with no config
-            $product = $this->productRepository->get($params['sku']);
+            $product = $this->productRepository->get($params['sku'], false, $storeId);
         }
 
         $mediaGalleryEntries = [];
