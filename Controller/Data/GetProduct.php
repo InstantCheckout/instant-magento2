@@ -41,6 +41,7 @@ class GetProduct extends Action implements HttpGetActionInterface
 
         $options = NULL;
         $storeId = NULL;
+        $frontendLabelOptionPairs = NULL;
 
         if (!isset($params['sku'])) {
             return "Please provide sku in query params";
@@ -73,6 +74,38 @@ class GetProduct extends Action implements HttpGetActionInterface
             }
 
             $product = $this->configurableProduct->getProductByAttributes($productOptions, $product);
+
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $productTypeInstance = $objectManager->get('Magento\ConfigurableProduct\Model\Product\Type\Configurable');
+            $parentIds = $productTypeInstance->getParentIdsByChild($product->getId());
+            $parentId = array_shift($parentIds);
+
+            // Get product attributes for this configurable product
+            $configurableProduct = $objectManager->get('\Magento\Catalog\Model\Product')->load($parentId);
+            $productAttributeOptions = $productTypeInstance->getConfigurableAttributesAsArray($configurableProduct);
+
+            // Get product model for child product
+            $childProduct = $objectManager->get('\Magento\Catalog\Model\Product')->load($product->getId());
+
+            // For each product attribute on configurable product, get value label pairs
+            $frontendLabelOptionPairs = [];
+            foreach ($productAttributeOptions as $attributeOption) {
+                $optionLabel = "";
+                $frontendLabelOptionPair = [];
+                $childProductAttributeOptionValue = $childProduct->getData($attributeOption['attribute_code']);
+
+                $options = $attributeOption['options'];
+                foreach ($options as $option) {
+                    if ($option['value'] == $childProductAttributeOptionValue) {
+                        $optionLabel = $option['label'];
+                    }
+                }
+
+                $frontendLabelOptionPair['label'] = $attributeOption['frontend_label'];
+                $frontendLabelOptionPair['value'] = $optionLabel;
+
+                array_push($frontendLabelOptionPairs, $frontendLabelOptionPair);
+            }
         } else {
             // If selectedOptions is not populated, then we have a simple product with no config
             $product = $this->productRepository->get($params['sku'], false, $storeId);
@@ -95,6 +128,9 @@ class GetProduct extends Action implements HttpGetActionInterface
             $customAttributes[] = $attribute;
         }
 
+        if ($frontendLabelOptionPairs) {
+            $data['frontend_options'] = $frontendLabelOptionPairs;
+        }
         $data['id'] = $product->getId();
         $data['attribute_set_id'] = $product->getAttributeSetId();
         $data['sku'] = $product->getSku();
