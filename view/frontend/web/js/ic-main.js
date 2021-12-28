@@ -5,7 +5,9 @@ define([
     "use strict";
 
     // Initialise config and cache values
-    checkoutHelper.initializeInstant();
+    checkoutHelper.initializeInstant(() => {
+        checkoutHelper.handleCartTotalChanged();
+    });
 
     // Handling onMessages
     window.onmessage = function (e) {
