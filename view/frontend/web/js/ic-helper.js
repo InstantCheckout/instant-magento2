@@ -93,7 +93,7 @@ define([
 
                 let cartContainsBlacklistedSku = false;
 
-                if (cartData?.items) {
+                if (cartData && cartData.items) {
                     cartData.items.forEach(item => {
                         window.Instant.config.disabledForSkusContaining.forEach(x => {
                             if (x && item.product_sku.indexOf(x) !== -1) {
@@ -164,7 +164,11 @@ define([
             $(checkoutButtonLockIconSelector).hide();
 
             let checkoutWindow;
-            if (window?.Instant?.config?.checkoutConfig?.quoteData?.entity_id) {
+            if (window.Instant &&
+                window.Instant.config &&
+                window.Instant.config.checkoutConfig &&
+                window.Instant.config.checkoutConfig.quoteData &&
+                window.Instant.config.checkoutConfig.quoteData.entity_id) {
                 checkoutWindow = this.init(null, window.Instant.config.checkoutConfig.quoteData.entity_id, sourceLocation);
             } else {
                 if (!this.canBrowserSetWindowLocation()) {

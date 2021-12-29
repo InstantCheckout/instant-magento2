@@ -105,7 +105,7 @@ define([
             $(pdpBtnText).hide();
 
             let checkoutWindow;
-            if (window?.Instant?.config) {
+            if (window.Instant && window.Instant.config) {
                 checkoutWindow = checkoutHelper.init([{ sku: config.sku, qty, options }], null, "pdp");
             } else {
                 if (!checkoutHelper.canBrowserSetWindowLocation()) {
