@@ -104,7 +104,24 @@ define([
             $(pdpBtnSelector).attr('disabled', true);
             $(pdpBtnText).hide();
 
-            const checkoutWindow = checkoutHelper.init([{ sku: config.sku, qty, options }], null, "pdp");
+            let checkoutWindow;
+            if (window?.Instant?.config) {
+                checkoutWindow = checkoutHelper.init([{ sku: config.sku, qty, options }], null, "pdp");
+            } else {
+                if (!checkoutHelper.canBrowserSetWindowLocation()) {
+                    checkoutWindow = checkoutHelper.openCheckoutWindow("https://checkout.instant.one/");
+                }
+
+                checkoutHelper.handleInstantAwareFunc(() => {
+                    const url = checkoutHelper.getCheckoutUrl([{ sku: config.sku, qty, options }], null, "pdp");
+                    if (checkoutWindow) {
+                        checkoutWindow.location = url;
+                    } else {
+                        window.location = url;
+                    }
+                });
+            }
+
             if (checkoutWindow) {
                 const loop = setInterval(function () {
                     if (checkoutWindow.closed) {

@@ -92,13 +92,16 @@ define([
                 const cartData = this.getCustomerCartData();
 
                 let cartContainsBlacklistedSku = false;
-                cartData.items.forEach(item => {
-                    window.Instant.config.disabledForSkusContaining.forEach(x => {
-                        if (x && item.product_sku.indexOf(x) !== -1) {
-                            cartContainsBlacklistedSku = true;
-                        }
+
+                if (cartData?.items) {
+                    cartData.items.forEach(item => {
+                        window.Instant.config.disabledForSkusContaining.forEach(x => {
+                            if (x && item.product_sku.indexOf(x) !== -1) {
+                                cartContainsBlacklistedSku = true;
+                            }
+                        })
                     })
-                })
+                }
 
                 const shouldEnableInstantBtn = !cartContainsBlacklistedSku && !(disabledTotalThreshold && parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold) && window.Instant.config.isGuest;
                 const shouldEnableMinicartInstantBtn = cartData && cartData.items && cartData.items.length > 0 && window.Instant.config.enableMinicartBtn && shouldEnableInstantBtn;
@@ -109,15 +112,22 @@ define([
             })
         },
 
-        init: function (items, cartId, source) {
-            const url = this.getCheckoutUrl(items, cartId, source);
-
+        openCheckoutWindow: function (url) {
             const windowHeight = 800;
             const windowWidth = 490;
             const posY = window.outerHeight / 2 + window.screenY - (windowHeight / 2);
             const posX = window.outerWidth / 2 + window.screenX - (windowWidth / 2);
-
             return window.open(url, '', 'location=yes,height=' + windowHeight + ',width=' + windowWidth + ',top=' + posY + ',left=' + posX + ',scrollbars=yes,status=yes');
+        },
+
+        init: function (items, cartId, source) {
+            return this.openCheckoutWindow(this.getCheckoutUrl(items, cartId, source));
+        },
+
+        canBrowserSetWindowLocation: function () {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isFbOrInstaBrowser = (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1) || navigator.userAgent.includes("Instagram");
+            return isFbOrInstaBrowser;
         },
 
         checkoutCustomerCart: function (
@@ -153,7 +163,24 @@ define([
             $(checkoutButtonTextSelector).hide();
             $(checkoutButtonLockIconSelector).hide();
 
-            const checkoutWindow = this.init(null, window.Instant.config.checkoutConfig.quoteData.entity_id, sourceLocation);
+            let checkoutWindow;
+            if (window?.Instant?.config?.checkoutConfig?.quoteData?.entity_id) {
+                checkoutWindow = this.init(null, window.Instant.config.checkoutConfig.quoteData.entity_id, sourceLocation);
+            } else {
+                if (!this.canBrowserSetWindowLocation()) {
+                    checkoutWindow = this.openCheckoutWindow("https://checkout.instant.one/");
+                }
+
+                this.handleInstantAwareFunc(() => {
+                    const url = this.getCheckoutUrl(null, window.Instant.config.checkoutConfig.quoteData.entity_id, sourceLocation);
+                    if (checkoutWindow) {
+                        checkoutWindow.location = url;
+                    } else {
+                        window.location = url;
+                    }
+                });
+            }
+
             if (checkoutWindow) {
                 const loop = setInterval(function () {
                     if (checkoutWindow.closed) {
