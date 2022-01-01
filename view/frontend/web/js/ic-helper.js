@@ -168,7 +168,8 @@ define([
                 window.Instant.config &&
                 window.Instant.config.checkoutConfig &&
                 window.Instant.config.checkoutConfig.quoteData &&
-                window.Instant.config.checkoutConfig.quoteData.entity_id) {
+                window.Instant.config.checkoutConfig.quoteData.entity_id &&
+                window.Instant.config.checkoutConfig.quoteData.entity_id.length === 32) {
                 checkoutWindow = this.init(null, window.Instant.config.checkoutConfig.quoteData.entity_id, sourceLocation);
             } else {
                 if (!this.canBrowserSetWindowLocation()) {
