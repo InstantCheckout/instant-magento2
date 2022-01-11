@@ -87,15 +87,16 @@ define([
 
         handleCartTotalChanged: function () {
             this.handleInstantAwareFunc(() => {
-                const disabledTotalThreshold = window.Instant.config.disabledTotalThreshold;
+                const config = window.Instant.config;
+
+                const disabledTotalThreshold = config.disabledTotalThreshold;
 
                 const cartData = this.getCustomerCartData();
 
                 let cartContainsBlacklistedSku = false;
-
                 if (cartData && cartData.items) {
                     cartData.items.forEach(item => {
-                        window.Instant.config.disabledForSkusContaining.forEach(x => {
+                        config.disabledForSkusContaining.forEach(x => {
                             if (x && item.product_sku.indexOf(x) !== -1) {
                                 cartContainsBlacklistedSku = true;
                             }
@@ -105,10 +106,20 @@ define([
 
                 const shouldEnableInstantBtn = !cartContainsBlacklistedSku && !(disabledTotalThreshold && parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold) && window.Instant.config.isGuest;
                 const shouldEnableMinicartInstantBtn = cartData && cartData.items && cartData.items.length > 0 && window.Instant.config.enableMinicartBtn && shouldEnableInstantBtn;
-
                 $('#ic-mc-btn-container').css('display', shouldEnableMinicartInstantBtn ? 'flex' : 'none');
                 $('#ic-cindex-btn-container').css('display', shouldEnableInstantBtn ? 'flex' : 'none');
                 $('#ic-cpage-btn-container').css('display', shouldEnableInstantBtn ? 'flex' : 'none');
+
+                const cartBtnWidth = (config.cartBtnWidth && parseInt(config.cartBtnWidth) > 0) ? config.cartBtnWidth : "90";
+                const pdpBtnWidth = (config.pdpBtnWidth && parseInt(config.pdpBtnWidth) > 0) ? config.pdpBtnWidth : "100";
+                const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+                const btnHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+                $('.ic-cart-btn-wrapper').css('width', cartBtnWidth + '%');
+                $('.ic-pdp-btn-container').css('width', pdpBtnWidth + '%');
+                $('.ic-pdp-btn').css('border-radius', btnBorderRadius + 'px');
+                $('.ic-cart-btn').css('border-radius', btnBorderRadius + 'px');
+                $('.ic-pdp-btn').css('height', btnHeight + 'px');
+                $('.ic-cart-btn').css('height', btnHeight + 'px');
             })
         },
 
@@ -168,7 +179,8 @@ define([
                 window.Instant.config &&
                 window.Instant.config.checkoutConfig &&
                 window.Instant.config.checkoutConfig.quoteData &&
-                window.Instant.config.checkoutConfig.quoteData.entity_id) {
+                window.Instant.config.checkoutConfig.quoteData.entity_id &&
+                window.Instant.config.checkoutConfig.quoteData.entity_id.length === 32) {
                 checkoutWindow = this.init(null, window.Instant.config.checkoutConfig.quoteData.entity_id, sourceLocation);
             } else {
                 if (!this.canBrowserSetWindowLocation()) {

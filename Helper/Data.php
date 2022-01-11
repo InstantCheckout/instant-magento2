@@ -58,6 +58,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
 
     /**
+     * Instant cart button width
+     */
+    const CART_BTN_WIDTH = 'instant/visual/cart_btn_width';
+
+    /**
+     * Instant pdp button width
+     */
+    const PDP_BTN_WIDTH = 'instant/visual/pdp_btn_width';
+
+    /**
+     * Instant btn border radius
+     */
+    const BTN_BORDER_RADIUS = 'instant/visual/btn_border_radius';
+
+    /**
+     * Instant btn height
+     */
+    const BTN_HEIGHT = 'instant/visual/btn_height';
+
+    /**
      * @var \Magento\Checkout\Model\CompositeConfigProvider
      */
     protected $configProvider;
@@ -195,6 +215,42 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $disableForSkusContaining = $this->getConfig(self::DISABLED_FOR_SKUS_CONTAINING);
         return explode(',', $disableForSkusContaining);
+    }
+
+    /**
+     * Get cart btn width
+     * @return string
+     */
+    public function getCartBtnWidth()
+    {
+        return $this->getConfig(self::CART_BTN_WIDTH);
+    }
+
+    /**
+     * Get btn border radius
+     * @return string
+     */
+    public function getBtnBorderRadius()
+    {
+        return $this->getConfig(self::BTN_BORDER_RADIUS);
+    }
+
+    /**
+     * Get btn height
+     * @return string
+     */
+    public function getBtnHeight()
+    {
+        return $this->getConfig(self::BTN_HEIGHT);
+    }
+
+    /**
+     * Get pdp btn width
+     * @return string
+     */
+    public function getPdpBtnWidth()
+    {
+        return $this->getConfig(self::PDP_BTN_WIDTH);
     }
 
     /**
