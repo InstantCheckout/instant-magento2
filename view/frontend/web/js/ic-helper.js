@@ -114,12 +114,12 @@ define([
                 const pdpBtnWidth = (config.pdpBtnWidth && parseInt(config.pdpBtnWidth) > 0) ? config.pdpBtnWidth : "100";
                 const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
                 const btnHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
-                $('.ic-cart-btn-wrapper').css('width', cartBtnWidth + '% !important');
-                $('.ic-pdp-btn-container').css('width', pdpBtnWidth + '% !important');
-                $('.ic-pdp-btn').css('border-radius', btnBorderRadius + 'px !important');
-                $('.ic-cart-btn').css('border-radius', btnBorderRadius + 'px !important');
-                $('.ic-pdp-btn').css('height', btnHeight + 'px !important');
-                $('.ic-cart-btn').css('height', btnHeight + 'px !important');
+                $('.ic-cart-btn-wrapper').css('width', cartBtnWidth + '%');
+                $('.ic-pdp-btn-container').css('width', pdpBtnWidth + '%');
+                $('.ic-pdp-btn').css('border-radius', btnBorderRadius + 'px');
+                $('.ic-cart-btn').css('border-radius', btnBorderRadius + 'px');
+                $('.ic-pdp-btn').css('height', btnHeight + 'px');
+                $('.ic-cart-btn').css('height', btnHeight + 'px');
             })
         },
 
