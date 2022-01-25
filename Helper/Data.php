@@ -58,9 +58,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
 
     /**
-     * Instant cart button width
+     * Instant minicart button width
      */
-    const CART_BTN_WIDTH = 'instant/visual/cart_btn_width';
+    const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
+
+    /**
+     * Instant cart index button width
+     */
+    const CINDEX_BTN_WIDTH = 'instant/visual/cindex_btn_width';
+
+    /**
+     * Instant checkout page width
+     */
+    const CPAGE_BTN_WIDTH = 'instant/visual/cpage_btn_width';
 
     /**
      * Instant pdp button width
@@ -88,6 +98,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $serializer;
 
     /**
+     * @var \Magento\Framework\Session\SessionManager
+     */
+    private $sessionManager;
+
+    /**
      * Constructor.
      * @param Context $context
      * @param Session $customerSession
@@ -96,12 +111,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         Context $context,
         Session $customerSession,
         \Magento\Checkout\Model\CompositeConfigProvider $configProvider,
+        \Magento\Framework\Session\SessionManager $sessionManager,
         \Magento\Framework\Serialize\SerializerInterface $serializerInterface = null
     ) {
         $this->customerSession = $customerSession;
         $this->configProvider = $configProvider;
         $this->serializer = $serializerInterface ?: \Magento\Framework\App\ObjectManager::getInstance()
             ->get(\Magento\Framework\Serialize\Serializer\JsonHexTag::class);
+        $this->sessionManager = $sessionManager;
 
         return parent::__construct($context);
     }
@@ -117,6 +134,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $config,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+    }
+
+    /**
+     * Retrieve sessionID
+     *
+     * @return string
+     */
+    public function getSessionId()
+    {
+        return $this->sessionManager->getSessionId();
     }
 
     /**
@@ -218,12 +245,30 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get cart btn width
+     * Get minicart btn width
      * @return string
      */
-    public function getCartBtnWidth()
+    public function getMcBtnWidth()
     {
-        return $this->getConfig(self::CART_BTN_WIDTH);
+        return $this->getConfig(self::MC_BTN_WIDTH);
+    }
+
+    /**
+     * Get cart index btn width
+     * @return string
+     */
+    public function getCIndexBtnWidth()
+    {
+        return $this->getConfig(self::CINDEX_BTN_WIDTH);
+    }
+
+    /**
+     * Get checkout page width
+     * @return string
+     */
+    public function getCPageBtnWidth()
+    {
+        return $this->getConfig(self::CPAGE_BTN_WIDTH);
     }
 
     /**

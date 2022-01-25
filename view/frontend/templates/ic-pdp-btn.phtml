@@ -16,11 +16,14 @@
             <span>or</span>
         </div>
         <h4 id="ic-pdp-required-options-msg" class="ic-error-text">Please select required options</h4>
-        <button id="ic-pdp-btn" type="button" title="Instant Checkout" class="ic-pdp-btn" data-mage-init='
+        <button disabled id="ic-pdp-btn" type="button" title="Instant Checkout" class="ic-pdp-btn" data-mage-init='
                     {
                         "Instant_Checkout/js/ic-pdp-checkout": {
                             "form": "#<?= $block->escapeHtml($formId); ?>",
-                            "sku": "<?= $block->escapeHtmlAttr($block->getProduct()->getSku()) ?>"
+                            "sku": "<?= $block->escapeHtmlAttr($block->getProduct()->getSku()) ?>",
+                            "btnWidth": "<?= $block->escapeHtml($helper->getPdpBtnWidth()) ?>",
+                            "btnBorderRadius": "<?= $block->escapeHtml($helper->getBtnBorderRadius()) ?>",
+                            "btnHeight": "<?= $block->escapeHtml($helper->getBtnHeight()) ?>"
                         }            
                     }
                     '>

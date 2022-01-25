@@ -7,6 +7,11 @@ define([
 ], function (ko, $, Component, checkoutHelper, customerData) {
     'use strict';
 
+    $('#ic-mc-btn-container').css('display', 'flex');
+    checkoutHelper.handleInstantAwareFunc(() => {
+        checkoutHelper.handleCartTotalChanged();
+    });
+
     return Component.extend({
         defaults: {
             template: 'Instant_Checkout/ic-mc-btn',

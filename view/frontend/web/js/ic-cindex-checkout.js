@@ -5,6 +5,18 @@ define([
     "use strict";
 
     return function (config, element) {
+        $('#ic-cindex-btn-wrapper').css('display', 'flex');
+
+        const cartBtnWidth = (config.btnWidth && parseInt(config.btnWidth) > 0) ? config.btnWidth : "90";
+        const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+        const btnHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+
+        checkoutHelper.setCartIndexBtnAttributes(cartBtnWidth, btnHeight, btnBorderRadius);
+
+        checkoutHelper.handleInstantAwareFunc(() => {
+            checkoutHelper.handleCartTotalChanged();
+        })
+
         $(element).click(function () {
             checkoutHelper.checkoutCustomerCart(
                 "#ic-cindex-btn",

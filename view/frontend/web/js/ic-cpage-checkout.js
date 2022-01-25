@@ -4,6 +4,10 @@ define([
 ], function (Component, checkoutHelper) {
     'use strict';
 
+    checkoutHelper.handleInstantAwareFunc(() => {
+        checkoutHelper.handleCartTotalChanged();
+    })
+
     return Component.extend({
         defaults: {
             template: 'Instant_Checkout/ic-cpage-btn'

@@ -44,11 +44,14 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['disabledTotalThreshold'] = $instantHelper->getDisabledCartTotalThreshold();
         $data['disabledForSkusContaining'] = $instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $storeCode;
-        $data['cartBtnWidth'] = $instantHelper->getCartBtnWidth();
+        $data['mcBtnWidth'] = $instantHelper->getMcBtnWidth();
+        $data['cpageBtnWidth'] = $instantHelper->getCPageBtnWidth();
+        $data['cindexBtnWidth'] = $instantHelper->getCIndexBtnWidth();
         $data['pdpBtnWidth'] = $instantHelper->getPdpBtnWidth();
         $data['btnBorderRadius'] = $instantHelper->getBtnBorderRadius();
         $data['btnHeight'] = $instantHelper->getBtnHeight();
         $data['checkoutConfig'] = json_decode($instantHelper->getSerializedCheckoutConfig(), true);
+        $data['sessId'] = $instantHelper->getSessionId();
 
         $result->setData($data);
 

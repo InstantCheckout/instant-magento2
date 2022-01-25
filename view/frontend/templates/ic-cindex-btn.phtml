@@ -3,7 +3,6 @@
 
 <?php /** @var \Magento\Catalog\Block\Product\View $block */ ?>
 <?php $helper = $this->helper(\Instant\Checkout\Helper\Data::class); ?>
-<?php $formId = $helper->getProductPageAddToCartFormId(); ?>
 <!-- INSTANT BUTTON START -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,10 +11,14 @@
 
 <div class='ic-css-reset' style="width:100% !important">
     <div id="ic-cindex-btn-container" class="ic-btn-container">
-        <div class="ic-cart-btn-wrapper">
-            <button id="ic-cindex-btn" type="button" title="Instant Checkout" class="ic-cart-btn" data-mage-init='
+        <div id="ic-cindex-btn-wrapper" class="ic-cart-btn-wrapper">
+            <button disabled id="ic-cindex-btn" type="button" title="Instant Checkout" class="ic-cart-btn" data-mage-init='
                     {
-                        "Instant_Checkout/js/ic-cindex-checkout": {}            
+                        "Instant_Checkout/js/ic-cindex-checkout": {
+                            "btnWidth": "<?= $block->escapeHtml($helper->getCIndexBtnWidth()) ?>",
+                            "btnBorderRadius": "<?= $block->escapeHtml($helper->getBtnBorderRadius()) ?>",
+                            "btnHeight": "<?= $block->escapeHtml($helper->getBtnHeight()) ?>"
+                        }            
                     }
                     '>
                 <div id="ic-cindex-btn-loading" class='ic-btn-loading'></div>

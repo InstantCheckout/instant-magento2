@@ -22,18 +22,27 @@ define([
     const pdpMobileBackdrop = '#ic-pdp-mobile-backdrop';
     const pdpMobileBackToShopping = '#ic-pdp-mobile-back-to-shopping';
     const pdpDesktopBackToCheckout = '#ic-pdp-desktop-back-to-checkout';
-    const pdpBtnContainerSelector = "#ic-pdp-btn-container";
     const pdpRequiredOptionsMsgSelector = "#ic-pdp-required-options-msg";
+    const pdpBtnContainerSelector = "#ic-pdp-btn-container";
 
     return function (config, element) {
+        $(pdpBtnContainerSelector).css('display', 'flex');
+        $(pdpBtnSelector).prop('disabled', false);
+
+        const btnWidth = (config.btnWidth && parseInt(config.btnWidth) > 0) ? config.btnWidth : "100";
+        const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+        const btnHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+
+        checkoutHelper.setPdpBtnAttributes(btnWidth, btnHeight, btnBorderRadius);
         checkoutHelper.handleInstantAwareFunc(() => {
+            checkoutHelper.handleCartTotalChanged();
+
             let skuIsDisabled = false;
-            window.Instant.config.disabledForSkusContaining.forEach(x => {
+            Instant.config.disabledForSkusContaining.forEach(x => {
                 if (x && config.sku.indexOf(x) !== -1) {
                     skuIsDisabled = true;
                 }
             })
-
             $(pdpBtnContainerSelector).css('display', skuIsDisabled ? 'none' : 'flex');
             $(pdpBtnContainerSelector).css('flex-direction', 'column');
         })
@@ -109,7 +118,7 @@ define([
                 checkoutWindow = checkoutHelper.init([{ sku: config.sku, qty, options }], null, "pdp");
             } else {
                 if (!checkoutHelper.canBrowserSetWindowLocation()) {
-                    checkoutWindow = checkoutHelper.openCheckoutWindow("https://checkout.instant.one/");
+                    checkoutWindow = checkoutHelper.openCheckoutWindow(checkoutHelper.getInstantBaseUrl());
                 }
 
                 checkoutHelper.handleInstantAwareFunc(() => {

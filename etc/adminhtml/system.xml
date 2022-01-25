@@ -51,9 +51,17 @@
             </group>
             <group id="visual" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Visual Config</label>
-                <field id="cart_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Width of minicart, checkout summary and checkout page buttons</label>
+                <field id="mc_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Width of minicart button</label>
                     <comment>Defaults to 90%. (%) Low values may cause visual glitching.</comment>
+                </field>
+                <field id="cindex_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Width of checkout/cart summary button</label>
+                    <comment>Defaults to 90%. (%) Low values may cause visual glitching.</comment>
+                </field>
+                <field id="cpage_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Width of checkout page button</label>
+                    <comment>Defaults to 60%. (%) Low values may cause visual glitching.</comment>
                 </field>
                 <field id="pdp_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Width of PDP button</label>

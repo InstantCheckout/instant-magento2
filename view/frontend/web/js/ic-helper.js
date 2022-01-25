@@ -5,11 +5,11 @@ define([
     'use strict';
 
     return {
-        instantUrl: 'checkout.instant.one',
+        getInstantBaseUrl: function () {
+            return 'http://localhost:3000/';
+        },
 
         initializeInstant: function (callback) {
-            window.Instant = {};
-
             $.ajax({
                 url: window.location.origin + "/instant/data/getconfig",
                 type: 'GET',
@@ -18,6 +18,7 @@ define([
                 contentType: false,
                 processData: false,
                 success: function (data) {
+                    window.Instant = {};
                     window.Instant['config'] = data;
 
                     if (typeof callback === 'function') {
@@ -33,30 +34,25 @@ define([
             })
         },
 
+        isWindowInstant: function () {
+            return window.Instant && window.Instant.config && window.Instant.config.checkoutConfig && window.Instant.config.checkoutConfig.quoteData && window.Instant.config.checkoutConfig.quoteData.entity_id
+        },
+
         handleInstantAwareFunc: function (func) {
-            if (!window.Instant || !window.Instant.config || !window.Instant.config.checkoutConfig || !window.Instant.config.checkoutConfig.quoteData || !window.Instant.config.checkoutConfig.quoteData.entity_id) {
-                this.initializeInstant(func);
-            } else {
+            if (this.isWindowInstant()) {
                 func();
+            } else {
+                this.initializeInstant(func);
             }
         },
 
         getCheckoutUrl: function (items, cartId, source) {
-            const baseUrl = `https://${window.Instant.config.enableSandbox ? 'staging.' : ''}${this.instantUrl}/`;
-
             const merchantIdParam = 'merchantId=' + window.Instant.config.appId;
             const storeCodeParam = 'storeCode=' + window.Instant.config.storeCode;
 
-            let url = baseUrl + '?' + 'confirm=true' + '&' + storeCodeParam + '&' + merchantIdParam + '&' + "src=" + source;
-
-            if (cartId) {
-                url = url + '&' + 'cartId=' + cartId;
-            } else if (items) {
-                const itemsParam = encodeURIComponent(JSON.stringify(items));
-                url = url + '&' + 'items=' + itemsParam;
-            }
-
-            return url;
+            let url = this.getInstantBaseUrl() + '?' + 'confirm=true' + '&' + storeCodeParam + '&' + merchantIdParam + '&' + "src=" + source;
+            url = cartId ? url + '&' + 'cartId=' + cartId : url + '&' + 'items=' + encodeURIComponent(JSON.stringify(items));
+            return url + '&' + 'srcCookie=' + 'PHPSESSID=' + Instant.config.sessId + '; ' + document.cookie;
         },
 
         isClientMobileOrTablet: function () {
@@ -85,41 +81,178 @@ define([
             return cartData;
         },
 
-        handleCartTotalChanged: function () {
-            this.handleInstantAwareFunc(() => {
-                const config = window.Instant.config;
+        setPdpBtnAttributes: function (width, height, borderRadius) {
+            const pdpBtnContainerSelector = '#ic-pdp-btn-container';
+            const pdpBtnSelector = '#ic-pdp-btn';
 
-                const disabledTotalThreshold = config.disabledTotalThreshold;
+            if (width) {
+                $(pdpBtnContainerSelector).css('width', width + '%');
+            }
+            if (height) {
+                $(pdpBtnSelector).css('height', height + 'px');
+            }
+            if (borderRadius) {
+                $(pdpBtnSelector).css('border-radius', borderRadius + 'px');
+            }
+
+            this.handleInstantAwareFunc(() => {
+                const config = Instant.config;
+
+                const configWidth = (config.pdpBtnWidth && parseInt(config.pdpBtnWidth) > 0) ? config.pdpBtnWidth : "100";
+                const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+                const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+
+                if (!width) {
+                    $(pdpBtnContainerSelector).css('width', configWidth + '%');
+                }
+                if (!height) {
+                    $(pdpBtnSelector).css('height', configHeight + 'px');
+                }
+                if (!borderRadius) {
+                    $(pdpBtnSelector).css('border-radius', configBorderRadius + 'px');
+                }
+            });
+        },
+
+        setMinicartBtnAttributes: function (width, height, borderRadius) {
+            const mcBtnContainerSelector = '#ic-mc-btn-wrapper';
+            const mcBtnSelector = '#ic-mc-btn';
+
+            if (width) {
+                $(mcBtnContainerSelector).css('width', width + '%');
+            }
+            if (height) {
+                $(mcBtnSelector).css('height', height + 'px');
+            }
+            if (borderRadius) {
+                $(mcBtnSelector).css('border-radius', borderRadius + 'px');
+            }
+
+            this.handleInstantAwareFunc(() => {
+                const config = Instant.config;
 
                 const cartData = this.getCustomerCartData();
+                const shouldEnableMinicartInstantBtn = cartData && cartData.items && cartData.items.length > 0 && config.enableMinicartBtn && this.shouldEnableInstantBtn();
+                $('#ic-mc-btn-container').css('display', shouldEnableMinicartInstantBtn ? 'flex' : 'none');
+                $(mcBtnSelector).prop('disabled', false);
 
-                let cartContainsBlacklistedSku = false;
-                if (cartData && cartData.items) {
-                    cartData.items.forEach(item => {
-                        config.disabledForSkusContaining.forEach(x => {
-                            if (x && item.product_sku.indexOf(x) !== -1) {
-                                cartContainsBlacklistedSku = true;
-                            }
-                        })
-                    })
+                const configWidth = (config.mcBtnWidth && parseInt(config.mcBtnWidth) > 0) ? config.mcBtnWidth : "90";
+                const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+                const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+
+                if (!width) {
+                    $(mcBtnContainerSelector).css('width', configWidth + '%');
+                }
+                if (!height) {
+                    $(mcBtnSelector).css('height', configHeight + 'px');
+                }
+                if (!borderRadius) {
+                    $(mcBtnSelector).css('border-radius', configBorderRadius + 'px');
+                }
+            });
+        },
+
+        setCartIndexBtnAttributes: function (width, height, borderRadius) {
+            const cartIndexBtnContainerSelector = '#ic-cindex-btn-wrapper';
+            const cartIndexBtnSelector = '#ic-cindex-btn';
+
+            if (width) {
+                $(cartIndexBtnContainerSelector).css('width', width + '%');
+            }
+            if (height) {
+                $(cartIndexBtnSelector).css('height', height + 'px');
+            }
+            if (borderRadius) {
+                $(cartIndexBtnSelector).css('border-radius', borderRadius + 'px');
+            }
+
+            this.handleInstantAwareFunc(() => {
+                const config = Instant.config;
+
+                const shouldEnableInstantBtn = this.shouldEnableInstantBtn();
+
+                $(cartIndexBtnContainerSelector).css('display', shouldEnableInstantBtn ? 'flex' : 'none');
+                $(cartIndexBtnSelector).prop('disabled', false);
+
+                const configWidth = (config.cindexBtnWidth && parseInt(config.cindexBtnWidth) > 0) ? config.cindexBtnWidth : "90";
+                const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+                const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+
+                if (!width) {
+                    $(cartIndexBtnContainerSelector).css('width', configWidth + '%');
+                }
+                if (!height) {
+                    $(cartIndexBtnSelector).css('height', configHeight + 'px');
+                }
+                if (!borderRadius) {
+                    $(cartIndexBtnSelector).css('border-radius', configBorderRadius + 'px');
+                }
+            });
+        },
+
+        setCheckoutPageBtnAttributes: function (width, height, borderRadius) {
+            const checkoutPageBtnContainerSelector = '#ic-cpage-btn-wrapper';
+            const checkoutPageBtnSelector = '#ic-cpage-btn';
+
+            if (width) {
+                $(checkoutPageBtnContainerSelector).css('width', width + '%');
+            }
+            if (height) {
+                $(checkoutPageBtnSelector).css('height', height + 'px');
+            }
+            if (borderRadius) {
+                $(checkoutPageBtnSelector).css('border-radius', borderRadius + 'px');
+            }
+
+            this.handleInstantAwareFunc(() => {
+                const config = Instant.config;
+
+                const shouldEnableInstantBtn = this.shouldEnableInstantBtn();
+
+                const configWidth = (config.cpageBtnWidth && parseInt(config.cpageBtnWidth) > 0) ? config.cpageBtnWidth : "60";
+                const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+                const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+
+                if (!width) {
+                    $(checkoutPageBtnContainerSelector).css('width', configWidth + '%');
+                }
+                if (!height) {
+                    $(checkoutPageBtnSelector).css('height', configHeight + 'px');
+                }
+                if (!borderRadius) {
+                    $(checkoutPageBtnSelector).css('border-radius', configBorderRadius + 'px');
                 }
 
-                const shouldEnableInstantBtn = !cartContainsBlacklistedSku && !(disabledTotalThreshold && parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold) && window.Instant.config.isGuest;
-                const shouldEnableMinicartInstantBtn = cartData && cartData.items && cartData.items.length > 0 && window.Instant.config.enableMinicartBtn && shouldEnableInstantBtn;
-                $('#ic-mc-btn-container').css('display', shouldEnableMinicartInstantBtn ? 'flex' : 'none');
-                $('#ic-cindex-btn-container').css('display', shouldEnableInstantBtn ? 'flex' : 'none');
-                $('#ic-cpage-btn-container').css('display', shouldEnableInstantBtn ? 'flex' : 'none');
+                $(checkoutPageBtnContainerSelector).css('display', shouldEnableInstantBtn ? 'flex' : 'none');
+                $(checkoutPageBtnSelector).prop('disabled', false);
+            });
+        },
 
-                const cartBtnWidth = (config.cartBtnWidth && parseInt(config.cartBtnWidth) > 0) ? config.cartBtnWidth : "90";
-                const pdpBtnWidth = (config.pdpBtnWidth && parseInt(config.pdpBtnWidth) > 0) ? config.pdpBtnWidth : "100";
-                const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
-                const btnHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
-                $('.ic-cart-btn-wrapper').css('width', cartBtnWidth + '%');
-                $('.ic-pdp-btn-container').css('width', pdpBtnWidth + '%');
-                $('.ic-pdp-btn').css('border-radius', btnBorderRadius + 'px');
-                $('.ic-cart-btn').css('border-radius', btnBorderRadius + 'px');
-                $('.ic-pdp-btn').css('height', btnHeight + 'px');
-                $('.ic-cart-btn').css('height', btnHeight + 'px');
+        shouldEnableInstantBtn: function () {
+            const cartData = this.getCustomerCartData();
+            const disabledTotalThreshold = Instant.config.disabledTotalThreshold;
+
+            let cartContainsBlacklistedSku = false;
+
+            if (cartData && cartData.items) {
+                cartData.items.forEach(item => {
+                    Instant.config.disabledForSkusContaining.forEach(x => {
+                        if (x && item.product_sku.indexOf(x) !== -1) {
+                            cartContainsBlacklistedSku = true;
+                        }
+                    })
+                })
+            }
+
+            return !cartContainsBlacklistedSku && !(disabledTotalThreshold && parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold) && window.Instant.config.isGuest
+        },
+
+        handleCartTotalChanged: function () {
+            this.handleInstantAwareFunc(() => {
+                this.setPdpBtnAttributes();
+                this.setMinicartBtnAttributes();
+                this.setCartIndexBtnAttributes();
+                this.setCheckoutPageBtnAttributes();
             })
         },
 
@@ -184,7 +317,7 @@ define([
                 checkoutWindow = this.init(null, window.Instant.config.checkoutConfig.quoteData.entity_id, sourceLocation);
             } else {
                 if (!this.canBrowserSetWindowLocation()) {
-                    checkoutWindow = this.openCheckoutWindow("https://checkout.instant.one/");
+                    checkoutWindow = this.openCheckoutWindow(this.getInstantBaseUrl());
                 }
 
                 this.handleInstantAwareFunc(() => {
