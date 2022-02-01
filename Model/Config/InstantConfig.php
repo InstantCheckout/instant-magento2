@@ -47,11 +47,6 @@ class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
         return parent::__construct($context);
     }
 
-    /**
-     * Retrieve config value
-     *
-     * @return string
-     */
     public function getConfig($config)
     {
         return $this->scopeConfig->getValue(
@@ -60,154 +55,90 @@ class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
-    /**
-     * Retrieve sessionID
-     *
-     * @return string
-     */
     public function getSessionId()
     {
         return $this->sessionManager->getSessionId();
     }
 
-    /**
-     * Get whether customer is logged in 
-     */
     public function getIsGuest()
     {
         return !$this->customerSession->isLoggedIn();
     }
 
-    /**
-     * Get Instant App ID
-     * @return string
-     */
     public function getInstantAppId()
     {
         $instantAppId = $this->getConfig(self::INSTANT_APP_ID_PATH);
         return $instantAppId;
     }
 
-    /**
-     * Get Instant Access Token
-     * @return string
-     */
     public function getInstantApiAccessToken()
     {
         $instantAccessToken = $this->getConfig(self::ACCESS_TOKEN_PATH);
         return $instantAccessToken;
     }
 
-    /**
-     * Enable Instant minicart button configuration
-     * @return string
-     */
     public function getInstantMinicartBtnEnabled()
     {
         $minicartBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_MINICART_BTN_PATH);
         return $minicartBtnEnabled === "1";
     }
 
-    /**
-     * Get checkout page enabled
-     * @return string
-     */
     public function getInstantBtnCheckoutPageEnabled()
     {
         $checkoutPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH);
         return $checkoutPageBtnEnabled === "1";
     }
 
-    /**
-     * Get cart summary enabled
-     * @return string
-     */
     public function getInstantBtnCheckoutSummaryEnabled()
     {
         $checkoutSummaryEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_SUMMARY);
         return $checkoutSummaryEnabled === "1";
     }
 
-    /**
-     * Get catalog page enabled
-     * @return string
-     */
     public function getInstantBtnCatalogPageEnabled()
     {
         $catalogPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CATALOG_PAGE_PATH);
         return $catalogPageBtnEnabled === "1";
     }
 
-    /**
-     * Get staging/sandbox or live/production environment config
-     * @return string
-     */
     public function getSandboxEnabledConfig()
     {
         $sandboxEnabled = $this->getConfig(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
         return $sandboxEnabled === "1";
     }
 
-    /**
-     * Get disabled SKU phrases
-     * @return string
-     */
     public function getDisabledForSkusContaining()
     {
         $disableForSkusContaining = $this->getConfig(self::DISABLED_FOR_SKUS_CONTAINING);
         return explode(',', $disableForSkusContaining);
     }
 
-    /**
-     * Get minicart btn width
-     * @return string
-     */
     public function getMcBtnWidth()
     {
         return $this->getConfig(self::MC_BTN_WIDTH);
     }
 
-    /**
-     * Get cart index btn width
-     * @return boolean
-     */
     public function getShouldResizeCartIndexBtn()
     {
         $shouldResize = $this->getConfig(self::SHOULD_RESIZE_CART_INDEX_BTN);
         return $shouldResize === '1';
     }
 
-    /**
-     * Get checkout page width
-     * @return string
-     */
     public function getCPageBtnWidth()
     {
         return $this->getConfig(self::CPAGE_BTN_WIDTH);
     }
 
-    /**
-     * Get btn border radius
-     * @return string
-     */
     public function getBtnBorderRadius()
     {
         return $this->getConfig(self::BTN_BORDER_RADIUS);
     }
 
-    /**
-     * Get btn height
-     * @return string
-     */
     public function getBtnHeight()
     {
         return $this->getConfig(self::BTN_HEIGHT);
     }
 
-    /**
-     * Get pdp btn width
-     * @return string
-     */
     public function getShouldResizePdpBtn()
     {
         $shouldResize = $this->getConfig(self::SHOULD_RESIZE_PDP_BTN);
@@ -216,7 +147,14 @@ class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getInstantApiUrl()
     {
-        return "https://zaonwy905l.execute-api.ap-southeast-2.amazonaws.com/pr289";
+        $apiUrl = 'api.instant.one';
+        $isStaging = $this->getSandboxEnabledConfig();
+
+        if ($isStaging) {
+            $apiUrl = 'staging.' . $apiUrl;
+        }
+
+        return "https://" . $apiUrl;
     }
 
     public function guid()

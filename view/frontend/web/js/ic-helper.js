@@ -8,7 +8,7 @@ define([
         getInstantBaseUrl: function () {
             const isSandbox = Instant.config.enableSandbox;
 
-            return 'http://' + (isSandbox ? '' : '') + 'localhost:3000/';
+            return 'https://' + (isSandbox ? 'staging.' : '') + 'checkout.instant.one/';
         },
 
         initializeInstant: function (callback) {
