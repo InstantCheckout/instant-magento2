@@ -15,36 +15,40 @@
                     <label>Instant App ID</label>
                     <comment>Enter the Application ID provided by Instant</comment>
                 </field>
-                <field id="enable_sandbox" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_access_token" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Instant Access Token</label>
+                    <comment>Enter the Access Token provided by Instant (This is used to authenticate your API calls to Instant. IMPORTANT: This is private, do not make publicly available)</comment>
+                </field>
+                <field id="enable_sandbox" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Is in Sandbox/Staging Environment</label>
-                    <comment>Defaults to No. CRITICAL: Set to No if in LIVE/PRODUCTION environment. Set to Yes if this site is a SANDBOX/STAGING environment. </comment>
+                    <comment>Defaults to Yes. CRITICAL: Set to No if in LIVE/PRODUCTION environment. Set to Yes if this site is a SANDBOX/STAGING environment. </comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="disabled_total_threshold" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Disable Instant for carts where the total is above X amount</label>
-                    <comment>Defaults to empty. Enter a number representing the threshold for cart sub-total at which Instant should be disabled. (e.g. Entering 150 will ensure Instant will be disabled for carts with sub-totals above 150 units of currency.) To enable Instant for all carts, leave empty.</comment>
+                <field id="activate_button" translate="label comment" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <button_label>Activate</button_label>
+                    <button_url>adminhtml/instant/activation/send</button_url>
+                    <frontend_model>Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send</frontend_model>
+                    <comment>Important: Ensure config is correct and saved before activating Instant. Clicking this
+                 will send an access token to Instant, allowing Instant to make secure API calls to your store.
+             </comment>
                 </field>
-                <field id="disabled_for_skus_containing" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="disabled_for_skus_containing" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Disable Instant for products where the SKU contains the following specified phrases (provide a comma delimited list)</label>
                     <comment>Defaults to empty. Enter a comma delimited list. If a product's SKU contains any of phrases in this comma delimited list, then Instant will be disabled. (e.g. ABC,DEF will ensure Instant is disabled for all products where the SKU contains either ABC or DEF.) To enable Instant for all products, leave empty.</comment>
                 </field>
-                <field id="product_addtocart_form_id" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>ID of the Form containing Add to Cart button on product page</label>
-                    <comment>Defaults to "product_addtocart_form". Enter addtocart form ID for product view page.</comment>
-                </field>
-                <field id="enable_catalog" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enable_catalog" translate="label" type="select" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Product Catalog Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="enable_minicart" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enable_minicart" translate="label" type="select" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Minicart</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="enable_checkout_summary" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable on Checkout Summary Page</label>
+                <field id="enable_checkout_summary" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable on Cart Summary Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="enable_checkout_page" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enable_checkout_page" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Checkout Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
@@ -55,17 +59,19 @@
                     <label>Width of minicart button</label>
                     <comment>Defaults to 90%. (%) Low values may cause visual glitching.</comment>
                 </field>
-                <field id="cindex_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Width of checkout/cart summary button</label>
-                    <comment>Defaults to 90%. (%) Low values may cause visual glitching.</comment>
-                </field>
                 <field id="cpage_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Width of checkout page button</label>
                     <comment>Defaults to 60%. (%) Low values may cause visual glitching.</comment>
                 </field>
-                <field id="pdp_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Width of PDP button</label>
-                    <comment>Defaults to 100%. (%) Low values may cause visual glitching.</comment>
+                <field id="should_resize_pdp_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Should resize Instant PDP button to Add to Cart button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to yes.</comment>
+                </field>
+                <field id="should_resize_cart_index_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Should resize Instant cart summary button to primary proceed button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to yes.</comment>
                 </field>
                 <field id="btn_border_radius" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Border radius of buttons</label>

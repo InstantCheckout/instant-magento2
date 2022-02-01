@@ -6,7 +6,9 @@ define([
 
     return {
         getInstantBaseUrl: function () {
-            return 'http://localhost:3000/';
+            const isSandbox = Instant.config.enableSandbox;
+
+            return 'http://' + (isSandbox ? '' : '') + 'localhost:3000/';
         },
 
         initializeInstant: function (callback) {
@@ -34,14 +36,37 @@ define([
             })
         },
 
+        showBackdrop: function (checkoutWindow) {
+            const onClick = () => {
+                if (checkoutWindow) {
+                    checkoutWindow.focus();
+                } else {
+                    $('#ic-backdrop-container').css('display', 'none');
+                }
+            };
+
+            $('#ic-backdrop-container').css('display', 'flex');
+            $('.ic-backdrop').css('display', 'flex');
+            $('.ic-backdrop-close').on('click', function () {
+                $('#ic-backdrop-container').css('display', 'none');
+            });
+            $('.ic-backdrop-message').on('click', function () {
+                onClick();
+            });
+            $('.ic-backdrop-continue').on('click', function () {
+                onClick();
+            });
+        },
+
         isWindowInstant: function () {
-            return window.Instant && window.Instant.config && window.Instant.config.checkoutConfig && window.Instant.config.checkoutConfig.quoteData && window.Instant.config.checkoutConfig.quoteData.entity_id
+            return window.Instant && window.Instant.config ? true : false;
         },
 
         handleInstantAwareFunc: function (func) {
             if (this.isWindowInstant()) {
                 func();
             } else {
+                console.log("Window is not Instant?")
                 this.initializeInstant(func);
             }
         },
@@ -49,10 +74,17 @@ define([
         getCheckoutUrl: function (items, cartId, source) {
             const merchantIdParam = 'merchantId=' + window.Instant.config.appId;
             const storeCodeParam = 'storeCode=' + window.Instant.config.storeCode;
+            const sessionIdParam = Instant.config.sessId ? 'sessionId=' + Instant.config.sessId : '';
+            const srcParam = "src=" + source;
+            const confirmParam = "confirm=true";
 
-            let url = this.getInstantBaseUrl() + '?' + 'confirm=true' + '&' + storeCodeParam + '&' + merchantIdParam + '&' + "src=" + source;
+            console.log(sessionIdParam);
+
+            let url = this.getInstantBaseUrl() + '?' + confirmParam + '&' + storeCodeParam + '&' + merchantIdParam + '&' + sessionIdParam + '&' + srcParam;
             url = cartId ? url + '&' + 'cartId=' + cartId : url + '&' + 'items=' + encodeURIComponent(JSON.stringify(items));
-            return url + '&' + 'srcCookie=' + 'PHPSESSID=' + Instant.config.sessId + '; ' + document.cookie;
+
+            console.log(url);
+            return url;
         },
 
         isClientMobileOrTablet: function () {
@@ -81,13 +113,25 @@ define([
             return cartData;
         },
 
-        setPdpBtnAttributes: function (width, height, borderRadius) {
+        configurePdpBtn: function (shouldResizePdpBtn, height, borderRadius) {
             const pdpBtnContainerSelector = '#ic-pdp-btn-container';
             const pdpBtnSelector = '#ic-pdp-btn';
+            const atcBtnSelector = '#product-addtocart-button';
 
-            if (width) {
-                $(pdpBtnContainerSelector).css('width', width + '%');
-            }
+            const resizePdpBtn = (shouldResize) => {
+                if (!shouldResize) {
+                    return;
+                }
+
+                $(pdpBtnContainerSelector).css('width', $(atcBtnSelector).outerWidth() + 'px');
+                $(window).resize(function () {
+                    $(pdpBtnContainerSelector).css('width', $(atcBtnSelector).outerWidth() + 'px');
+                });
+            };
+
+            resizePdpBtn(shouldResizePdpBtn);
+            $(pdpBtnContainerSelector).prependTo($(".box-tocart .fieldset .actions").first());
+
             if (height) {
                 $(pdpBtnSelector).css('height', height + 'px');
             }
@@ -98,13 +142,11 @@ define([
             this.handleInstantAwareFunc(() => {
                 const config = Instant.config;
 
-                const configWidth = (config.pdpBtnWidth && parseInt(config.pdpBtnWidth) > 0) ? config.pdpBtnWidth : "100";
                 const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
                 const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
 
-                if (!width) {
-                    $(pdpBtnContainerSelector).css('width', configWidth + '%');
-                }
+                resizePdpBtn(config.shouldResizePdpBtn);
+
                 if (!height) {
                     $(pdpBtnSelector).css('height', configHeight + 'px');
                 }
@@ -115,11 +157,12 @@ define([
         },
 
         setMinicartBtnAttributes: function (width, height, borderRadius) {
-            const mcBtnContainerSelector = '#ic-mc-btn-wrapper';
+            const mcBtnContainerSelector = '#ic-mc-btn-container';
+            const mcBtnWrapperSelector = '#ic-mc-btn-wrapper';
             const mcBtnSelector = '#ic-mc-btn';
 
             if (width) {
-                $(mcBtnContainerSelector).css('width', width + '%');
+                $(mcBtnWrapperSelector).css('width', width + '%');
             }
             if (height) {
                 $(mcBtnSelector).css('height', height + 'px');
@@ -133,7 +176,7 @@ define([
 
                 const cartData = this.getCustomerCartData();
                 const shouldEnableMinicartInstantBtn = cartData && cartData.items && cartData.items.length > 0 && config.enableMinicartBtn && this.shouldEnableInstantBtn();
-                $('#ic-mc-btn-container').css('display', shouldEnableMinicartInstantBtn ? 'flex' : 'none');
+                $(mcBtnContainerSelector).css('display', shouldEnableMinicartInstantBtn ? 'flex' : 'none');
                 $(mcBtnSelector).prop('disabled', false);
 
                 const configWidth = (config.mcBtnWidth && parseInt(config.mcBtnWidth) > 0) ? config.mcBtnWidth : "90";
@@ -141,7 +184,7 @@ define([
                 const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
 
                 if (!width) {
-                    $(mcBtnContainerSelector).css('width', configWidth + '%');
+                    $(mcBtnWrapperSelector).css('width', configWidth + '%');
                 }
                 if (!height) {
                     $(mcBtnSelector).css('height', configHeight + 'px');
@@ -152,13 +195,31 @@ define([
             });
         },
 
-        setCartIndexBtnAttributes: function (width, height, borderRadius) {
-            const cartIndexBtnContainerSelector = '#ic-cindex-btn-wrapper';
+        setCartIndexBtnAttributes: function (shouldResize, height, borderRadius, refreshConfig = true) {
+            const cartIndexBtnContainerSelector = '#ic-cindex-btn-container';
+            const cartIndexBtnWrapperSelector = '#ic-cindex-btn-wrapper';
             const cartIndexBtnSelector = '#ic-cindex-btn';
 
-            if (width) {
-                $(cartIndexBtnContainerSelector).css('width', width + '%');
-            }
+            const resizeCartIndexBtn = (shouldResize) => {
+                if (!shouldResize) {
+                    return;
+                }
+
+                const primaryCheckoutBtnSelector = $("button.action.primary.checkout");
+                let cartIndexJqueryEl = primaryCheckoutBtnSelector;
+
+                if (primaryCheckoutBtnSelector.length > 1) {
+                    cartIndexJqueryEl = primaryCheckoutBtnSelector.eq(1);
+                }
+
+                $(cartIndexBtnWrapperSelector).css('width', cartIndexJqueryEl.outerWidth() + 'px');
+                $(window).resize(function () {
+                    $(cartIndexBtnWrapperSelector).css('width', cartIndexJqueryEl.outerWidth() + 'px');
+                });
+            };
+
+            resizeCartIndexBtn(shouldResize);
+
             if (height) {
                 $(cartIndexBtnSelector).css('height', height + 'px');
             }
@@ -169,18 +230,13 @@ define([
             this.handleInstantAwareFunc(() => {
                 const config = Instant.config;
 
-                const shouldEnableInstantBtn = this.shouldEnableInstantBtn();
-
-                $(cartIndexBtnContainerSelector).css('display', shouldEnableInstantBtn ? 'flex' : 'none');
+                resizeCartIndexBtn(config.shouldResizeCartIndexBtn)
+                $(cartIndexBtnContainerSelector).css('display', this.shouldEnableInstantBtn() ? 'flex' : 'none');
                 $(cartIndexBtnSelector).prop('disabled', false);
 
-                const configWidth = (config.cindexBtnWidth && parseInt(config.cindexBtnWidth) > 0) ? config.cindexBtnWidth : "90";
                 const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
                 const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
 
-                if (!width) {
-                    $(cartIndexBtnContainerSelector).css('width', configWidth + '%');
-                }
                 if (!height) {
                     $(cartIndexBtnSelector).css('height', configHeight + 'px');
                 }
@@ -191,11 +247,12 @@ define([
         },
 
         setCheckoutPageBtnAttributes: function (width, height, borderRadius) {
-            const checkoutPageBtnContainerSelector = '#ic-cpage-btn-wrapper';
+            const checkoutPageBtnContainerSelector = '#ic-cpage-btn-container';
+            const checkoutPageBtnWrapperSelector = '#ic-cpage-btn-wrapper';
             const checkoutPageBtnSelector = '#ic-cpage-btn';
 
             if (width) {
-                $(checkoutPageBtnContainerSelector).css('width', width + '%');
+                $(checkoutPageBtnWrapperSelector).css('width', width + '%');
             }
             if (height) {
                 $(checkoutPageBtnSelector).css('height', height + 'px');
@@ -214,7 +271,7 @@ define([
                 const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
 
                 if (!width) {
-                    $(checkoutPageBtnContainerSelector).css('width', configWidth + '%');
+                    $(checkoutPageBtnWrapperSelector).css('width', configWidth + '%');
                 }
                 if (!height) {
                     $(checkoutPageBtnSelector).css('height', configHeight + 'px');
@@ -230,7 +287,6 @@ define([
 
         shouldEnableInstantBtn: function () {
             const cartData = this.getCustomerCartData();
-            const disabledTotalThreshold = Instant.config.disabledTotalThreshold;
 
             let cartContainsBlacklistedSku = false;
 
@@ -244,12 +300,12 @@ define([
                 })
             }
 
-            return !cartContainsBlacklistedSku && !(disabledTotalThreshold && parseFloat(disabledTotalThreshold) > 0 && parseFloat(cartData.subtotalAmount) > disabledTotalThreshold) && window.Instant.config.isGuest
+            return !cartContainsBlacklistedSku && window.Instant.config.isGuest;
         },
 
         handleCartTotalChanged: function () {
             this.handleInstantAwareFunc(() => {
-                this.setPdpBtnAttributes();
+                this.configurePdpBtn();
                 this.setMinicartBtnAttributes();
                 this.setCartIndexBtnAttributes();
                 this.setCheckoutPageBtnAttributes();
@@ -274,39 +330,11 @@ define([
             return isFbOrInstaBrowser;
         },
 
-        checkoutCustomerCart: function (
-            checkoutButtonSelector,
-            checkoutButtonLoadingIndicatorSelector,
-            checkoutButtonTextSelector,
-            checkoutButtonLockIconSelector,
-            desktopBackdropSelector,
-            mobileBackdropSelector,
-            desktopBackToCheckoutTextElementSelector,
-            mobileBackToShoppingSelector,
-            sourceLocation) {
-            if (this.isClientMobileOrTablet()) {
-                $(mobileBackdropSelector).css('display', 'unset');
-                $(mobileBackToShoppingSelector).css('display', 'unset');
-                $(mobileBackToShoppingSelector).on('click', function () {
-                    $(mobileBackdropSelector).css('display', 'none');
-                    $(checkoutButtonSelector).attr('disabled', false);
-                    $(checkoutButtonTextSelector).show();
-                    $(checkoutButtonLockIconSelector).show();
-                    $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
-                });
-            } else {
-                $(desktopBackdropSelector).css('display', 'unset');
-                $(desktopBackToCheckoutTextElementSelector).css('display', 'unset');
-                $(desktopBackToCheckoutTextElementSelector).on('click', function () {
-                    checkoutWindow.focus();
-                });
-            }
+        hideBackdrop: function () {
+            $('#ic-backdrop-container').css('display', 'none');
+        },
 
-            $(checkoutButtonSelector).attr('disabled', true);
-            $(checkoutButtonLoadingIndicatorSelector).css('display', 'unset');
-            $(checkoutButtonTextSelector).hide();
-            $(checkoutButtonLockIconSelector).hide();
-
+        checkoutCustomerCart: function (sourceLocation) {
             let checkoutWindow;
             if (window.Instant &&
                 window.Instant.config &&
@@ -322,6 +350,7 @@ define([
 
                 this.handleInstantAwareFunc(() => {
                     const url = this.getCheckoutUrl(null, window.Instant.config.checkoutConfig.quoteData.entity_id, sourceLocation);
+
                     if (checkoutWindow) {
                         checkoutWindow.location = url;
                     } else {
@@ -331,15 +360,10 @@ define([
             }
 
             if (checkoutWindow) {
+                this.showBackdrop(checkoutWindow);
                 const loop = setInterval(function () {
                     if (checkoutWindow.closed) {
-                        $(checkoutButtonSelector).attr('disabled', false);
-                        $(checkoutButtonTextSelector).show();
-                        $(checkoutButtonLoadingIndicatorSelector).css('display', 'none');
-                        $(checkoutButtonLockIconSelector).show();
-                        $(mobileBackdropSelector).css('display', 'none');
-                        $(desktopBackdropSelector).css('display', 'none');
-
+                        $('#ic-backdrop-container').css('display', 'none');
                         clearInterval(loop);
                     }
                 }, 500);

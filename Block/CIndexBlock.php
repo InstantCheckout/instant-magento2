@@ -8,7 +8,7 @@ class CIndexBlock extends \Magento\Framework\View\Element\Template
     public function _toHtml()
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $instantHelper = $objectManager->create(\Instant\Checkout\Helper\Data::class);
+        $instantHelper = $objectManager->create(\Instant\Checkout\Model\Config\InstantConfig::class);
 
         $isGuest = $instantHelper->getIsGuest();
         $checkoutSummaryEnabled = $instantHelper->getInstantBtnCheckoutSummaryEnabled();

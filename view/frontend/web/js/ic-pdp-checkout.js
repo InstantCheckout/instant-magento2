@@ -15,13 +15,6 @@ define([
     }
 
     const pdpBtnSelector = "#ic-pdp-btn";
-    const pdpBtnLoadingSelector = "#ic-pdp-btn-loading";
-    const pdpBtnText = '#ic-pdp-btn-text';
-    const pdpBtnLockIcon = "#ic-pdp-btn-lock-icon";
-    const pdpDesktopBackdrop = '#ic-pdp-desktop-backdrop';
-    const pdpMobileBackdrop = '#ic-pdp-mobile-backdrop';
-    const pdpMobileBackToShopping = '#ic-pdp-mobile-back-to-shopping';
-    const pdpDesktopBackToCheckout = '#ic-pdp-desktop-back-to-checkout';
     const pdpRequiredOptionsMsgSelector = "#ic-pdp-required-options-msg";
     const pdpBtnContainerSelector = "#ic-pdp-btn-container";
 
@@ -29,11 +22,10 @@ define([
         $(pdpBtnContainerSelector).css('display', 'flex');
         $(pdpBtnSelector).prop('disabled', false);
 
-        const btnWidth = (config.btnWidth && parseInt(config.btnWidth) > 0) ? config.btnWidth : "100";
         const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
         const btnHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
 
-        checkoutHelper.setPdpBtnAttributes(btnWidth, btnHeight, btnBorderRadius);
+        checkoutHelper.configurePdpBtn(config.shouldResizePdpBtn, btnHeight, btnBorderRadius);
         checkoutHelper.handleInstantAwareFunc(() => {
             checkoutHelper.handleCartTotalChanged();
 
@@ -44,32 +36,17 @@ define([
                 }
             })
             $(pdpBtnContainerSelector).css('display', skuIsDisabled ? 'none' : 'flex');
-            $(pdpBtnContainerSelector).css('flex-direction', 'column');
         })
 
-        const onClose = () => {
-            // Enable the Instant PDP button
-            $(pdpBtnSelector).attr('disabled', false);
-            $(pdpBtnSelector).css('font-size', '19px');
-            $(pdpBtnSelector).attr('data-tooltip', 'Instant Checkout')
-            $(pdpBtnText).show();
-            $(pdpBtnLoadingSelector).css('display', 'none');
-            $(pdpBtnLockIcon).show();
-
-            // Disable backdrop
-            $(pdpMobileBackdrop).css('display', 'none');
-            $(pdpDesktopBackdrop).css('display', 'none');
-        };
-
         $(element).click(function () {
-            if (!config.sku || !config.form) {
+            if (!config.sku) {
                 return;
             }
 
             let qty;
             const options = [];
 
-            parseFormEntries(config.form).forEach((entry) => {
+            parseFormEntries('#product_addtocart_form').forEach((entry) => {
                 const { attribute, value } = entry;
 
                 const superAttributeRegEx = /super_attribute\[(.*)\]/g;
@@ -92,26 +69,7 @@ define([
                 return;
             }
 
-            if (checkoutHelper.isClientMobileOrTablet()) {
-                $(pdpMobileBackdrop).css('display', 'unset');
-                $(pdpMobileBackToShopping).css('display', 'unset');
-                $(pdpMobileBackToShopping).on('click', function () {
-                    onClose();
-                });
-            } else {
-                $(pdpDesktopBackdrop).css('display', 'unset');
-                $(pdpDesktopBackToCheckout).css('display', 'unset');
-                $(pdpDesktopBackToCheckout).on('click', function () {
-                    checkoutWindow.focus();
-                });
-            }
-
             $(pdpRequiredOptionsMsgSelector).css('display', 'none');
-            $(pdpBtnLoadingSelector).css('display', 'unset');
-            $(pdpBtnLockIcon).hide();
-            $(pdpBtnSelector).css('font-size', '0');
-            $(pdpBtnSelector).attr('disabled', true);
-            $(pdpBtnText).hide();
 
             let checkoutWindow;
             if (window.Instant && window.Instant.config) {
@@ -132,9 +90,10 @@ define([
             }
 
             if (checkoutWindow) {
+                checkoutHelper.showBackdrop(checkoutWindow);
                 const loop = setInterval(function () {
                     if (checkoutWindow.closed) {
-                        onClose();
+                        checkoutHelper.hideBackdrop();
                         clearInterval(loop);
                     }
                 }, 500);

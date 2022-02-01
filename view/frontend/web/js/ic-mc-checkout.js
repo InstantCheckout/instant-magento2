@@ -7,10 +7,10 @@ define([
 ], function (ko, $, Component, checkoutHelper, customerData) {
     'use strict';
 
-    $('#ic-mc-btn-container').css('display', 'flex');
-    checkoutHelper.handleInstantAwareFunc(() => {
-        checkoutHelper.handleCartTotalChanged();
-    });
+    const mcBtnContainerSelector = "#ic-mc-btn-container";
+
+    $(mcBtnContainerSelector).css('display', 'flex');
+    checkoutHelper.handleCartTotalChanged();
 
     return Component.extend({
         defaults: {
@@ -33,21 +33,8 @@ define([
             checkoutHelper.handleCartTotalChanged();
         },
 
-        /**
-         * Load Instant Checkout for customer cart
-         */
         checkoutCart: function () {
-            checkoutHelper.checkoutCustomerCart(
-                "#ic-mc-btn",
-                "#ic-mc-btn-loading",
-                "#ic-mc-btn-text",
-                "#ic-mc-btn-lock-icon",
-                "#ic-mc-desktop-backdrop",
-                "#ic-mc-mobile-backdrop",
-                "#ic-mc-desktop-back-to-checkout",
-                "#ic-mc-minicart-back-to-shopping",
-                "minicart"
-            );
+            checkoutHelper.checkoutCustomerCart("minicart");
         }
     });
 });

@@ -1,15 +1,9 @@
 <!-- INSTANT BUTTON START -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap" rel="stylesheet">
-
-<div class='ic-css-reset' style="width:100% !important">
-    <div id="ic-mc-btn-container" class="ic-btn-container">
-        <div id="ic-mc-btn-wrapper" class="ic-cart-btn-wrapper">
-            <button disabled id="ic-mc-btn" data-bind="click: checkoutCart, afterRender: render" class="ic-cart-btn"
+<div id="ic-mc-btn-container" class="ic-btn-container">
+    <div class='ic-css-reset'>
+        <div id="ic-mc-btn-wrapper" class="ic-btn-wrapper">
+            <button disabled id="ic-mc-btn" data-bind="click: checkoutCart, afterRender: render" class="ic-btn"
                 type="button">
-                <div id="ic-mc-btn-loading" class='ic-btn-loading'></div>
                 <svg id="ic-mc-btn-lock-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="15"
                     style="margin-right:7px" viewBox="0 0 22 22">
                     <path style="fill:white"
@@ -19,17 +13,6 @@
             </button>
             <div class="ic-btn-strike">
                 <span>or</span>
-            </div>
-        </div>
-        <div id="ic-mc-desktop-backdrop" class="ic-backdrop">
-            <h4 id="ic-mc-desktop-back-to-checkout" class="ic-back-to-checkout">Back to checkout</h4>
-        </div>
-        <div id="ic-mc-mobile-backdrop" class="ic-backdrop">
-            <div class="ic-mobile-backdrop-inner-container">
-                <div class="ic-mobile-backdrop-text">Finish reviewing your order</div>
-                <div class="ic-mobile-backdrop-text">or</div>
-                <div id="ic-mc-minicart-back-to-shopping" class="ic-mobile-back-to-shopping-text">Go back
-                    to shopping</div>
             </div>
         </div>
     </div>

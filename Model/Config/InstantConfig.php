@@ -1,106 +1,35 @@
 <?php
 
-namespace Instant\Checkout\Helper;
+namespace Instant\Checkout\Model\Config;
 
 use Magento\Framework\App\Helper\Context;
 use \Magento\Customer\Model\Session;
 
-class Data extends \Magento\Framework\App\Helper\AbstractHelper
+class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    /**
-     * Instant App ID Path
-     */
     const INSTANT_APP_ID_PATH = 'instant/general/app_id';
-
-    /**
-     * Default addtocart button form id
-     */
-    const PRODUCT_ADDTOCART_FORM_ID = 'product_addtocart_form';
-
-    /**
-     * Addtocart button form id path
-     */
-    const PRODUCT_ADDTOCART_FORM_ID_PATH = 'instant/general/product_addtocart_form_id';
-
-    /**
-     * Enable checkout page button path
-     */
+    const ACCESS_TOKEN_PATH = 'instant/general/api_access_token';
     const ENABLE_INSTANT_CHECKOUT_PAGE_PATH = 'instant/general/enable_checkout_page';
-
-    /**
-     * Enable minicart button path
-     */
     const ENABLE_INSTANT_MINICART_BTN_PATH = 'instant/general/enable_minicart';
-
-    /**
-     * Enable sandbox mode path
-     */
     const ENABLE_INSTANT_SANDBOX_MODE_PATH = 'instant/general/enable_sandbox';
-
-    /**
-     * Enable catalog page path
-     */
     const ENABLE_INSTANT_CATALOG_PAGE_PATH = 'instant/general/enable_catalog';
-
-    /**
-     * Enable cart summary path
-     */
     const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
-
-    /**
-     * Threshold for cart total where Instant should be disabled path
-     */
-    const DISABLED_CART_TOTAL_THRESHOLD = 'instant/general/disabled_total_threshold';
-
-    /**
-     * Disable Instant for skus containing path
-     */
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
-
-    /**
-     * Instant minicart button width
-     */
     const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
-
-    /**
-     * Instant cart index button width
-     */
-    const CINDEX_BTN_WIDTH = 'instant/visual/cindex_btn_width';
-
-    /**
-     * Instant checkout page width
-     */
+    const SHOULD_RESIZE_CART_INDEX_BTN = 'instant/visual/should_resize_cart_index_btn';
     const CPAGE_BTN_WIDTH = 'instant/visual/cpage_btn_width';
-
-    /**
-     * Instant pdp button width
-     */
-    const PDP_BTN_WIDTH = 'instant/visual/pdp_btn_width';
-
-    /**
-     * Instant btn border radius
-     */
+    const SHOULD_RESIZE_PDP_BTN = 'instant/visual/should_resize_pdp_btn';
     const BTN_BORDER_RADIUS = 'instant/visual/btn_border_radius';
-
-    /**
-     * Instant btn height
-     */
     const BTN_HEIGHT = 'instant/visual/btn_height';
-
-    /**
-     * @var \Magento\Checkout\Model\CompositeConfigProvider
-     */
-    protected $configProvider;
-
-    /**
-     * @var \Magento\Framework\Serialize\SerializerInterface
-     */
-    private $serializer;
 
     /**
      * @var \Magento\Framework\Session\SessionManager
      */
     private $sessionManager;
+    /**
+     * @var Session
+     */
+    private $customerSession;
 
     /**
      * Constructor.
@@ -110,14 +39,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(
         Context $context,
         Session $customerSession,
-        \Magento\Checkout\Model\CompositeConfigProvider $configProvider,
-        \Magento\Framework\Session\SessionManager $sessionManager,
-        \Magento\Framework\Serialize\SerializerInterface $serializerInterface = null
+        \Magento\Framework\Session\SessionManager $sessionManager
     ) {
         $this->customerSession = $customerSession;
-        $this->configProvider = $configProvider;
-        $this->serializer = $serializerInterface ?: \Magento\Framework\App\ObjectManager::getInstance()
-            ->get(\Magento\Framework\Serialize\Serializer\JsonHexTag::class);
         $this->sessionManager = $sessionManager;
 
         return parent::__construct($context);
@@ -165,6 +89,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get Instant Access Token
+     * @return string
+     */
+    public function getInstantApiAccessToken()
+    {
+        $instantAccessToken = $this->getConfig(self::ACCESS_TOKEN_PATH);
+        return $instantAccessToken;
+    }
+
+    /**
      * Enable Instant minicart button configuration
      * @return string
      */
@@ -172,16 +106,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $minicartBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_MINICART_BTN_PATH);
         return $minicartBtnEnabled === "1";
-    }
-
-    /**
-     * Get product page addtocart form id
-     * @return string
-     */
-    public function getProductPageAddToCartFormId()
-    {
-        $addToCartFormId = $this->getConfig(self::PRODUCT_ADDTOCART_FORM_ID_PATH);
-        return $addToCartFormId ? $addToCartFormId : self::PRODUCT_ADDTOCART_FORM_ID;
     }
 
     /**
@@ -225,16 +149,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get Instant disabled cart total threshold
-     * @return string
-     */
-    public function getDisabledCartTotalThreshold()
-    {
-        $threshold = $this->getConfig(self::DISABLED_CART_TOTAL_THRESHOLD);
-        return $threshold;
-    }
-
-    /**
      * Get disabled SKU phrases
      * @return string
      */
@@ -255,11 +169,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get cart index btn width
-     * @return string
+     * @return boolean
      */
-    public function getCIndexBtnWidth()
+    public function getShouldResizeCartIndexBtn()
     {
-        return $this->getConfig(self::CINDEX_BTN_WIDTH);
+        $shouldResize = $this->getConfig(self::SHOULD_RESIZE_CART_INDEX_BTN);
+        return $shouldResize === '1';
     }
 
     /**
@@ -293,34 +208,32 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Get pdp btn width
      * @return string
      */
-    public function getPdpBtnWidth()
+    public function getShouldResizePdpBtn()
     {
-        return $this->getConfig(self::PDP_BTN_WIDTH);
+        $shouldResize = $this->getConfig(self::SHOULD_RESIZE_PDP_BTN);
+        return $shouldResize === "1";
     }
 
-    /**
-     * Retrieve checkout configuration
-     *
-     * @return array
-     * @codeCoverageIgnore
-     */
-    public function getCheckoutConfig()
+    public function getInstantApiUrl()
     {
-        return $this->configProvider->getConfig();
+        return "https://zaonwy905l.execute-api.ap-southeast-2.amazonaws.com/pr289";
     }
 
-    /**
-     * Retrieve serialized checkout config.
-     *
-     * @return bool|string
-     * @since 100.2.0
-     */
-    public function getSerializedCheckoutConfig()
+    public function guid()
     {
-        try {
-            return  $this->serializer->serialize($this->getCheckoutConfig());
-        } catch (\Exception $e) {
-            return null;
+        $guid = '';
+        if (function_exists('com_create_guid') === true) {
+            $guid = trim(com_create_guid(), '{}');
+        } else {
+            $guid = sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
         }
+
+        return strtolower($guid);
+    }
+
+    public function encodeURIComponent($str)
+    {
+        $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
+        return strtr(rawurlencode($str), $revert);
     }
 }

@@ -22,7 +22,7 @@ class CPageBtnDisable
         array $jsLayout
     ) {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $instantHelper = $objectManager->create(\Instant\Checkout\Helper\Data::class);
+        $instantHelper = $objectManager->create(\Instant\Checkout\Model\Config\InstantConfig::class);
 
         $enabled = $instantHelper->getInstantBtnCheckoutPageEnabled();
         $isGuest = $instantHelper->getIsGuest();

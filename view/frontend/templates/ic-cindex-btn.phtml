@@ -2,26 +2,20 @@
 ?>
 
 <?php /** @var \Magento\Catalog\Block\Product\View $block */ ?>
-<?php $helper = $this->helper(\Instant\Checkout\Helper\Data::class); ?>
+<?php $helper = $this->helper(\Instant\Checkout\Model\Config\InstantConfig::class); ?>
 <!-- INSTANT BUTTON START -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap" rel="stylesheet">
-
-<div class='ic-css-reset' style="width:100% !important">
-    <div id="ic-cindex-btn-container" class="ic-btn-container">
-        <div id="ic-cindex-btn-wrapper" class="ic-cart-btn-wrapper">
-            <button disabled id="ic-cindex-btn" type="button" title="Instant Checkout" class="ic-cart-btn" data-mage-init='
+<div id="ic-cindex-btn-container" class="ic-btn-container">
+    <div class='ic-css-reset'>
+        <div id="ic-cindex-btn-wrapper" class="ic-btn-wrapper">
+            <button disabled id="ic-cindex-btn" type="button" title="Instant Checkout" class="ic-btn" data-mage-init='
                     {
                         "Instant_Checkout/js/ic-cindex-checkout": {
-                            "btnWidth": "<?= $block->escapeHtml($helper->getCIndexBtnWidth()) ?>",
+                            "shouldResizeCartIndexBtn": "<?= $block->escapeHtml($helper->getShouldResizeCartIndexBtn()) ?>",
                             "btnBorderRadius": "<?= $block->escapeHtml($helper->getBtnBorderRadius()) ?>",
                             "btnHeight": "<?= $block->escapeHtml($helper->getBtnHeight()) ?>"
                         }            
                     }
                     '>
-                <div id="ic-cindex-btn-loading" class='ic-btn-loading'></div>
                 <svg id="ic-cindex-btn-lock-icon" xmlns="http://www.w3.org/2000/svg" width="17" height="15" style="margin-right:7px" viewBox="0 0 22 22">
                     <path style="fill:white" d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z" />
                 </svg>
@@ -29,16 +23,6 @@
             </button>
             <div class="ic-btn-strike">
                 <span>or</span>
-            </div>
-        </div>
-        <div id="ic-cindex-desktop-backdrop" class="ic-backdrop">
-            <h4 id="ic-cindex-desktop-back-to-checkout" class="ic-back-to-checkout">Back to checkout</h4>
-        </div>
-        <div id="ic-cindex-mobile-backdrop" class="ic-backdrop">
-            <div class="ic-mobile-backdrop-inner-container">
-                <div class="ic-mobile-backdrop-text">Finish reviewing your order</div>
-                <div class="ic-mobile-backdrop-text">or</div>
-                <div id="ic-cindex-mobile-back-to-shopping" class="ic-mobile-back-to-shopping-text">Go back to shopping</div>
             </div>
         </div>
     </div>
