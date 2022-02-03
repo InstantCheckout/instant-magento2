@@ -104,12 +104,12 @@ class Send extends Action
         ];
         $valid = 0;
 
-        $responseText = 'sending activation failure';
+        $responseText = 'failure';
 
         $response = $this->doRequest->execute('/admin/integration/magento', $payload);
         if ($response['status'] === 200) {
             $valid = 1;
-            $responseText = 'sending activation success';
+            $responseText = 'success';
         }
         $resultJson = $this->resultJsonFactory->create();
         $data = [

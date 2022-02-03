@@ -60,12 +60,15 @@ class DoRequest
             'Expect:' => ''
         ];
         $this->curl->setHeaders($headers);
+
+        $baseApiUrl = $instantHelper->getInstantApiUrl();
+
         switch ($requestMethod) {
             case 'POST':
-                $this->curl->post($instantHelper->getInstantApiUrl() . $endpoint, $requestBody);
+                $this->curl->post($baseApiUrl . $endpoint, $requestBody);
                 break;
             case 'GET':
-                $this->curl->get($instantHelper->getInstantApiUrl() . $endpoint);
+                $this->curl->get($baseApiUrl . $endpoint);
                 break;
             default:
                 throw new LocalizedException(__('This %1 request method is not implemented yet.', $requestMethod));
