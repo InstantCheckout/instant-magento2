@@ -95,19 +95,23 @@ class NotifyInstantOnShipment implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        try {
-            /** @var Shipment $shipment */
-            $shipment = $observer->getEvent()->getShipment();
-            /** @var ShipmentItemInterface $item */
-            foreach ($shipment->getItemsCollection() as $item) {
-                $this->shipItemRepository->save($item);
-                /** @var Order $order */
-                $order = $observer->getEvent()->getShipment()->getOrder();
-                $json = $this->getPayloadJson($shipment, $order);
-                $this->doRequest->execute('/order/fulfil', $json);
+        $order = $observer->getEvent()->getShipment()->getOrder();
+
+        if ($order->getPayment()->getMethod() === 'instant') {
+            try {
+                /** @var Shipment $shipment */
+                $shipment = $observer->getEvent()->getShipment();
+                /** @var ShipmentItemInterface $item */
+                foreach ($shipment->getItemsCollection() as $item) {
+                    $this->shipItemRepository->save($item);
+                    /** @var Order $order */
+                    $order = $observer->getEvent()->getShipment()->getOrder();
+                    $json = $this->getPayloadJson($shipment, $order);
+                    $this->doRequest->execute('/order/fulfil', $json);
+                }
+            } catch (Exception $e) {
+                return;
             }
-        } catch (Exception $e) {
-            return;
         }
     }
 
