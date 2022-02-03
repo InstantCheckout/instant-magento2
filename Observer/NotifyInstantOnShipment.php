@@ -101,14 +101,10 @@ class NotifyInstantOnShipment implements ObserverInterface
             try {
                 /** @var Shipment $shipment */
                 $shipment = $observer->getEvent()->getShipment();
-                /** @var ShipmentItemInterface $item */
-                foreach ($shipment->getItemsCollection() as $item) {
-                    $this->shipItemRepository->save($item);
-                    /** @var Order $order */
-                    $order = $observer->getEvent()->getShipment()->getOrder();
-                    $json = $this->getPayloadJson($shipment, $order);
-                    $this->doRequest->execute('/order/fulfil', $json);
-                }
+                /** @var Order $order */
+                $order = $observer->getEvent()->getShipment()->getOrder();
+                $json = $this->getPayloadJson($shipment, $order);
+                $this->doRequest->execute('/order/fulfil', $json);
             } catch (Exception $e) {
                 return;
             }

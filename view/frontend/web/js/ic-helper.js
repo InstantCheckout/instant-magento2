@@ -59,7 +59,7 @@ define([
         },
 
         isWindowInstant: function () {
-            return window.Instant && window.Instant.config ? true : false;
+            return window.Instant && window.Instant.config && window.Instant.config.checkoutConfig && window.Instant.config.checkoutConfig.quoteData && window.Instant.config.checkoutConfig.quoteData.entity_id ? true : false;
         },
 
         handleInstantAwareFunc: function (func) {
