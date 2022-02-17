@@ -6,7 +6,8 @@ define([
 
     // Initialise config and cache values
     checkoutHelper.initializeInstant(() => {
-        checkoutHelper.handleCartTotalChanged();
+        $(document).trigger('instant-initialized');
+        checkoutHelper.handleCartTotalChanged(false);
     });
 
     // Handling onMessages

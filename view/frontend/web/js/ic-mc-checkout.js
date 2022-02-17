@@ -8,9 +8,7 @@ define([
     'use strict';
 
     const mcBtnContainerSelector = "#ic-mc-btn-container";
-
     $(mcBtnContainerSelector).css('display', 'flex');
-    checkoutHelper.handleCartTotalChanged();
 
     return Component.extend({
         defaults: {
@@ -23,7 +21,9 @@ define([
             ko.computed(function () {
                 return ko.toJSON(customerData.get('cart')().subtotalAmount);
             }).subscribe(function () {
-                checkoutHelper.handleCartTotalChanged();
+                if (customerData.get('cart')().subtotalAmount) {
+                    checkoutHelper.handleCartTotalChanged();
+                }
             });
 
             return this;

@@ -16,7 +16,6 @@ define([
                 url: window.location.origin + "/instant/data/getconfig",
                 type: 'GET',
                 cache: false,
-                retryLimit: 3,
                 contentType: false,
                 processData: false,
                 success: function (data) {
@@ -27,12 +26,6 @@ define([
                         callback();
                     }
                 },
-                error: function () {
-                    this.retryLimit--;
-                    if (this.retryLimit) {
-                        $.ajax(this);
-                    }
-                }
             })
         },
 
@@ -66,7 +59,6 @@ define([
             if (this.isWindowInstant()) {
                 func();
             } else {
-                console.log("Window is not Instant?")
                 this.initializeInstant(func);
             }
         },
@@ -78,12 +70,9 @@ define([
             const srcParam = "src=" + source;
             const confirmParam = "confirm=true";
 
-            console.log(sessionIdParam);
-
             let url = this.getInstantBaseUrl() + '?' + confirmParam + '&' + storeCodeParam + '&' + merchantIdParam + '&' + sessionIdParam + '&' + srcParam;
             url = cartId ? url + '&' + 'cartId=' + cartId : url + '&' + 'items=' + encodeURIComponent(JSON.stringify(items));
 
-            console.log(url);
             return url;
         },
 
@@ -113,7 +102,7 @@ define([
             return cartData;
         },
 
-        configurePdpBtn: function (shouldResizePdpBtn, height, borderRadius) {
+        configurePdpBtn: function (shouldResizePdpBtn, height, borderRadius, refresh = true) {
             const pdpBtnContainerSelector = '#ic-pdp-btn-container';
             const pdpBtnSelector = '#ic-pdp-btn';
             const atcBtnSelector = '#product-addtocart-button';
@@ -139,7 +128,7 @@ define([
                 $(pdpBtnSelector).css('border-radius', borderRadius + 'px');
             }
 
-            this.handleInstantAwareFunc(() => {
+            if (refresh) {
                 const config = Instant.config;
 
                 const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
@@ -153,7 +142,7 @@ define([
                 if (!borderRadius) {
                     $(pdpBtnSelector).css('border-radius', configBorderRadius + 'px');
                 }
-            });
+            }
         },
 
         setMinicartBtnAttributes: function (width, height, borderRadius) {
@@ -171,31 +160,29 @@ define([
                 $(mcBtnSelector).css('border-radius', borderRadius + 'px');
             }
 
-            this.handleInstantAwareFunc(() => {
-                const config = Instant.config;
+            const config = Instant.config;
 
-                const cartData = this.getCustomerCartData();
-                const shouldEnableMinicartInstantBtn = cartData && cartData.items && cartData.items.length > 0 && config.enableMinicartBtn && this.shouldEnableInstantBtn();
-                $(mcBtnContainerSelector).css('display', shouldEnableMinicartInstantBtn ? 'flex' : 'none');
-                $(mcBtnSelector).prop('disabled', false);
+            const cartData = this.getCustomerCartData();
+            const shouldEnableMinicartInstantBtn = cartData && cartData.items && cartData.items.length > 0 && config.enableMinicartBtn && this.shouldEnableInstantBtn();
+            $(mcBtnContainerSelector).css('display', shouldEnableMinicartInstantBtn ? 'flex' : 'none');
+            $(mcBtnSelector).prop('disabled', false);
 
-                const configWidth = (config.mcBtnWidth && parseInt(config.mcBtnWidth) > 0) ? config.mcBtnWidth : "90";
-                const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
-                const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+            const configWidth = (config.mcBtnWidth && parseInt(config.mcBtnWidth) > 0) ? config.mcBtnWidth : "90";
+            const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+            const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
 
-                if (!width) {
-                    $(mcBtnWrapperSelector).css('width', configWidth + '%');
-                }
-                if (!height) {
-                    $(mcBtnSelector).css('height', configHeight + 'px');
-                }
-                if (!borderRadius) {
-                    $(mcBtnSelector).css('border-radius', configBorderRadius + 'px');
-                }
-            });
+            if (!width) {
+                $(mcBtnWrapperSelector).css('width', configWidth + '%');
+            }
+            if (!height) {
+                $(mcBtnSelector).css('height', configHeight + 'px');
+            }
+            if (!borderRadius) {
+                $(mcBtnSelector).css('border-radius', configBorderRadius + 'px');
+            }
         },
 
-        setCartIndexBtnAttributes: function (shouldResize, height, borderRadius, refreshConfig = true) {
+        setCartIndexBtnAttributes: function (shouldResize, height, borderRadius) {
             const cartIndexBtnContainerSelector = '#ic-cindex-btn-container';
             const cartIndexBtnWrapperSelector = '#ic-cindex-btn-wrapper';
             const cartIndexBtnSelector = '#ic-cindex-btn';
@@ -227,23 +214,22 @@ define([
                 $(cartIndexBtnSelector).css('border-radius', borderRadius + 'px');
             }
 
-            this.handleInstantAwareFunc(() => {
-                const config = Instant.config;
+            const config = Instant.config;
 
-                resizeCartIndexBtn(config.shouldResizeCartIndexBtn)
-                $(cartIndexBtnContainerSelector).css('display', this.shouldEnableInstantBtn() ? 'flex' : 'none');
-                $(cartIndexBtnSelector).prop('disabled', false);
+            resizeCartIndexBtn(config.shouldResizeCartIndexBtn)
+            $(cartIndexBtnContainerSelector).css('display', this.shouldEnableInstantBtn() ? 'flex' : 'none');
+            $(cartIndexBtnSelector).prop('disabled', false);
 
-                const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
-                const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+            const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+            const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
 
-                if (!height) {
-                    $(cartIndexBtnSelector).css('height', configHeight + 'px');
-                }
-                if (!borderRadius) {
-                    $(cartIndexBtnSelector).css('border-radius', configBorderRadius + 'px');
-                }
-            });
+            if (!height) {
+                $(cartIndexBtnSelector).css('height', configHeight + 'px');
+            }
+            if (!borderRadius) {
+                $(cartIndexBtnSelector).css('border-radius', configBorderRadius + 'px');
+            }
+
         },
 
         setCheckoutPageBtnAttributes: function (width, height, borderRadius) {
@@ -261,28 +247,26 @@ define([
                 $(checkoutPageBtnSelector).css('border-radius', borderRadius + 'px');
             }
 
-            this.handleInstantAwareFunc(() => {
-                const config = Instant.config;
+            const config = Instant.config;
 
-                const shouldEnableInstantBtn = this.shouldEnableInstantBtn();
+            const shouldEnableInstantBtn = this.shouldEnableInstantBtn();
 
-                const configWidth = (config.cpageBtnWidth && parseInt(config.cpageBtnWidth) > 0) ? config.cpageBtnWidth : "60";
-                const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
-                const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
+            const configWidth = (config.cpageBtnWidth && parseInt(config.cpageBtnWidth) > 0) ? config.cpageBtnWidth : "60";
+            const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
+            const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
 
-                if (!width) {
-                    $(checkoutPageBtnWrapperSelector).css('width', configWidth + '%');
-                }
-                if (!height) {
-                    $(checkoutPageBtnSelector).css('height', configHeight + 'px');
-                }
-                if (!borderRadius) {
-                    $(checkoutPageBtnSelector).css('border-radius', configBorderRadius + 'px');
-                }
+            if (!width) {
+                $(checkoutPageBtnWrapperSelector).css('width', configWidth + '%');
+            }
+            if (!height) {
+                $(checkoutPageBtnSelector).css('height', configHeight + 'px');
+            }
+            if (!borderRadius) {
+                $(checkoutPageBtnSelector).css('border-radius', configBorderRadius + 'px');
+            }
 
-                $(checkoutPageBtnContainerSelector).css('display', shouldEnableInstantBtn ? 'flex' : 'none');
-                $(checkoutPageBtnSelector).prop('disabled', false);
-            });
+            $(checkoutPageBtnContainerSelector).css('display', shouldEnableInstantBtn ? 'flex' : 'none');
+            $(checkoutPageBtnSelector).prop('disabled', false);
         },
 
         shouldEnableInstantBtn: function () {
@@ -303,13 +287,20 @@ define([
             return !cartContainsBlacklistedSku && window.Instant.config.isGuest;
         },
 
-        handleCartTotalChanged: function () {
-            this.handleInstantAwareFunc(() => {
+        handleCartTotalChanged: function (shouldInitInstant = true) {
+            if (shouldInitInstant) {
+                this.handleInstantAwareFunc(() => {
+                    this.configurePdpBtn();
+                    this.setMinicartBtnAttributes();
+                    this.setCartIndexBtnAttributes();
+                    this.setCheckoutPageBtnAttributes();
+                })
+            } else {
                 this.configurePdpBtn();
                 this.setMinicartBtnAttributes();
                 this.setCartIndexBtnAttributes();
                 this.setCheckoutPageBtnAttributes();
-            })
+            }
         },
 
         openCheckoutWindow: function (url) {

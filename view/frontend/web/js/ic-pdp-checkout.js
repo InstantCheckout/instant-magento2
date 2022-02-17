@@ -25,10 +25,9 @@ define([
         const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
         const btnHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
 
-        checkoutHelper.configurePdpBtn(config.shouldResizePdpBtn, btnHeight, btnBorderRadius);
-        checkoutHelper.handleInstantAwareFunc(() => {
-            checkoutHelper.handleCartTotalChanged();
+        checkoutHelper.configurePdpBtn(config.shouldResizePdpBtn, btnHeight, btnBorderRadius, false);
 
+        $(document).on('instant-initialized', function () {
             let skuIsDisabled = false;
             Instant.config.disabledForSkusContaining.forEach(x => {
                 if (x && config.sku.indexOf(x) !== -1) {
@@ -36,7 +35,7 @@ define([
                 }
             })
             $(pdpBtnContainerSelector).css('display', skuIsDisabled ? 'none' : 'flex');
-        })
+        });
 
         $(element).click(function () {
             if (!config.sku) {
