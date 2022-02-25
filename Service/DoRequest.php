@@ -22,7 +22,6 @@ class DoRequest
     /**
      * DoRequest constructor.
      * @param Curl $curl
-     * @param FastCheckout $fastCheckoutHelper
      * @param StoreManagerInterface $storeManager
      * @SuppressWarnings(PHPMD.LongVariable)
      */
