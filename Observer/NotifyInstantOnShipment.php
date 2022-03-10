@@ -1,17 +1,26 @@
 <?php
 
+/**
+ * Instant_Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Instant\Checkout\Observer;
 
 use Exception;
-use Instant\Checkout\Model\Config\InstantConfig;
+use Instant\Checkout\Helper\InstantHelper;
 use Instant\Checkout\Service\DoRequest;
 use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfig;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Api\Data\ShipmentTrackInterface;
 use Magento\Sales\Api\OrderItemRepositoryInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -26,9 +35,9 @@ use Psr\Log\LoggerInterface;
 class NotifyInstantOnShipment implements ObserverInterface
 {
     /**
-     * @var InstantConfig
+     * @var InstantHelper
      */
-    protected $instantConfig;
+    protected $instantHelper;
     /**
      * @var Transaction
      */
@@ -65,7 +74,7 @@ class NotifyInstantOnShipment implements ObserverInterface
      * @param OrderRepositoryInterface $orderRepository
      * @param LoggerInterface $logger
      * @param ScopeConfig $scopeConfig
-     * @param InstantConfig $fastConfig
+     * @param InstantHelper $instantHelper
      * @param DoRequest $doRequest
      * @param OrderItemRepositoryInterface $orderItemRepository
      * @param ShipmentItemRepositoryInterface $shipItemRepository
@@ -75,7 +84,7 @@ class NotifyInstantOnShipment implements ObserverInterface
         OrderRepositoryInterface $orderRepository,
         LoggerInterface $logger,
         ScopeConfig $scopeConfig,
-        InstantConfig $instantConfig,
+        InstantHelper $instantHelper,
         DoRequest $doRequest,
         OrderItemRepositoryInterface $orderItemRepository,
         ShipmentItemRepositoryInterface $shipItemRepository
@@ -84,7 +93,7 @@ class NotifyInstantOnShipment implements ObserverInterface
         $this->orderRepository = $orderRepository;
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
-        $this->instantConfig = $instantConfig;
+        $this->instantHelper = $instantHelper;
         $this->doRequest = $doRequest;
         $this->orderItemRepository = $orderItemRepository;
         $this->shipItemRepository = $shipItemRepository;
@@ -104,7 +113,7 @@ class NotifyInstantOnShipment implements ObserverInterface
                 /** @var Order $order */
                 $order = $observer->getEvent()->getShipment()->getOrder();
                 $json = $this->getPayloadJson($shipment, $order);
-                $this->doRequest->execute('/order/fulfil', $json);
+                $this->doRequest->execute('order/fulfil', $json);
             } catch (Exception $e) {
                 return;
             }

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<!--
+/**
+ * Instant Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+ -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="instant_checkout_cron_jobs">
+        <job name="instant_checkout_resendfailedrequest" instance="Instant\Checkout\Cron\Instant\ResendFailedRequest" method="execute">
+            <config_path>instant/general/retry_failures_cron</config_path>
+        </job>
+    </group>
+</config>

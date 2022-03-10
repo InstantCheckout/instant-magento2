@@ -1,7 +1,18 @@
 <?php
 
+/**
+ * Instant_Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+
 namespace Instant\Checkout\Plugin;
 
+use Instant\Checkout\Helper\InstantHelper;
 use Magento\Checkout\Block\Checkout\LayoutProcessor;
 
 /**
@@ -12,6 +23,20 @@ use Magento\Checkout\Block\Checkout\LayoutProcessor;
 class CPageBtnDisable
 {
     /**
+     * @var InstantHelper
+     */
+    private $instantHelper;
+
+    /**
+     * Constructor.
+     */
+    public function __construct(
+        InstantHelper $instantHelper
+    ) {
+        $this->instantHelper = $instantHelper;
+    }
+
+    /**
      * @param \Magento\Checkout\Block\Checkout\LayoutProcessor $processor
      * @param array $jsLayout
      *
@@ -21,11 +46,8 @@ class CPageBtnDisable
         LayoutProcessor $processor,
         array $jsLayout
     ) {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $instantHelper = $objectManager->create(\Instant\Checkout\Model\Config\InstantConfig::class);
-
-        $enabled = $instantHelper->getInstantBtnCheckoutPageEnabled();
-        $isGuest = $instantHelper->getIsGuest();
+        $enabled = $this->instantHelper->getInstantBtnCheckoutPageEnabled();
+        $isGuest = $this->instantHelper->getIsGuest();
 
         if (!$enabled || !$isGuest) {
             $jsLayout['components']['checkout']['children']['cpage-btn']['componentDisabled'] = true;

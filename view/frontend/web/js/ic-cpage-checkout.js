@@ -4,7 +4,7 @@ define([
 ], function (Component, checkoutHelper) {
     'use strict';
 
-    checkoutHelper.handleCartTotalChanged();
+    checkoutHelper.refreshInstant();
 
     return Component.extend({
         defaults: {
@@ -12,7 +12,7 @@ define([
         },
 
         render: function () {
-            checkoutHelper.handleCartTotalChanged();
+            checkoutHelper.refreshInstant();
         },
 
         checkoutCart: function () {

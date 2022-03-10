@@ -1,0 +1,22 @@
+{
+    "instant_checkout_requestlog": {
+        "column": {
+            "requestlog_id": true,
+            "idempotency_key": true,
+            "request_id": true,
+            "body": true,
+            "attempts": true,
+            "status": true,
+            "response_content": true,
+            "priority": true,
+            "created_at": true,
+            "updated_at": true,
+            "retry_required": true,
+            "uri_endpoint": true,
+            "request_method": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Instant_Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+
 namespace Instant\Checkout\Controller\Data;
 
 use Magento\Backend\App\Action\Context;
@@ -8,12 +18,28 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use \Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Store\Api\StoreRepositoryInterface;
 
 class GetProduct extends Action implements HttpGetActionInterface
 {
+    /**
+     * @var JsonResult
+     */
     protected $jsonResultFactory;
+
+    /**
+     * @var ProductRepositoryInterface
+     */
     protected $productRepository;
+
+    /**
+     * @var Configurable
+     */
     protected $configurableProduct;
+
+    /**
+     * @var StoreRepositoryInterface
+     */
     protected $storeRepository;
 
     /**
@@ -24,7 +50,7 @@ class GetProduct extends Action implements HttpGetActionInterface
         JsonFactory $jsonResultFactory,
         ProductRepositoryInterface $productRepository,
         Configurable $configurableProduct,
-        \Magento\Store\Api\StoreRepositoryInterface $storeRepository
+        StoreRepositoryInterface $storeRepository
     ) {
         $this->jsonResultFactory = $jsonResultFactory;
         $this->productRepository = $productRepository;
@@ -131,7 +157,7 @@ class GetProduct extends Action implements HttpGetActionInterface
         if ($frontendLabelOptionPairs) {
             $data['frontend_options'] = $frontendLabelOptionPairs;
         }
-        
+
         $data['id'] = $product->getId();
         $data['attribute_set_id'] = $product->getAttributeSetId();
         $data['sku'] = $product->getSku();

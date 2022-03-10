@@ -1,23 +1,41 @@
 <?php
 
+/**
+ * Instant_Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+
 namespace Instant\Checkout\Observer;
 
 use Exception;
+use Instant\Checkout\Helper\InstantHelper;
 use Magento\Framework\Event\Observer as EventObserver;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\App\ObjectManager;
-use Instant\Checkout\Model\Config\InstantConfig;
+use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
 
 class SetTransactionOnInvoicePaid implements ObserverInterface
 {
+    /**
+     * @var BuilderInterface
+     */
     protected $transactionBuilder;
-    protected $instantConfig;
+
+    /**
+     * @var InstantHelper
+     */
+    protected $instantHelper;
 
     public function __construct(
-        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
+        BuilderInterface $transactionBuilder,
+        InstantHelper $instantHelper
     ) {
         $this->transactionBuilder = $transactionBuilder;
-        $this->instantConfig = ObjectManager::getInstance()->get(InstantConfig::class);
+        $this->instantHelper = $instantHelper;
     }
 
     public function createTransaction($order = null, $paymentData = array())
@@ -44,7 +62,7 @@ class SetTransactionOnInvoicePaid implements ObserverInterface
             $payment->save();
             $order->save();
 
-            return  $transaction->save()->getTransactionId();
+            return $transaction->save()->getTransactionId();
         } catch (Exception $e) {
             return;
         }
@@ -52,7 +70,6 @@ class SetTransactionOnInvoicePaid implements ObserverInterface
 
     /**
      * @param EventObserver $observer
-     * @return $this
      */
     public function execute(EventObserver $observer)
     {
@@ -60,7 +77,7 @@ class SetTransactionOnInvoicePaid implements ObserverInterface
         $order = $invoice->getOrder();
 
         if ($order->getPayment()->getMethod() === "instant") {
-            $txId = $this->createTransaction($order, ['id' => $this->instantConfig->guid()]);
+            $txId = $this->createTransaction($order, ['id' => $this->instantHelper->guid()]);
             $invoice->setTransactionId($txId);
         }
     }

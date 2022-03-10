@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<!--
+/**
+ * Instant Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+ -->
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="instant_checkout_requestlog" resource="default" engine="innodb" comment="instant_checkout_requestlog Table">
+        <column xsi:type="smallint" name="requestlog_id" padding="6" unsigned="true" nullable="false" identity="true" comment="Entity Id" />
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="requestlog_id" />
+        </constraint>
+        <column name="request_id" nullable="false" xsi:type="varchar" comment="request_id" length="255" />
+        <column name="body" nullable="false" xsi:type="text" comment="body" />
+        <column name="attempts" nullable="false" xsi:type="smallint" comment="attempts" default="1" />
+        <column name="status" nullable="false" xsi:type="smallint" comment="status" />
+        <column name="response_content" nullable="false" xsi:type="text" comment="responseContent" />
+        <column name="priority" nullable="true" xsi:type="int" comment="priority" default="0" identity="false" />
+        <column name="created_at" nullable="false" xsi:type="timestamp" comment="created_at" default="CURRENT_TIMESTAMP" />
+        <column name="updated_at" nullable="false" xsi:type="datetime" comment="updated_at" default="CURRENT_TIMESTAMP" on_update="true" />
+        <column name="retry_required" nullable="false" xsi:type="smallint" comment="retry_required" default="0" />
+        <column name="uri_endpoint" nullable="false" xsi:type="varchar" comment="uri_endpoint" length="255" />
+        <column name="request_method" nullable="false" xsi:type="varchar" comment="request_method" length="255" />
+        <column name="idempotency_key" nullable="false" xsi:type="varchar" comment="idempotency_key" length="255" />
+    </table>
+</schema>

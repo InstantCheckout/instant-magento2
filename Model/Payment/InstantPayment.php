@@ -1,11 +1,20 @@
 <?php
 
+/**
+ * Instant_Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Instant\Checkout\Model\Payment;
 
-use Magento\Framework\App\ObjectManager;
-use Instant\Checkout\Model\Config\InstantConfig;
+use Instant\Checkout\Helper\InstantHelper;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -82,7 +91,10 @@ class InstantPayment extends AbstractMethod
      */
     protected $_objectManager;
 
-    protected $instantConfig;
+    /**
+     * @var InstantHelper
+     */
+    protected $instantHelper;
 
     /**
      * @var DoRequest
@@ -113,12 +125,13 @@ class InstantPayment extends AbstractMethod
         ScopeConfigInterface $scopeConfig,
         PaymentLogger $logger,
         DoRequest $request,
+        InstantHelper $instantHelper,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        $this->instantConfig = ObjectManager::getInstance()->get(InstantConfig::class);
         $this->doRequest = $request;
+        $this->instantHelper = $instantHelper;
         parent::__construct(
             $context,
             $registry,
@@ -211,7 +224,7 @@ class InstantPayment extends AbstractMethod
             'storeCode' => $order->getStore()->getCode(),
         ];
 
-        $this->doRequest->execute('/order/refund', $payload);
+        $this->doRequest->execute('order/refund', $payload);
     }
 
     public function initialize($paymentAction, $stateObject)

@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Instant_Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+
 namespace Instant\Checkout\Controller\Data;
 
 use Magento\Backend\App\Action\Context;
@@ -11,9 +21,15 @@ use \Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 class GetSimpleProductConfigAttributes extends Action implements HttpGetActionInterface
 {
+    /**
+     * @var JsonResult
+     */
     protected $jsonResultFactory;
+
+    /**
+     * @var ProductRepositoryInterface
+     */
     protected $productRepository;
-    protected $configurableProduct;
 
     /**
      * Constructor.
@@ -26,7 +42,6 @@ class GetSimpleProductConfigAttributes extends Action implements HttpGetActionIn
     ) {
         $this->jsonResultFactory = $jsonResultFactory;
         $this->productRepository = $productRepository;
-        $this->configurableProduct = $configurableProduct;
 
         return parent::__construct($context);
     }

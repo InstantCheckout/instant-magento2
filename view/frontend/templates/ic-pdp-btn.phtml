@@ -2,7 +2,7 @@
 ?>
 
 <?php /** @var \Magento\Catalog\Block\Product\View $block */ ?>
-<?php $helper = $this->helper(\Instant\Checkout\Model\Config\InstantConfig::class); ?>
+<?php $helper = $this->helper(\Instant\Checkout\Helper\InstantHelper::class); ?>
 
 <div id="ic-pdp-btn-container" class="ic-btn-container">
     <div class='ic-css-reset'>
@@ -13,7 +13,8 @@
                     "sku": "<?= $block->escapeHtmlAttr($block->getProduct()->getSku()) ?>",
                     "shouldResizePdpBtn": "<?= $block->escapeHtml($helper->getShouldResizePdpBtn()) ?>",
                     "btnBorderRadius": "<?= $block->escapeHtml($helper->getBtnBorderRadius()) ?>",
-                    "btnHeight": "<?= $block->escapeHtml($helper->getBtnHeight()) ?>"
+                    "btnHeight": "<?= $block->escapeHtml($helper->getBtnHeight()) ?>",
+                    "btnColor": "<?= $block->escapeHtml($helper->getBtnColor()) ?>"
                 }            
             }
             '>

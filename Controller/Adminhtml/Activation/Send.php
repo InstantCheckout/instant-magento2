@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Instant_Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
 
 declare(strict_types=1);
 
@@ -106,7 +115,8 @@ class Send extends Action
 
         $responseText = 'failure';
 
-        $response = $this->doRequest->execute('/admin/integration/magento', $payload);
+        $response = $this->doRequest->execute('admin/integration/magento', $payload);
+
         if ($response['status'] === 200) {
             $valid = 1;
             $responseText = 'success';

@@ -24,7 +24,12 @@
                 <should_resize_cart_index_btn>1</should_resize_cart_index_btn>
                 <should_resize_pdp_btn>1</should_resize_pdp_btn>
                 <btn_border_radius>3</btn_border_radius>
+                <btn_height>45</btn_height>
+                <btn_color>#00D160</btn_color>
                 <disabled_for_skus_containing></disabled_for_skus_containing>
+                <enable_cookie_forwarding>0</enable_cookie_forwarding>
+                <retry_failures_cron>*/5 * * * *</retry_failures_cron>
+                <retry_failures_count>3</retry_failures_count>
             </general>
         </instant>
     </default>

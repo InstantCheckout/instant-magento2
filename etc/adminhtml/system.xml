@@ -52,6 +52,19 @@
                     <label>Enable on Checkout Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="enable_cookie_forwarding" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Cookie Forwarding</label>
+                    <comment>*Experimental* Defaults to no. Provides Instant with cookies on page load which enables support for cookie based functionality like affiliate plugins.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="retry_failures_cron" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Retry failures cron schedule</label>
+                    <comment>Schedule for resending failed requests - default is */5 * * * *</comment>
+                </field>
+                <field id="retry_failures_count" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Retry failure count</label>
+                    <comment>Number of attempts to retry failed requests to Instant. Default is 3</comment>
+                </field>
             </group>
             <group id="visual" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Visual Config</label>
@@ -80,6 +93,10 @@
                 <field id="btn_height" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Height of buttons</label>
                     <comment>Defaults to 45. (in px, provide an integer. min 40, max 50)</comment>
+                </field>
+                <field id="btn_color" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Color of Instant buttons. In HEX (e.g. #RRGGBB)</label>
+                    <comment>Defaults to #00D160.</comment>
                 </field>
             </group>
         </section>

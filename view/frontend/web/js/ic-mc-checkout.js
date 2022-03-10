@@ -22,7 +22,7 @@ define([
                 return ko.toJSON(customerData.get('cart')().subtotalAmount);
             }).subscribe(function () {
                 if (customerData.get('cart')().subtotalAmount) {
-                    checkoutHelper.handleCartTotalChanged();
+                    checkoutHelper.refreshInstant();
                 }
             });
 
@@ -30,7 +30,7 @@ define([
         },
 
         render: function () {
-            checkoutHelper.handleCartTotalChanged();
+            checkoutHelper.refreshInstant(false);
         },
 
         checkoutCart: function () {

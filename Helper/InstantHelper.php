@@ -1,11 +1,22 @@
 <?php
 
-namespace Instant\Checkout\Model\Config;
+/**
+ * Instant_Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+
+namespace Instant\Checkout\Helper;
 
 use Magento\Framework\App\Helper\Context;
-use \Magento\Customer\Model\Session;
+use Magento\Customer\Model\Session;
+use Magento\Framework\Session\SessionManager;
 
-class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
+class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const INSTANT_APP_ID_PATH = 'instant/general/app_id';
     const ACCESS_TOKEN_PATH = 'instant/general/api_access_token';
@@ -14,6 +25,8 @@ class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const ENABLE_INSTANT_SANDBOX_MODE_PATH = 'instant/general/enable_sandbox';
     const ENABLE_INSTANT_CATALOG_PAGE_PATH = 'instant/general/enable_catalog';
     const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
+    const RETRY_FAILURES_COUNT = 'instant/general/retry_failures_count';
+    const ENABLE_COOKIE_FORWARDING = 'instant/general/enable_cookie_forwarding';
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
     const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
     const SHOULD_RESIZE_CART_INDEX_BTN = 'instant/visual/should_resize_cart_index_btn';
@@ -21,9 +34,10 @@ class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const SHOULD_RESIZE_PDP_BTN = 'instant/visual/should_resize_pdp_btn';
     const BTN_BORDER_RADIUS = 'instant/visual/btn_border_radius';
     const BTN_HEIGHT = 'instant/visual/btn_height';
+    const BTN_COLOR = 'instant/visual/btn_color';
 
     /**
-     * @var \Magento\Framework\Session\SessionManager
+     * @var \Magento\Framework\SessionSessionManager
      */
     private $sessionManager;
     /**
@@ -39,7 +53,7 @@ class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(
         Context $context,
         Session $customerSession,
-        \Magento\Framework\Session\SessionManager $sessionManager
+        SessionManager $sessionManager
     ) {
         $this->customerSession = $customerSession;
         $this->sessionManager = $sessionManager;
@@ -63,6 +77,18 @@ class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getIsGuest()
     {
         return !$this->customerSession->isLoggedIn();
+    }
+
+    public function getRetryFailuresCount()
+    {
+        $retryFailuresCount = $this->getConfig(self::RETRY_FAILURES_COUNT);
+        return $retryFailuresCount;
+    }
+
+    public function getBtnColor()
+    {
+        $btnColor = $this->getConfig(self::BTN_COLOR);
+        return $btnColor;
     }
 
     public function getInstantAppId()
@@ -99,6 +125,12 @@ class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $catalogPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CATALOG_PAGE_PATH);
         return $catalogPageBtnEnabled === "1";
+    }
+
+    public function getCookieForwardingEnabled()
+    {
+        $cookieForwardingEnabled = $this->getConfig(self::ENABLE_COOKIE_FORWARDING);
+        return $cookieForwardingEnabled === "1";
     }
 
     public function getSandboxEnabledConfig()
@@ -147,7 +179,7 @@ class InstantConfig extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getInstantApiUrl()
     {
-        $apiUrl = 'api.instant.one';
+        $apiUrl = 'eqj1u0edm3.execute-api.ap-southeast-2.amazonaws.com/pr314/';
         $isStaging = $this->getSandboxEnabledConfig();
 
         if ($isStaging) {

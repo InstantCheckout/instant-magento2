@@ -8,7 +8,7 @@ define([
         getInstantBaseUrl: function () {
             const isSandbox = Instant.config.enableSandbox;
 
-            return 'https://' + (isSandbox ? 'staging.' : '') + 'checkout.instant.one/';
+            return 'http://' + (isSandbox ? 'staging.' : '') + 'localhost:3000/';
         },
 
         initializeInstant: function (callback) {
@@ -166,6 +166,7 @@ define([
             const shouldEnableMinicartInstantBtn = cartData && cartData.items && cartData.items.length > 0 && config.enableMinicartBtn && this.shouldEnableInstantBtn();
             $(mcBtnContainerSelector).css('display', shouldEnableMinicartInstantBtn ? 'flex' : 'none');
             $(mcBtnSelector).prop('disabled', false);
+            $(mcBtnSelector).css('background', config.btnColor ? config.btnColor : '#00D160');
 
             const configWidth = (config.mcBtnWidth && parseInt(config.mcBtnWidth) > 0) ? config.mcBtnWidth : "90";
             const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
@@ -219,6 +220,7 @@ define([
             resizeCartIndexBtn(config.shouldResizeCartIndexBtn)
             $(cartIndexBtnContainerSelector).css('display', this.shouldEnableInstantBtn() ? 'flex' : 'none');
             $(cartIndexBtnSelector).prop('disabled', false);
+            $(cartIndexBtnSelector).css('background', config.btnColor ? config.btnColor : '#00D160');
 
             const configBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
             const configHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
@@ -267,6 +269,7 @@ define([
 
             $(checkoutPageBtnContainerSelector).css('display', shouldEnableInstantBtn ? 'flex' : 'none');
             $(checkoutPageBtnSelector).prop('disabled', false);
+            $(checkoutPageBtnSelector).css('background', config.btnColor ? config.btnColor : '#00D160');
         },
 
         shouldEnableInstantBtn: function () {
@@ -287,8 +290,8 @@ define([
             return !cartContainsBlacklistedSku && window.Instant.config.isGuest;
         },
 
-        handleCartTotalChanged: function (shouldInitInstant = true) {
-            if (shouldInitInstant) {
+        refreshInstant: function (shouldRefreshInstant = true) {
+            if (!this.isWindowInstant() && shouldRefreshInstant) {
                 this.handleInstantAwareFunc(() => {
                     this.configurePdpBtn();
                     this.setMinicartBtnAttributes();
