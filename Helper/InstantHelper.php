@@ -179,7 +179,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getInstantApiUrl()
     {
-        $apiUrl = 'api.instant.one';        
+        $apiUrl = 'api.instant.one/';
         $isStaging = $this->getSandboxEnabledConfig();
 
         if ($isStaging) {
