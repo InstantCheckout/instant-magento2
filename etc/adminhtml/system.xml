@@ -81,6 +81,11 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to yes.</comment>
                 </field>
+                <field id="should_position_pdp_below_atc" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Should position Instant PDP button below Add to Cart button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to no.</comment>
+                </field>
                 <field id="should_resize_cart_index_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Should resize Instant cart summary button to primary proceed button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

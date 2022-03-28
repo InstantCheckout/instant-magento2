@@ -23,6 +23,7 @@
                 <mc_btn_width>90</mc_btn_width>
                 <should_resize_cart_index_btn>1</should_resize_cart_index_btn>
                 <should_resize_pdp_btn>1</should_resize_pdp_btn>
+                <should_position_pdp_below_atc>1</should_position_pdp_below_atc>
                 <btn_border_radius>3</btn_border_radius>
                 <btn_height>45</btn_height>
                 <btn_color>#00D160</btn_color>

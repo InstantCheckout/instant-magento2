@@ -15,6 +15,7 @@ namespace Instant\Checkout\Helper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Session\SessionManager;
+use Magento\Store\Model\StoreManagerInterface;
 
 class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -31,6 +32,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
     const SHOULD_RESIZE_CART_INDEX_BTN = 'instant/visual/should_resize_cart_index_btn';
     const CPAGE_BTN_WIDTH = 'instant/visual/cpage_btn_width';
+    const SHOULD_POSITION_PDP_BELOW_ATC = 'instant/visual/should_position_pdp_below_atc';
     const SHOULD_RESIZE_PDP_BTN = 'instant/visual/should_resize_pdp_btn';
     const BTN_BORDER_RADIUS = 'instant/visual/btn_border_radius';
     const BTN_HEIGHT = 'instant/visual/btn_height';
@@ -40,10 +42,17 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Framework\SessionSessionManager
      */
     private $sessionManager;
+
     /**
      * @var Session
      */
     private $customerSession;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
 
     /**
      * Constructor.
@@ -53,10 +62,12 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(
         Context $context,
         Session $customerSession,
-        SessionManager $sessionManager
+        SessionManager $sessionManager,
+        StoreManagerInterface $storeManager
     ) {
         $this->customerSession = $customerSession;
         $this->sessionManager = $sessionManager;
+        $this->storeManager = $storeManager;
 
         return parent::__construct($context);
     }
@@ -72,11 +83,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getSessionId()
     {
         return $this->sessionManager->getSessionId();
-    }
-
-    public function getIsGuest()
-    {
-        return !$this->customerSession->isLoggedIn();
     }
 
     public function getRetryFailuresCount()
@@ -177,6 +183,22 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $shouldResize === "1";
     }
 
+    public function getCurrentCurrencyCode()
+    {
+        return $this->storeManager->getStore()->getCurrentCurrencyCode();
+    }
+
+    public function getBaseCurrencyCode()
+    {
+        return $this->storeManager->getStore()->getBaseCurrencyCode();
+    }
+
+    public function getShouldPositionPdpBelowAtc()
+    {
+        $shouldPosition = $this->getConfig(self::SHOULD_POSITION_PDP_BELOW_ATC);
+        return $shouldPosition === "1";
+    }
+
     public function getInstantApiUrl()
     {
         $apiUrl = 'api.instant.one/';
@@ -191,14 +213,17 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function guid()
     {
-        $guid = '';
-        if (function_exists('com_create_guid') === true) {
-            $guid = trim(com_create_guid(), '{}');
-        } else {
-            $guid = sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
-        }
-
-        return strtolower($guid);
+        return sprintf(
+            '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
+            random_int(0, 65535),
+            random_int(0, 65535),
+            random_int(0, 65535),
+            random_int(16384, 20479),
+            random_int(32768, 49151),
+            random_int(0, 65535),
+            random_int(0, 65535),
+            random_int(0, 65535)
+        );
     }
 
     public function encodeURIComponent($str)

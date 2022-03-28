@@ -4,11 +4,7 @@ define([
 ], function ($, checkoutHelper) {
     "use strict";
 
-    // Initialise config and cache values
-    checkoutHelper.initializeInstant(() => {
-        $(document).trigger('instant-initialized');
-        checkoutHelper.refreshInstant(false);
-    });
+    checkoutHelper.refreshInstantButtons();
 
     // Handling onMessages
     window.addEventListener('message', function (e) {

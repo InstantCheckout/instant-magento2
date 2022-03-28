@@ -5,16 +5,17 @@ define([
     "use strict";
 
     return function (config, element) {
-        const cindexBtnWrapperSelector = "#ic-cindex-btn-wrapper";
+        if (config.baseCurrencyCode !== config.currentCurrencyCode) {
+            return;
+        }
 
-        const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
-        const btnHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
-
-        $(document).on('instant-initialized', function () {
-            checkoutHelper.setCartIndexBtnAttributes(config.shouldResizeCartIndexBtn, btnHeight, btnBorderRadius);
+        $(document).on('instant-config-loaded', function () {
+            checkoutHelper.setCartIndexBtnAttributes(
+                config.shouldResizeCartIndexBtn,
+                (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45",
+                (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3",
+                config.btnColor);
         })
-
-        $(cindexBtnWrapperSelector).css('display', 'flex');
 
         $(element).click(function () {
             checkoutHelper.checkoutCustomerCart("checkoutIndex");

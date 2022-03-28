@@ -5,33 +5,18 @@ define([
 ], function ($, _, checkoutHelper) {
     "use strict";
 
-    function parseFormEntries(formSelector) {
-        return [...(new FormData($(formSelector)[0]).entries())].map(function (e) {
-            return {
-                attribute: e[0],
-                value: e[1],
-            }
-        });
-    }
-
     const pdpBtnSelector = "#ic-pdp-btn";
     const pdpRequiredOptionsMsgSelector = "#ic-pdp-required-options-msg";
     const pdpBtnContainerSelector = "#ic-pdp-btn-container";
 
     return function (config, element) {
-        $(pdpBtnContainerSelector).css('display', 'flex');
-        $(pdpBtnSelector).prop('disabled', false);
-        console.log(config.btnColor);
-        $(pdpBtnSelector).css('background', config.btnColor);
+        if (config.baseCurrencyCode !== config.currentCurrencyCode) {
+            return;
+        }
 
-        const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
-        const btnHeight = (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45";
-
-        checkoutHelper.configurePdpBtn(config.shouldResizePdpBtn, btnHeight, btnBorderRadius, false);
-
-        $(document).on('instant-initialized', function () {
+        $(document).on('instant-config-loaded', function () {
             let skuIsDisabled = false;
-            Instant.config.disabledForSkusContaining.forEach(x => {
+            window.Instant.disabledForSkusContaining.forEach(x => {
                 if (x && config.sku.indexOf(x) !== -1) {
                     skuIsDisabled = true;
                 }
@@ -39,66 +24,47 @@ define([
             $(pdpBtnContainerSelector).css('display', skuIsDisabled ? 'none' : 'flex');
         });
 
-        $(element).click(function () {
-            if (!config.sku) {
-                return;
-            }
+        checkoutHelper.configurePdpBtn(
+            config.shouldResizePdpBtn,
+            (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45",
+            (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3",
+            config.shouldPositionPdpBelowAtc);
 
+        $(pdpBtnContainerSelector).css('display', 'flex');
+        $(pdpBtnSelector).prop('disabled', false);
+        $(pdpBtnSelector).css('background', config.btnColor);
+
+        $(element).click(function () {
             let qty;
             const options = [];
 
-            parseFormEntries('#product_addtocart_form').forEach((entry) => {
-                const { attribute, value } = entry;
-
-                const superAttributeRegEx = /super_attribute\[(.*)\]/g;
-                const match = superAttributeRegEx.exec(attribute);
-
-                if (match && match.length > 0) {
-                    options.push({ id: match[1], value: value });
-                }
-
-                if (attribute === 'qty') {
-                    qty = value;
+            const formEntries = [...(new FormData($('#product_addtocart_form')[0]).entries())].map(function (e) {
+                return {
+                    attribute: e[0],
+                    value: e[1],
                 }
             });
 
-            const hasConfigurableAttributes = options.length > 0;
-            const hasIncompleteConfigurableAttributes = options.filter(o => !o.value).length > 0 ? true : false;
+            formEntries.forEach((entry) => {
+                const match = /super_attribute\[(.*)\]/g.exec(entry.attribute);
 
-            if (hasConfigurableAttributes && hasIncompleteConfigurableAttributes) {
-                $(pdpRequiredOptionsMsgSelector).css('display', 'unset');
-                return;
-            }
-
-            $(pdpRequiredOptionsMsgSelector).css('display', 'none');
-
-            let checkoutWindow;
-            if (window.Instant && window.Instant.config) {
-                checkoutWindow = checkoutHelper.init([{ sku: config.sku, qty, options }], null, "pdp");
-            } else {
-                if (!checkoutHelper.canBrowserSetWindowLocation()) {
-                    checkoutWindow = checkoutHelper.openCheckoutWindow(checkoutHelper.getInstantBaseUrl());
+                if (match && match.length > 0) {
+                    options.push({ id: match[1], value: entry.value });
                 }
 
-                checkoutHelper.handleInstantAwareFunc(() => {
-                    const url = checkoutHelper.getCheckoutUrl([{ sku: config.sku, qty, options }], null, "pdp");
-                    if (checkoutWindow) {
-                        checkoutWindow.location = url;
-                    } else {
-                        window.location = url;
-                    }
-                });
+                if (entry.attribute === 'qty') {
+                    qty = entry.value;
+                }
+            });
+
+            if (options.length > 0 && options.filter(o => !o.value).length > 0 ? true : false) {
+                $(pdpRequiredOptionsMsgSelector).css('display', 'unset');
+                return;
+            } else {
+                $(pdpRequiredOptionsMsgSelector).css('display', 'none');
             }
 
-            if (checkoutWindow) {
-                checkoutHelper.showBackdrop(checkoutWindow);
-                const loop = setInterval(function () {
-                    if (checkoutWindow.closed) {
-                        checkoutHelper.hideBackdrop();
-                        clearInterval(loop);
-                    }
-                }, 500);
-            }
+            checkoutHelper.checkoutProduct(config.sku, qty, options)
         });
     }
 });

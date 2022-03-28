@@ -6,4 +6,7 @@
     <event name="sales_order_invoice_pay">
         <observer name="set_tx_on_invoice_pay" instance="Instant\Checkout\Observer\SetTransactionOnInvoicePaid" />
     </event>
+    <event name="checkout_submit_all_after">
+        <observer name="guest_to_customer" instance="Instant\Checkout\Observer\UpdateGuestOrderWithCustomer" />
+    </event>
 </config>

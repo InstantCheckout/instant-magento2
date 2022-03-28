@@ -12,14 +12,32 @@
 
 namespace Instant\Checkout\Controller\Cart;
 
-use Magento\Backend\App\Action\Context;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Action\Action;
-use Magento\Framework\App\Action\HttpPutActionInterface;
-use Magento\Checkout\Model\Session;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\Result\JsonFactory as ResultJsonFactory;
+use Magento\Quote\Api\CartRepositoryInterface;
 
-class Clear extends Action implements HttpPutActionInterface
+class Clear extends Action
 {
-    private $session;
+    /**
+     * @var ResultJsonFactory
+     */
+    protected $resultJsonFactory;
+    /**
+     * @var CustomerSession
+     */
+    protected $customerSession;
+    /**
+     * @var CheckoutSession
+     */
+    protected $checkoutSession;
+
+    /**
+     * @var CartRepositoryInterface
+     */
+    protected $quoteRepository;
 
     /**
      * Constructor.
@@ -27,9 +45,15 @@ class Clear extends Action implements HttpPutActionInterface
      */
     public function __construct(
         Context $context,
-        Session $session
+        ResultJsonFactory $resultJsonFactory,
+        CheckoutSession $checkoutSession,
+        CustomerSession $customerSession,
+        CartRepositoryInterface $quoteRepository
     ) {
-        $this->session = $session;
+        $this->resultJsonFactory = $resultJsonFactory;
+        $this->checkoutSession = $checkoutSession;
+        $this->customerSession = $customerSession;
+        $this->quoteRepository = $quoteRepository;
 
         return parent::__construct($context);
     }
@@ -39,6 +63,17 @@ class Clear extends Action implements HttpPutActionInterface
      */
     public function execute()
     {
-        $this->session->setQuoteId(null);
+        $quote = $this->checkoutSession->getQuote();
+        $quoteId = $quote->getId();
+
+        if ($quoteId) {
+            $cart = $this->quoteRepository->get($quoteId);
+            $cart->delete();
+        }
+        $this->checkoutSession->clearQuote();
+        $this->checkoutSession->clearStorage();
+        $this->checkoutSession->restoreQuote();
+        $result = $this->resultJsonFactory->create();
+        return $result->setData(['success' => true]);
     }
 }
