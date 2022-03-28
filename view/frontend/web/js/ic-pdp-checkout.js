@@ -21,7 +21,6 @@ define([
     return function (config, element) {
         $(pdpBtnContainerSelector).css('display', 'flex');
         $(pdpBtnSelector).prop('disabled', false);
-        console.log(config.btnColor);
         $(pdpBtnSelector).css('background', config.btnColor);
 
         const btnBorderRadius = (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3";
