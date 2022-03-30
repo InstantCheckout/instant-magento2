@@ -115,11 +115,13 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
 
                 $permissions = [
                     'Magento_Backend::admin',
+                    'Magento_Backend::store',
                     'Magento_Sales::sales',
                     'Magento_Sales::sales_operation',
                     'Magento_Sales::sales_order',
                     'Magento_Sales::actions',
                     'Magento_Sales::create',
+                    'Magento_Sales::cancel',
                     'Magento_Sales::actions_view',
                     'Magento_Sales::email',
                     'Magento_Sales::review_payment',

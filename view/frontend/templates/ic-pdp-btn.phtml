@@ -6,7 +6,7 @@
 
 <div id="ic-pdp-btn-container" class="ic-btn-container">
     <div class='ic-css-reset'>
-        <div id="ic-pdp-btn-wrapper" class="ic-btn-wrapper" style="margin-bottom: 5px;">
+        <div id="ic-pdp-btn-wrapper" class="ic-btn-wrapper" style="margin-top:0px !important;">
             <button disabled id="ic-pdp-btn" type="button" title="Instant Checkout" class="ic-btn" data-mage-init='
             {
                 "Instant_Checkout/js/ic-pdp-checkout": {
@@ -17,7 +17,8 @@
                     "btnColor": "<?= $block->escapeHtml($helper->getBtnColor()) ?>",
                     "baseCurrencyCode": "<?= $block->escapeHtml($helper->getBaseCurrencyCode()) ?>",
                     "currentCurrencyCode": "<?= $block->escapeHtml($helper->getCurrentCurrencyCode()) ?>",
-                    "shouldPositionPdpBelowAtc": "<?= $block->escapeHtml($helper->getShouldPositionPdpBelowAtc()) ?>"
+                    "shouldPositionPdpBelowAtc": "<?= $block->escapeHtml($helper->getShouldPositionPdpBelowAtc()) ?>",
+                    "pdpBtnCustomStyle": "<?= $block->escapeHtml($helper->getPdpBtnCustomStyle()) ?>"
                 }            
             }
             '>
@@ -28,7 +29,7 @@
                 <h4 id="ic-pdp-btn-text" class="ic-btn-text">Instant Checkout</h4>
             </button>
             <h4 id="ic-pdp-required-options-msg" class="ic-error-text">Please select required options</h4>
-            <div class="ic-btn-strike">
+            <div id="ic-pdp-btn-strike" class="ic-btn-strike">
                 <span>or</span>
             </div>
         </div>

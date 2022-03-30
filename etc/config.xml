@@ -27,6 +27,7 @@
                 <btn_border_radius>3</btn_border_radius>
                 <btn_height>45</btn_height>
                 <btn_color>#00D160</btn_color>
+                <pdp_btn_custom_style></pdp_btn_custom_style>
                 <disabled_for_skus_containing></disabled_for_skus_containing>
                 <enable_cookie_forwarding>0</enable_cookie_forwarding>
                 <retry_failures_cron>*/5 * * * *</retry_failures_cron>

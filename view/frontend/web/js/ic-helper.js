@@ -11,9 +11,7 @@ define([
 
         getInstantBaseUrl: function () {
             const isSandbox = window.Instant.enableSandbox;
-
-            // return 'https://' + (isSandbox ? 'staging.' : '') + 'checkout.instant.one/';
-            return 'http://localhost:3000/'
+            return 'https://' + (isSandbox ? 'staging.' : '') + 'checkout.instant.one/';
         },
 
         reloadInstantConfig: function (callback) {
@@ -122,6 +120,7 @@ define([
             const pdpBtnContainerSelector = '#ic-pdp-btn-container';
             const pdpBtnSelector = '#ic-pdp-btn';
             const atcBtnSelector = '#product-addtocart-button';
+            const pdpBtnOrStrike = '#ic-pdp-btn-strike'
 
             const resizePdpBtn = this.isWindowInstant() ? window.Instant.shouldResizePdpBtn : shouldResizePdpBtn;
             const positionPdpBelowAtc = this.isWindowInstant() ? window.Instant.shouldPositionPdpBelowAtc : shouldPositionPdpBelowAtc;
@@ -136,7 +135,11 @@ define([
             }
 
             // If we should position pdp below atc, then do not attempt tp prepend pdp btn above actions
-            if (!positionPdpBelowAtc) {
+            if (positionPdpBelowAtc) {
+                $(pdpBtnOrStrike).insertBefore(pdpBtnSelector);
+                $(pdpBtnSelector).css('margin-bottom', '0px');
+                $(pdpBtnSelector).css('margin-top', '5px');
+            } else {
                 $(pdpBtnContainerSelector).prependTo($(".box-tocart .fieldset .actions").first());
             }
 

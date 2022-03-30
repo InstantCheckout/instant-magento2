@@ -103,6 +103,10 @@
                     <label>Color of Instant buttons. In HEX (e.g. #RRGGBB)</label>
                     <comment>Defaults to #00D160.</comment>
                 </field>
+                <field id="pdp_btn_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom style for PDP button container</label>
+                    <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
+                </field>
             </group>
         </section>
     </system>

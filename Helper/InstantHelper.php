@@ -37,6 +37,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const BTN_BORDER_RADIUS = 'instant/visual/btn_border_radius';
     const BTN_HEIGHT = 'instant/visual/btn_height';
     const BTN_COLOR = 'instant/visual/btn_color';
+    const PDP_BTN_CUSTOM_STYLE = 'instant/visual/pdp_btn_custom_style';
 
     /**
      * @var \Magento\Framework\SessionSessionManager
@@ -44,15 +45,9 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     private $sessionManager;
 
     /**
-     * @var Session
-     */
-    private $customerSession;
-
-    /**
      * @var StoreManagerInterface
      */
     protected $storeManager;
-
 
     /**
      * Constructor.
@@ -197,6 +192,12 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $shouldPosition = $this->getConfig(self::SHOULD_POSITION_PDP_BELOW_ATC);
         return $shouldPosition === "1";
+    }
+
+    public function getPdpBtnCustomStyle()
+    {
+        $pdpBtnCustomStyle = $this->getConfig(self::PDP_BTN_CUSTOM_STYLE);
+        return $pdpBtnCustomStyle;
     }
 
     public function getInstantApiUrl()
