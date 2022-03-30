@@ -134,7 +134,6 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                     'Magento_Sales::emails',
                     'Magento_Sales::sales_invoice',
                     'Magento_Sales::shipment',
-                    'Magento_Sales::cancel',                    
                     'Magento_Sales::transactions',
                     'Magento_Sales::sales_creditmemo',
                     'Magento_Catalog::sets',

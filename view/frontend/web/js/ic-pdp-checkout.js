@@ -34,8 +34,10 @@ define([
         $(pdpBtnSelector).prop('disabled', false);
         $(pdpBtnSelector).css('background', config.btnColor);
 
-        const containerStyle = $(pdpBtnContainerSelector).attr('style');
-        $(pdpBtnContainerSelector).attr('style', containerStyle + config.pdpBtnCustomStyle);
+        if (config.pdpBtnCustomStyle) {
+            const containerStyle = $(pdpBtnContainerSelector).attr('style');
+            $(pdpBtnContainerSelector).attr('style', containerStyle + config.pdpBtnCustomStyle);
+        }
 
         $(element).click(function () {
             let qty;
