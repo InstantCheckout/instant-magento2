@@ -116,14 +116,12 @@ define([
             $(buttonSelector).css('background', backgroundToSet);
         },
 
-        configurePdpBtn: function (shouldResizePdpBtn, height, borderRadius, shouldPositionPdpBelowAtc) {
+        configurePdpBtn: function (shouldResizePdpBtn, height, borderRadius) {
             const pdpBtnContainerSelector = '#ic-pdp-btn-container';
             const pdpBtnSelector = '#ic-pdp-btn';
             const atcBtnSelector = '#product-addtocart-button';
-            const pdpBtnOrStrike = '#ic-pdp-btn-strike'
 
             const resizePdpBtn = this.isWindowInstant() ? window.Instant.shouldResizePdpBtn : shouldResizePdpBtn;
-            const positionPdpBelowAtc = this.isWindowInstant() ? window.Instant.shouldPositionPdpBelowAtc : shouldPositionPdpBelowAtc;
 
             // If we should resize pdp button
             // We resize it to the size of the add to cart button
@@ -132,15 +130,6 @@ define([
                 $(window).resize(function () {
                     $(pdpBtnContainerSelector).css('width', $(atcBtnSelector).outerWidth() + 'px');
                 });
-            }
-
-            // If we should position pdp below atc, then do not attempt tp prepend pdp btn above actions
-            if (positionPdpBelowAtc) {
-                $(pdpBtnOrStrike).insertBefore(pdpBtnSelector);
-                $(pdpBtnSelector).css('margin-bottom', '0px');
-                $(pdpBtnSelector).css('margin-top', '5px');
-            } else {
-                $(pdpBtnContainerSelector).prependTo($(".box-tocart .fieldset .actions").first());
             }
 
             this.setBtnAttributes(pdpBtnSelector, height, borderRadius);
@@ -155,6 +144,24 @@ define([
             const mcBtnContainerSelector = '#ic-mc-btn-container';
             const mcBtnWrapperSelector = '#ic-mc-btn-wrapper';
             const mcBtnSelector = '#ic-mc-btn';
+            const mcBtnOrStrikeSelector = '#ic-mc-btn-strike';
+
+            // Apply any custom styles to button specified in config
+            if (window.Instant.mcBtnCustomStyle) {
+                const btnStyle = $(mcBtnSelector).attr('style');
+                $(mcBtnSelector).attr('style', btnStyle ? btnStyle : '' + window.Instant.mcBtnCustomStyle);
+            }
+
+            // Apply any custom styles to button outer container specified in config
+            if (window.Instant.mcBtnContainerCustomStyle) {
+                const containerStyle = $(mcBtnContainerSelector).attr('style');
+                $(mcBtnContainerSelector).attr('style', containerStyle ? containerStyle : '' + window.Instant.mcBtnContainerCustomStyle);
+            }
+
+            // Hide OR strike if specified in config
+            if (window.Instant.mcBtnHideOrStrike) {
+                $(mcBtnOrStrikeSelector).css('display', 'none');
+            }
 
             const widthToSet = (window.Instant.mcBtnWidth && parseInt(window.Instant.mcBtnWidth) > 0) ? window.Instant.mcBtnWidth : "90";
             $(mcBtnWrapperSelector).css('width', widthToSet + '%');
@@ -171,6 +178,24 @@ define([
             const cartIndexBtnContainerSelector = '#ic-cindex-btn-container';
             const cartIndexBtnWrapperSelector = '#ic-cindex-btn-wrapper';
             const cartIndexBtnSelector = '#ic-cindex-btn';
+            const cartIndexBtnOrStrikeSelector = '#ic-cindex-btn-strike';
+
+            // Apply any custom styles to button specified in config
+            if (window.Instant.cindexBtnCustomStyle) {
+                const btnStyle = $(cartIndexBtnSelector).attr('style');
+                $(cartIndexBtnSelector).attr('style', btnStyle ? btnStyle : '' + window.Instant.cindexBtnCustomStyle);
+            }
+
+            // Apply any custom styles to button outer container specified in config
+            if (window.Instant.cindexBtnContainerCustomStyle) {
+                const containerStyle = $(cartIndexBtnContainerSelector).attr('style');
+                $(cartIndexBtnContainerSelector).attr('style', containerStyle ? containerStyle : '' + window.Instant.cindexBtnContainerCustomStyle);
+            }
+
+            // Hide OR strike if specified in config
+            if (window.Instant.cindexBtnHideOrStrike) {
+                $(cartIndexBtnOrStrikeSelector).css('display', 'none');
+            }
 
             const resizeBtn = this.isWindowInstant() ? window.Instant.shouldResizeCartIndexBtn : shouldResize;
             if (resizeBtn) {

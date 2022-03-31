@@ -244,7 +244,14 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['btnColor'] = $this->instantHelper->getBtnColor();
         $data['currentCurrencyCode'] = $this->instantHelper->getCurrentCurrencyCode();
         $data['baseCurrencyCode'] = $this->instantHelper->getBaseCurrencyCode();
-        $data['shouldPositionPdpBelowAtc'] = $this->instantHelper->getShouldPositionPdpBelowAtc();
+
+        $data['mcBtnCustomStyle'] = $this->instantHelper->getMcBtnCustomStyle();
+        $data['mcBtnContainerCustomStyle'] = $this->instantHelper->getMcBtnContainerCustomStyle();
+        $data['mcBtnHideOrStrike'] = $this->instantHelper->getMcBtnShouldHideOrStrike();
+
+        $data['cindexBtnCustomStyle'] = $this->instantHelper->getCindexBtnCustomStyle();
+        $data['cindexBtnContainerCustomStyle'] = $this->instantHelper->getCindexBtnContainerCustomStyle();
+        $data['cindexBtnHideOrStrike'] = $this->instantHelper->getCindexBtnShouldHideOrStrike();
 
         $result->setData($data);
         return $result;

@@ -29,15 +29,28 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const RETRY_FAILURES_COUNT = 'instant/general/retry_failures_count';
     const ENABLE_COOKIE_FORWARDING = 'instant/general/enable_cookie_forwarding';
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
+
     const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
     const SHOULD_RESIZE_CART_INDEX_BTN = 'instant/visual/should_resize_cart_index_btn';
     const CPAGE_BTN_WIDTH = 'instant/visual/cpage_btn_width';
-    const SHOULD_POSITION_PDP_BELOW_ATC = 'instant/visual/should_position_pdp_below_atc';
-    const SHOULD_RESIZE_PDP_BTN = 'instant/visual/should_resize_pdp_btn';
     const BTN_BORDER_RADIUS = 'instant/visual/btn_border_radius';
     const BTN_HEIGHT = 'instant/visual/btn_height';
     const BTN_COLOR = 'instant/visual/btn_color';
-    const PDP_BTN_CUSTOM_STYLE = 'instant/visual/pdp_btn_custom_style';
+
+    const PDP_SHOULD_POSITION_PDP_BELOW_ATC = 'instant/pdpcustomisation/should_position_pdp_below_atc';
+    const PDP_SHOULD_RESIZE_PDP_BTN = 'instant/pdpcustomisation/should_resize_pdp_btn';
+    const PDP_BTN_CUSTOM_STYLE = 'instant/pdpcustomisation/pdp_btn_custom_style';
+    const PDP_BTN_REPOSITION_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_div';
+    const PDP_BTN_REPOSITION_WITHIN_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_within_div';
+    const PDP_REPOSITION_OR_STRIKE_ABOVE_BTN = 'instant/pdpcustomisation/pdp_reposition_or_strike_above_btn';
+
+    const MC_BTN_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_custom_style';
+    const MC_BTN_CONTAINER_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_container_custom_style';
+    const MC_BTN_HIDE_OR_STRIKE = 'instant/mccustomisation/mc_btn_hide_or_strike';
+
+    const CINDEX_BTN_CUSTOM_STYLE = 'instant/cindexcustomisation/cindex_btn_custom_style';
+    const CINDEX_BTN_CONTAINER_CUSTOM_STYLE = 'instant/cindexcustomisation/cindex_btn_container_custom_style';
+    const CINDEX_BTN_HIDE_OR_STRIKE = 'instant/cindexcustomisation/cindex_btn_hide_or_strike';
 
     /**
      * @var \Magento\Framework\SessionSessionManager
@@ -174,7 +187,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getShouldResizePdpBtn()
     {
-        $shouldResize = $this->getConfig(self::SHOULD_RESIZE_PDP_BTN);
+        $shouldResize = $this->getConfig(self::PDP_SHOULD_RESIZE_PDP_BTN);
         return $shouldResize === "1";
     }
 
@@ -190,14 +203,68 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getShouldPositionPdpBelowAtc()
     {
-        $shouldPosition = $this->getConfig(self::SHOULD_POSITION_PDP_BELOW_ATC);
+        $shouldPosition = $this->getConfig(self::PDP_SHOULD_POSITION_PDP_BELOW_ATC);
         return $shouldPosition === "1";
+    }
+
+    public function getShouldRepositionOrStrikeAbovePdpBtn()
+    {
+        $shouldRepositionOrStrikeAbovePdpBtn = $this->getConfig(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN);
+        return $shouldRepositionOrStrikeAbovePdpBtn === "1";
     }
 
     public function getPdpBtnCustomStyle()
     {
         $pdpBtnCustomStyle = $this->getConfig(self::PDP_BTN_CUSTOM_STYLE);
         return $pdpBtnCustomStyle;
+    }
+
+    public function getPdpBtnRepositionDiv()
+    {
+        $pdpBtnRepositionDiv = $this->getConfig(self::PDP_BTN_REPOSITION_DIV);
+        return $pdpBtnRepositionDiv;
+    }
+
+    public function getPdpBtnRepositionWithinDiv()
+    {
+        $pdpBtnRepositionWithinDiv = $this->getConfig(self::PDP_BTN_REPOSITION_WITHIN_DIV);
+        return $pdpBtnRepositionWithinDiv;
+    }
+
+    public function getMcBtnCustomStyle()
+    {
+        $mcBtnCustomStyle = $this->getConfig(self::MC_BTN_CUSTOM_STYLE);
+        return $mcBtnCustomStyle;
+    }
+
+    public function getMcBtnContainerCustomStyle()
+    {
+        $mcBtnContainerCustomStyle = $this->getConfig(self::MC_BTN_CONTAINER_CUSTOM_STYLE);
+        return $mcBtnContainerCustomStyle;
+    }
+
+    public function getMcBtnShouldHideOrStrike()
+    {
+        $mcBtnContainerCustomStyle = $this->getConfig(self::MC_BTN_HIDE_OR_STRIKE);
+        return $mcBtnContainerCustomStyle === "1";
+    }
+
+    public function getCindexBtnCustomStyle()
+    {
+        $cIndexBtnCustomStyle = $this->getConfig(self::CINDEX_BTN_CUSTOM_STYLE);
+        return $cIndexBtnCustomStyle;
+    }
+
+    public function getCindexBtnContainerCustomStyle()
+    {
+        $cIndexBtnContainerCustomStyle = $this->getConfig(self::CINDEX_BTN_CONTAINER_CUSTOM_STYLE);
+        return $cIndexBtnContainerCustomStyle;
+    }
+
+    public function getCindexBtnShouldHideOrStrike()
+    {
+        $cIndexBtnHideOrStrike = $this->getConfig(self::CINDEX_BTN_HIDE_OR_STRIKE);
+        return $cIndexBtnHideOrStrike === "1";
     }
 
     public function getInstantApiUrl()

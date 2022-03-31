@@ -76,16 +76,6 @@
                     <label>Width of checkout page button</label>
                     <comment>Defaults to 60%. (%) Low values may cause visual glitching.</comment>
                 </field>
-                <field id="should_resize_pdp_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Should resize Instant PDP button to Add to Cart button</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Defaults to yes.</comment>
-                </field>
-                <field id="should_position_pdp_below_atc" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Should position Instant PDP button below Add to Cart button</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Defaults to no.</comment>
-                </field>
                 <field id="should_resize_cart_index_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Should resize Instant cart summary button to primary proceed button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -103,9 +93,67 @@
                     <label>Color of Instant buttons. In HEX (e.g. #RRGGBB)</label>
                     <comment>Defaults to #00D160.</comment>
                 </field>
+            </group>
+            <group id="pdpcustomisation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>PDP Button Customisation</label>
+                <field id="should_resize_pdp_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Should resize Instant PDP button to Add to Cart button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to yes.</comment>
+                </field>
+                <field id="should_position_pdp_below_atc" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Should position Instant PDP button below Add to Cart button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to no.</comment>
+                </field>
                 <field id="pdp_btn_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for PDP button container</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
+                </field>
+                <field id="pdp_btn_reposition_div" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Setting for repositioning the PDP button before or after a div</label>
+                    <comment>Provide in the format {AFTER or BEFORE}|{element selector} e.g. AFTER|.product-social-links will reposition the PDP button after the HTML element matching the selector .product-social-links"</comment>
+                </field>
+                <field id="pdp_btn_reposition_within_div" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Setting for repositioning the PDP button as first or last element within a parent div</label>
+                    <comment>Provide in the format {PREPEND or APPEND}|{element selector} e.g. PREPEND|.product-info-price will reposition the PDP button as the first element within the div matching the selector .product-info-price"</comment>
+                </field>
+                <field id="pdp_reposition_or_strike_above_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Move OR strike to above the Instant PDP button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to no. By default, the OR strike is below the Instant PDP button. Setting this to yes will reposition it above the PDP button.</comment>
+                </field>
+            </group>
+            <group id="mccustomisation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Minicart Button Customisation</label>
+                <field id="mc_btn_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom style for minicart button</label>
+                    <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
+                </field>
+                <field id="mc_btn_container_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom style for outer minicart button container</label>
+                    <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
+                </field>
+                <field id="mc_btn_hide_or_strike" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hide OR strike for minicart button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to no.</comment>
+                </field>
+            </group>
+            <group id="cindexcustomisation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Cart Index Button Customisation</label>
+                <field id="cindex_btn_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom style for cart index button</label>
+                    <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
+                </field>
+                <field id="cindex_btn_container_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom style for outer cart index button container</label>
+                    <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
+                </field>
+                <field id="cindex_btn_hide_or_strike" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hide OR strike for cart index button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to no.</comment>
                 </field>
             </group>
         </section>
