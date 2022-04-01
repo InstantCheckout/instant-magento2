@@ -138,6 +138,7 @@ define([
         setMinicartBtnAttributes: function () {
             const cartData = this.getCustomerCartData();
             if (!(cartData && cartData.items && cartData.items.length > 0 && window.Instant.enableMinicartBtn && this.shouldEnableInstantBtn())) {
+                $(mcBtnContainerSelector).css('display', 'none');
                 return;
             }
 
@@ -172,6 +173,7 @@ define([
 
         setCartIndexBtnAttributes: function (shouldResize, height, borderRadius, btnColor) {
             if (this.isWindowInstant() && !this.shouldEnableInstantBtn()) {
+                $(cartIndexBtnContainerSelector).css('display', 'none');
                 return;
             }
 
@@ -219,6 +221,7 @@ define([
 
         setCheckoutPageBtnAttributes: function () {
             if (this.isWindowInstant() && !this.shouldEnableInstantBtn()) {
+                $(checkoutPageBtnContainerSelector).css('display', 'none');
                 return;
             }
 
