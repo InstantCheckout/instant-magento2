@@ -23,6 +23,7 @@ define([
             }).subscribe(function () {
                 if (customerData.get('cart')().subtotalAmount) {
                     checkoutHelper.refreshInstantButtons();
+                    checkoutHelper.reloadInstantConfig();
                 }
             });
 
