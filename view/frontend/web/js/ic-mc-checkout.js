@@ -22,6 +22,7 @@ define([
                 return ko.toJSON(customerData.get('cart')().subtotalAmount);
             }).subscribe(function () {
                 if (customerData.get('cart')().subtotalAmount) {
+                    checkoutHelper.reloadInstantConfig();
                     checkoutHelper.refreshInstantButtons();
                     checkoutHelper.reloadInstantConfig();
                 }

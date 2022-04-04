@@ -107,6 +107,10 @@
                     <comment>Defaults to no.</comment>
                 </field>
                 <field id="pdp_btn_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom style for PDP button</label>
+                    <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
+                </field>
+                <field id="pdp_btn_container_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for PDP button container</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
                 </field>

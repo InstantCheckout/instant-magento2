@@ -40,6 +40,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const PDP_SHOULD_POSITION_PDP_BELOW_ATC = 'instant/pdpcustomisation/should_position_pdp_below_atc';
     const PDP_SHOULD_RESIZE_PDP_BTN = 'instant/pdpcustomisation/should_resize_pdp_btn';
     const PDP_BTN_CUSTOM_STYLE = 'instant/pdpcustomisation/pdp_btn_custom_style';
+    const PDP_BTN_CONTAINER_CUSTOM_STYLE = 'instant/pdpcustomisation/pdp_btn_container_custom_style';
     const PDP_BTN_REPOSITION_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_div';
     const PDP_BTN_REPOSITION_WITHIN_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_within_div';
     const PDP_REPOSITION_OR_STRIKE_ABOVE_BTN = 'instant/pdpcustomisation/pdp_reposition_or_strike_above_btn';
@@ -217,6 +218,12 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $pdpBtnCustomStyle = $this->getConfig(self::PDP_BTN_CUSTOM_STYLE);
         return $pdpBtnCustomStyle;
+    }
+
+    public function getPdpBtnContainerCustomStyle()
+    {
+        $pdpBtnContainerCustomStyle = $this->getConfig(self::PDP_BTN_CONTAINER_CUSTOM_STYLE);
+        return $pdpBtnContainerCustomStyle;
     }
 
     public function getPdpBtnRepositionDiv()

@@ -140,7 +140,7 @@ define([
             const mcBtnWrapperSelector = '#ic-mc-btn-wrapper';
             const mcBtnSelector = '#ic-mc-btn';
             const mcBtnOrStrikeSelector = '#ic-mc-btn-strike';
-            
+
             const cartData = this.getCustomerCartData();
             if (!(cartData && cartData.items && cartData.items.length > 0 && window.Instant.enableMinicartBtn && this.shouldEnableInstantBtn())) {
                 $(mcBtnContainerSelector).css('display', 'none');
@@ -176,7 +176,7 @@ define([
             const cartIndexBtnWrapperSelector = '#ic-cindex-btn-wrapper';
             const cartIndexBtnSelector = '#ic-cindex-btn';
             const cartIndexBtnOrStrikeSelector = '#ic-cindex-btn-strike';
-            
+
             if (this.isWindowInstant() && !this.shouldEnableInstantBtn()) {
                 $(cartIndexBtnContainerSelector).css('display', 'none');
                 return;
@@ -220,14 +220,14 @@ define([
         },
 
         setCheckoutPageBtnAttributes: function () {
-            const checkoutPageBtnContainerSelector = '#ic-cpage-btn-container';
-            const checkoutPageBtnWrapperSelector = '#ic-cpage-btn-wrapper';
-            const checkoutPageBtnSelector = '#ic-cpage-btn';
-
             if (this.isWindowInstant() && !this.shouldEnableInstantBtn()) {
                 $(checkoutPageBtnContainerSelector).css('display', 'none');
                 return;
             }
+
+            const checkoutPageBtnContainerSelector = '#ic-cpage-btn-container';
+            const checkoutPageBtnWrapperSelector = '#ic-cpage-btn-wrapper';
+            const checkoutPageBtnSelector = '#ic-cpage-btn';
 
             const widthToSet = (window.Instant.cpageBtnWidth && parseInt(window.Instant.cpageBtnWidth) > 0) ? window.Instant.cpageBtnWidth : "60";
             $(checkoutPageBtnWrapperSelector).css('width', widthToSet + '%');

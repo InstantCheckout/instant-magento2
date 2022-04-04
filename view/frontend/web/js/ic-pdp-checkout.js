@@ -11,6 +11,8 @@ define([
     const pdpBtnOrStrike = '#ic-pdp-btn-strike'
 
     return function (config, element) {
+        console.log(config);
+
         if (config.baseCurrencyCode !== config.currentCurrencyCode) {
             return;
         }
@@ -30,17 +32,23 @@ define([
             (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45",
             (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3");
 
-        // Apply any custom styles specified in config
-        if (config.pdpBtnCustomStyle) {
-            const containerStyle = $(pdpBtnContainerSelector).attr('style');
-            $(pdpBtnContainerSelector).attr('style', containerStyle ? containerStyle : '' + config.pdpBtnCustomStyle);
-        }
-
         // If we should reposition OR strike, or should reposition pdp below atc, then move the OR strike before button
         if (config.pdpShouldRepositionOrStrikeAboveBtn || config.shouldPositionPdpBelowAtc) {
             $(pdpBtnOrStrike).insertBefore(pdpBtnSelector);
             $(pdpBtnSelector).css('margin-bottom', '0px');
             $(pdpBtnSelector).css('margin-top', '5px');
+        }
+
+        // Apply any custom styles for button specified in config
+        if (config.pdpBtnCustomStyle) {
+            const btnStyle = $(pdpBtnSelector).attr('style');
+            $(pdpBtnSelector).attr('style', btnStyle ? btnStyle + config.pdpBtnCustomStyle : btnStyle);
+        }
+
+        // Apply any custom styles for container specified in config
+        if (config.pdpBtnContainerCustomStyle) {
+            const containerStyle = $(pdpBtnContainerSelector).attr('style');
+            $(pdpBtnContainerSelector).attr('style', containerStyle ? containerStyle + config.pdpBtnContainerCustomStyle : config.pdpBtnContainerCustomStyle);
         }
 
         // If we should position pdp below atc, then do not attempt to prepend pdp btn above actions
