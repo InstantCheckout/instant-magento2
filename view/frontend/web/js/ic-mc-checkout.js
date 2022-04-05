@@ -24,7 +24,6 @@ define([
                 if (customerData.get('cart')().subtotalAmount) {
                     checkoutHelper.reloadInstantConfig();
                     checkoutHelper.refreshInstantButtons();
-                    checkoutHelper.reloadInstantConfig();
                 }
             });
 
