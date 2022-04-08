@@ -1,6 +1,6 @@
 define([
     'uiComponent',
-    'checkoutHelper'
+    'Instant_Checkout/js/ic-helper'
 ], function (Component, checkoutHelper) {
     'use strict';
 

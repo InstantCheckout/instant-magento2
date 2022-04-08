@@ -2,7 +2,7 @@ define([
     'ko',
     'jquery',
     'uiComponent',
-    'checkoutHelper',
+    'Instant_Checkout/js/ic-helper',
     'Magento_Customer/js/customer-data',
 ], function (ko, $, Component, checkoutHelper, customerData) {
     'use strict';
@@ -24,7 +24,6 @@ define([
                 if (customerData.get('cart')().subtotalAmount) {
                     checkoutHelper.reloadInstantConfig();
                     checkoutHelper.refreshInstantButtons();
-                    checkoutHelper.reloadInstantConfig();
                 }
             });
 

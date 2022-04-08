@@ -1,7 +1,7 @@
 define([
     'jquery',
     'underscore',
-    'checkoutHelper'
+    'Instant_Checkout/js/ic-helper'
 ], function ($, _, checkoutHelper) {
     "use strict";
 
