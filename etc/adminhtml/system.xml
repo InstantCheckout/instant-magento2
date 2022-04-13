@@ -36,6 +36,10 @@
                     <label>Disable Instant for products where the SKU contains the following specified phrases (provide a comma delimited list)</label>
                     <comment>Defaults to empty. Enter a comma delimited list. If a product's SKU contains any of phrases in this comma delimited list, then Instant will be disabled. (e.g. ABC,DEF will ensure Instant is disabled for all products where the SKU contains either ABC or DEF.) To enable Instant for all products, leave empty.</comment>
                 </field>
+                <field id="disabled_for_customer_group_ids" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable Instant for specific customer groups (provide a comma delimited list of IDs)</label>
+                    <comment>Defaults to empty. Enter a comma delimited list. Any customer group contained in this comma delimited list, will have Instant disabled (e.g. 1,2 will ensure Instant is disabled for all customers in groups with ID 1 or 2.)</comment>
+                </field>
                 <field id="enable_catalog" translate="label" type="select" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Product Catalog Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

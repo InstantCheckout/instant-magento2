@@ -11,7 +11,7 @@ define([
     const pdpBtnOrStrike = '#ic-pdp-btn-strike'
 
     return function (config, element) {
-        if (config.baseCurrencyCode !== config.currentCurrencyCode) {
+        if ((config.baseCurrencyCode !== config.currentCurrencyCode) || config.disabledForCustomerGroup) {
             return;
         }
 

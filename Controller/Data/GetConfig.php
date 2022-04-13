@@ -242,6 +242,7 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['btnBorderRadius'] = $this->instantHelper->getBtnBorderRadius();
         $data['btnHeight'] = $this->instantHelper->getBtnHeight();
         $data['btnColor'] = $this->instantHelper->getBtnColor();
+        $data['disabledForCustomerGroup'] = $this->instantHelper->getDisabledForCustomerGroup();
         $data['currentCurrencyCode'] = $this->instantHelper->getCurrentCurrencyCode();
         $data['baseCurrencyCode'] = $this->instantHelper->getBaseCurrencyCode();
 

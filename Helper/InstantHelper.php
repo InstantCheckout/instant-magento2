@@ -29,6 +29,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const RETRY_FAILURES_COUNT = 'instant/general/retry_failures_count';
     const ENABLE_COOKIE_FORWARDING = 'instant/general/enable_cookie_forwarding';
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
+    const DISABLED_FOR_CUSTOMER_GROUP_IDS = 'instant/general/disabled_for_customer_group_ids';
 
     const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
     const SHOULD_RESIZE_CART_INDEX_BTN = 'instant/visual/should_resize_cart_index_btn';
@@ -158,6 +159,25 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $disableForSkusContaining = $this->getConfig(self::DISABLED_FOR_SKUS_CONTAINING);
         return explode(',', $disableForSkusContaining);
+    }
+
+    public function getDisabledForCustomerGroup()
+    {
+        $disabledForCustomerGroupIdsConfig = $this->getConfig(self::DISABLED_FOR_CUSTOMER_GROUP_IDS);
+
+        $disabledCustomerGroupIds = explode(',', $disabledForCustomerGroupIdsConfig);
+        $customerGroupId = $this->getCustomerGroupId();
+
+        return in_array($customerGroupId, $disabledCustomerGroupIds);
+    }
+
+    public function getCustomerGroupId()
+    {
+        if ($this->customerSession->isLoggedIn()) {
+            return $this->customerSession->getCustomer()->getGroupId();
+        }
+
+        return -1;
     }
 
     public function getMcBtnWidth()

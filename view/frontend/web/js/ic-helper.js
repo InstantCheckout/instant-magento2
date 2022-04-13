@@ -220,14 +220,14 @@ define([
         },
 
         setCheckoutPageBtnAttributes: function () {
+            const checkoutPageBtnContainerSelector = '#ic-cpage-btn-container';
+            const checkoutPageBtnWrapperSelector = '#ic-cpage-btn-wrapper';
+            const checkoutPageBtnSelector = '#ic-cpage-btn';
+
             if (this.isWindowInstant() && !this.shouldEnableInstantBtn()) {
                 $(checkoutPageBtnContainerSelector).css('display', 'none');
                 return;
             }
-
-            const checkoutPageBtnContainerSelector = '#ic-cpage-btn-container';
-            const checkoutPageBtnWrapperSelector = '#ic-cpage-btn-wrapper';
-            const checkoutPageBtnSelector = '#ic-cpage-btn';
 
             const widthToSet = (window.Instant.cpageBtnWidth && parseInt(window.Instant.cpageBtnWidth) > 0) ? window.Instant.cpageBtnWidth : "60";
             $(checkoutPageBtnWrapperSelector).css('width', widthToSet + '%');
@@ -253,7 +253,7 @@ define([
                 })
             }
 
-            return !cartContainsBlacklistedSku && areBaseAndCurrentCurrenciesEqual;
+            return !cartContainsBlacklistedSku && areBaseAndCurrentCurrenciesEqual && !window.Instant.disabledForCustomerGroup;
         },
 
         refreshInstantButtons: function () {

@@ -47,8 +47,9 @@ class CPageBtnDisable
         array $jsLayout
     ) {
         $enabled = $this->instantHelper->getInstantBtnCheckoutPageEnabled();
+        $disabledForCustomerGroup = $this->instantHelper->getDisabledForCustomerGroup();
 
-        if (!$enabled) {
+        if (!$enabled || $disabledForCustomerGroup) {
             $jsLayout['components']['checkout']['children']['cpage-btn']['componentDisabled'] = true;
         }
 
