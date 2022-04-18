@@ -111,7 +111,7 @@ define([
             const borderRadiusToSet = this.isWindowInstant() ? (window.Instant.btnBorderRadius && parseInt(window.Instant.btnBorderRadius) >= 0 && parseInt(window.Instant.btnBorderRadius) <= 10) ? window.Instant.btnBorderRadius : "3" : borderRadius;
             const backgroundToSet = this.isWindowInstant() ? window.Instant.btnColor : (backgroundColor ? backgroundColor : '#00D160');
 
-            $(buttonSelector).css('height', heightToSet + 'px');
+            $(buttonSelector).css('min-height', heightToSet + 'px');
             $(buttonSelector).css('border-radius', borderRadiusToSet + 'px');
             $(buttonSelector).css('background', backgroundToSet);
         },
