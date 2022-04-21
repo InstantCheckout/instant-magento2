@@ -36,8 +36,9 @@ class PdpBlock extends \Magento\Framework\View\Element\Template
     public function _toHtml()
     {
         $catalogPageBtnEnabled = $this->instantHelper->getInstantBtnCatalogPageEnabled();
+        $disabledForCustomerGroup = $this->instantHelper->getDisabledForCustomerGroup();
 
-        if ($catalogPageBtnEnabled) {
+        if ($catalogPageBtnEnabled && !$disabledForCustomerGroup) {
             return parent::_toHtml();
         }
 
