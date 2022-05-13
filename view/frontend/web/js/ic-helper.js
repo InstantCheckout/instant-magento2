@@ -9,11 +9,6 @@ define([
             alert("An error occurred during checkout. Please try again.")
         },
 
-        getInstantBaseUrl: function () {
-            const isSandbox = window.Instant.enableSandbox;
-            return 'https://' + (isSandbox ? 'staging.' : '') + 'checkout.instant.one/';
-        },
-
         reloadInstantConfig: function (callback) {
             $.ajax({
                 url: window.location.origin + "/instant/data/getconfig",
@@ -32,32 +27,6 @@ define([
             })
         },
 
-        showBackdrop: function (checkoutWindow) {
-            const onClick = () => {
-                if (checkoutWindow) {
-                    checkoutWindow.focus();
-                } else {
-                    $('#ic-backdrop-container').css('display', 'none');
-                }
-            };
-
-            $('#ic-backdrop-container').css('display', 'flex');
-            $('.ic-backdrop').css('display', 'flex');
-            $('.ic-backdrop-close').on('click', function () {
-                $('#ic-backdrop-container').css('display', 'none');
-            });
-            $('.ic-backdrop-message').on('click', function () {
-                onClick();
-            });
-            $('.ic-backdrop-continue').on('click', function () {
-                onClick();
-            });
-        },
-
-        hideBackdrop: function () {
-            $('#ic-backdrop-container').css('display', 'none');
-        },
-
         isWindowInstant: function () {
             return !!window.Instant;
         },
@@ -68,26 +37,6 @@ define([
             } else {
                 this.reloadInstantConfig(func);
             }
-        },
-
-        getCheckoutUrl: function (items, cartId, source) {
-            const merchantIdParam = 'merchantId=' + window.Instant.appId;
-            const storeCodeParam = 'storeCode=' + window.Instant.storeCode;
-            const sessionIdParam = window.Instant.sessId ? 'sessionId=' + window.Instant.sessId : '';
-            const srcParam = "src=" + source;
-            const confirmParam = "confirm=true";
-            const currencyCodeParam = "currencyCode=" + window.Instant.currentCurrencyCode;
-
-            var url = this.getInstantBaseUrl() + '?' + confirmParam + '&' + storeCodeParam + '&' + merchantIdParam + '&' + sessionIdParam + '&' + srcParam + '&' + currencyCodeParam;
-
-            if (items) {
-                url = url + '&' + "items=" + encodeURIComponent(JSON.stringify(items));
-            }
-            if (cartId) {
-                url = url + '&' + "cartId=" + cartId;
-            }
-
-            return url;
         },
 
         getCustomerCartData: function () {
@@ -107,9 +56,9 @@ define([
         },
 
         setBtnAttributes: function (buttonSelector, height, borderRadius, backgroundColor) {
-            const heightToSet = this.isWindowInstant() ? (window.Instant.btnHeight && parseInt(window.Instant.btnHeight) >= 40 && parseInt(window.Instant.btnHeight) <= 50) ? window.Instant.btnHeight : "45" : height;
-            const borderRadiusToSet = this.isWindowInstant() ? (window.Instant.btnBorderRadius && parseInt(window.Instant.btnBorderRadius) >= 0 && parseInt(window.Instant.btnBorderRadius) <= 10) ? window.Instant.btnBorderRadius : "3" : borderRadius;
-            const backgroundToSet = this.isWindowInstant() ? window.Instant.btnColor : (backgroundColor ? backgroundColor : '#00D160');
+            const heightToSet = height || (this.isWindowInstant() && window.Instant.btnHeight ? window.Instant.btnHeight : '45');
+            const borderRadiusToSet = borderRadius || (this.isWindowInstant() && window.Instant.btnBorderRadius ? window.Instant.btnBorderRadius : '3')
+            const backgroundToSet = backgroundColor || (this.isWindowInstant() && window.Instant.btnColor ? window.Instant.btnColor : '#00D160');
 
             $(buttonSelector).css('min-height', heightToSet + 'px');
             $(buttonSelector).css('border-radius', borderRadiusToSet + 'px');
@@ -264,40 +213,5 @@ define([
                 this.setCheckoutPageBtnAttributes();
             });
         },
-
-        openCheckoutWindow: function (url) {
-            const windowHeight = 800;
-            const windowWidth = 490;
-            const posY = window.outerHeight / 2 + window.screenY - (windowHeight / 2);
-            const posX = window.outerWidth / 2 + window.screenX - (windowWidth / 2);
-
-            const checkoutWindow = window.open(url, '', 'location=yes,height=' + windowHeight + ',width=' + windowWidth + ',top=' + posY + ',left=' + posX + ',scrollbars=yes,status=yes');
-
-            this.showBackdrop(checkoutWindow);
-            const loop = setInterval(function () {
-                if (checkoutWindow.closed) {
-                    $('#ic-backdrop-container').css('display', 'none');
-                    clearInterval(loop);
-                }
-            }, 500);
-        },
-
-        checkoutCustomerCart: function (srcLocation) {
-            if (!this.isWindowInstant()) {
-                this.showErrorAlert();
-                return;
-            }
-
-            this.openCheckoutWindow(this.getCheckoutUrl(null, window.Instant.cartId, srcLocation));
-        },
-
-        checkoutProduct: function (sku, qty, options = []) {
-            if (!this.isWindowInstant()) {
-                this.showErrorAlert();
-                return;
-            }
-
-            this.openCheckoutWindow(this.getCheckoutUrl([{ sku, qty, options }], null, "pdp"));
-        }
     };
 });

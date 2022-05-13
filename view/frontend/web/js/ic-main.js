@@ -21,7 +21,7 @@ define([
                         contentType: false,
                         processData: false,
                         success: function () {
-                            document.location.reload();
+                            // do nothing
                         },
                         error: function () {
                             this.showErrorAlert();

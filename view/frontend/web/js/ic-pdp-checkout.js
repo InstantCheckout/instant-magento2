@@ -6,15 +6,27 @@ define([
     "use strict";
 
     const pdpBtnSelector = "#ic-pdp-btn";
-    const pdpRequiredOptionsMsgSelector = "#ic-pdp-required-options-msg";
     const pdpBtnContainerSelector = "#ic-pdp-btn-container";
     const pdpBtnOrStrike = '#ic-pdp-btn-strike'
 
-    return function (config, element) {
-        if (config.baseCurrencyCode !== config.currentCurrencyCode) {
-            return;
-        }
+    window.MutationObserver = window.MutationObserver
+        || window.WebKitMutationObserver
+        || window.MozMutationObserver;
 
+    const syncInstantButtonDisabled = () => {
+        const atcDisabledValue = $('#product-addtocart-button').is(':disabled');
+        $(pdpBtnSelector).prop('disabled', atcDisabledValue);
+    };
+    syncInstantButtonDisabled();
+
+    new MutationObserver(function () {
+        syncInstantButtonDisabled();
+    }).observe(document.querySelector('#product-addtocart-button'), {
+        attributes: true
+    });
+
+    return function (config, element) {
+        console.log(config);
         $(document).on('instant-config-loaded', function () {
             let skuIsDisabled = false;
             window.Instant.disabledForSkusContaining.forEach(x => {
@@ -27,8 +39,8 @@ define([
 
         checkoutHelper.configurePdpBtn(
             config.shouldResizePdpBtn,
-            (config.btnHeight && parseInt(config.btnHeight) >= 40 && parseInt(config.btnHeight) <= 50) ? config.btnHeight : "45",
-            (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3");
+            config.btnHeight,
+            config.btnBorderRadius);
 
         // If we should reposition OR strike, or should reposition pdp below atc, then move the OR strike before button
         if (config.pdpShouldRepositionOrStrikeAboveBtn || config.shouldPositionPdpBelowAtc) {
@@ -75,42 +87,10 @@ define([
         }
 
         $(pdpBtnContainerSelector).css('display', 'flex');
-        $(pdpBtnSelector).prop('disabled', false);
         $(pdpBtnSelector).css('background', config.btnColor);
 
         $(element).click(function () {
-            let qty;
-            const options = [];
-
-            const formEntries = [...(new FormData($('#product_addtocart_form')[0]).entries())].map(function (e) {
-                return {
-                    attribute: e[0],
-                    value: e[1],
-                }
-            });
-
-            formEntries.forEach((entry) => {
-                const match = /super_attribute\[(.*)\]/g.exec(entry.attribute);
-
-                if (match && match.length > 0) {
-                    options.push({ id: match[1], value: entry.value });
-                }
-
-                if (entry.attribute === 'qty') {
-                    qty = entry.value;
-                }
-            });
-
-            if (options.length > 0 && options.filter(o => !o.value).length > 0 ? true : false) {
-                $(pdpRequiredOptionsMsgSelector).css('display', 'unset');
-                return;
-            } else {
-                $(pdpRequiredOptionsMsgSelector).css('display', 'none');
-            }
-
-            qty = qty ? qty : "1" // If qty is not specified, then assume qty: 1
-
-            checkoutHelper.checkoutProduct(config.sku, qty, options)
+            window.InstantM2.handlePdpBtnClicked(config.sku);
         });
     }
 });

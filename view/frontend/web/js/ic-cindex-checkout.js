@@ -4,7 +4,7 @@ define([
 ], function ($, checkoutHelper) {
     "use strict";
 
-    return function (config, element) {
+    return function (config) {
         if (config.baseCurrencyCode !== config.currentCurrencyCode) {
             return;
         }
@@ -16,9 +16,5 @@ define([
                 (config.btnBorderRadius && parseInt(config.btnBorderRadius) >= 0 && parseInt(config.btnBorderRadius) <= 10) ? config.btnBorderRadius : "3",
                 config.btnColor);
         })
-
-        $(element).click(function () {
-            checkoutHelper.checkoutCustomerCart("checkoutIndex");
-        });
     }
 });

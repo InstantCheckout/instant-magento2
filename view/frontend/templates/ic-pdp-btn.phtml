@@ -7,7 +7,7 @@
 <div id="ic-pdp-btn-container" class="ic-btn-container">
     <div class='ic-css-reset'>
         <div id="ic-pdp-btn-wrapper" class="ic-btn-wrapper" style="margin-top:0px !important;">
-            <button disabled id="ic-pdp-btn" type="button" title="Instant Checkout" class="ic-btn" data-mage-init='
+            <button id="ic-pdp-btn" type="button" title="Instant Checkout" class="ic-btn" data-mage-init='
             {
                 "Instant_Checkout/js/ic-pdp-checkout": {
                     "sku": "<?= $block->escapeHtmlAttr($block->getProduct()->getSku()) ?>",
@@ -15,8 +15,6 @@
                     "btnBorderRadius": "<?= $block->escapeHtml($helper->getBtnBorderRadius()) ?>",
                     "btnHeight": "<?= $block->escapeHtml($helper->getBtnHeight()) ?>",
                     "btnColor": "<?= $block->escapeHtml($helper->getBtnColor()) ?>",
-                    "baseCurrencyCode": "<?= $block->escapeHtml($helper->getBaseCurrencyCode()) ?>",
-                    "currentCurrencyCode": "<?= $block->escapeHtml($helper->getCurrentCurrencyCode()) ?>",
                     "shouldPositionPdpBelowAtc": "<?= $block->escapeHtml($helper->getShouldPositionPdpBelowAtc()) ?>",
                     "pdpBtnCustomStyle": "<?= $block->escapeHtml($helper->getPdpBtnCustomStyle()) ?>",
                     "pdpBtnContainerCustomStyle": "<?= $block->escapeHtml($helper->getPdpBtnContainerCustomStyle()) ?>",
@@ -32,7 +30,6 @@
                 </svg>
                 <h4 id="ic-pdp-btn-text" class="ic-btn-text">Instant Checkout</h4>
             </button>
-            <h4 id="ic-pdp-required-options-msg" style="font-size:14px !important" class="ic-error-text">Please select required options</h4>
             <div id="ic-pdp-btn-strike" class="ic-btn-strike">
                 <span>or</span>
             </div>

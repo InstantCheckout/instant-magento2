@@ -10,7 +10,6 @@
   span,
   applet,
   object,
-  iframe,
   h1,
   h2,
   h3,
@@ -246,30 +245,6 @@
   display: none !important;
 }
 
-.ic-backdrop {
-  z-index              : 999;
-  position             : fixed;
-  top                  : -1000px;
-  bottom               : -1000px;
-  left                 : -1000px;
-  right                : -1000px;
-  background-color     : rgba(0, 0, 0, 0.7);
-  display              : -webkit-box;
-  display              : -ms-flexbox;
-  display              : flex;
-  -webkit-box-pack     : center;
-  -ms-flex-pack        : center;
-  justify-content      : center;
-  -webkit-box-align    : center;
-  -ms-flex-align       : center;
-  align-items          : center;
-  -webkit-box-orient   : vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction   : column;
-  flex-direction       : column;
-  display              : none;
-}
-
 .ic-btn:visited {
   .ic-btn;
 }
@@ -288,93 +263,6 @@
   margin-top: 0px !important;
 }
 
-.ic-error-text {
-  margin     : 0 !important;
-  margin-top : 5px !important;
-  font-size  : 14px !important;
-  font-weight: 500 !important;
-  display    : none;
-  color      : red !important;
-  text-align : center;
-}
-
-.ic-backdrop-message {
-  margin-bottom: 20px !important;
-  text-align   : center;
-  font-size    : 18px !important;
-  font-weight  : 400 !important;
-  cursor       : pointer !important;
-  color        : white !important;
-}
-
-.ic-backdrop-content {
-  width          : 350px;
-  display        : flex;
-  justify-content: center;
-  align-items    : center;
-  flex-direction : column;
-}
-
-@media only screen and (max-width: 350px) {
-  .ic-backdrop-content {
-    width: 100%;
-  }
-}
-
-.ic-backdrop-continue {
-  margin-bottom  : 20px !important;
-  font-size      : 18px !important;
-  font-weight    : 700 !important;
-  cursor         : pointer !important;
-  color          : white !important;
-  text-decoration: underline;
-}
-
-.ic-backdrop-close {
-  position : fixed;
-  right    : 25px;
-  top      : 25px;
-  width    : 16px;
-  height   : 16px;
-  opacity  : 0.6;
-  z-index  : 999999;
-  font-size: 23px !important;
-  color    : white;
-  cursor   : pointer;
-}
-
-.ic-mobile-backdrop-inner-container {
-  display              : -webkit-box;
-  display              : -ms-flexbox;
-  display              : flex;
-  -webkit-box-align    : center;
-  -ms-flex-align       : center;
-  align-items          : center;
-  -webkit-box-pack     : center;
-  -ms-flex-pack        : center;
-  justify-content      : center;
-  width                : 100%;
-  height               : 100%;
-  -webkit-box-orient   : vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction   : column;
-  flex-direction       : column;
-}
-
-.ic-mobile-backdrop-text {
-  font-size    : 16px !important;
-  font-weight  : 600 !important;
-  color        : white !important;
-  margin-bottom: 15px !important;
-}
-
-.ic-mobile-back-to-shopping-text {
-  font-size      : 16px !important;
-  font-weight    : 700 !important;
-  text-decoration: underline !important;
-  color          : white !important;
-}
-
 /* OR strike styles */
 
 .ic-btn-strike {
@@ -390,8 +278,8 @@
   font-weight  : 300 !important;
 
   span {
-    color     : #808080 !important;
-    font-size : 16px !important;
+    color    : #808080 !important;
+    font-size: 16px !important;
   }
 }
 

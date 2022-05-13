@@ -32,10 +32,6 @@ define([
 
         render: function () {
             checkoutHelper.refreshInstantButtons();
-        },
-
-        checkoutCart: function () {
-            checkoutHelper.checkoutCustomerCart("minicart");
         }
     });
 });

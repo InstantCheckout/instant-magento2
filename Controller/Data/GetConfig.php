@@ -32,6 +32,8 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 use Psr\Log\LoggerInterface;
+use Magento\Customer\Api\AddressRepositoryInterface;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 
 class GetConfig extends Action implements HttpGetActionInterface
 {
@@ -95,6 +97,14 @@ class GetConfig extends Action implements HttpGetActionInterface
      * @var LoggerInterface
      */
     private $logger;
+    /**
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+    /**
+     * @var AddressRepositoryInterface
+     */
+    private $addressRepository;
 
     /**
      * Constructor.
@@ -115,7 +125,9 @@ class GetConfig extends Action implements HttpGetActionInterface
         QuoteFactory $quoteFactory,
         QuoteIdMaskFactory $quoteIdMaskFactory,
         CurrencyFactory $currencyFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        CustomerRepositoryInterface $customerRepository,
+        AddressRepositoryInterface $addressRepository
     ) {
         $this->jsonResultFactory = $jsonResultFactory;
         $this->storeManager = $storeManager;
@@ -133,6 +145,8 @@ class GetConfig extends Action implements HttpGetActionInterface
         $this->doRequest = $doRequest;
         $this->currencyFactory = $currencyFactory;
         $this->logger = $logger;
+        $this->customerRepository = $customerRepository;
+        $this->addressRepository = $addressRepository;
 
         return parent::__construct($context);
     }
@@ -253,6 +267,33 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['cindexBtnCustomStyle'] = $this->instantHelper->getCindexBtnCustomStyle();
         $data['cindexBtnContainerCustomStyle'] = $this->instantHelper->getCindexBtnContainerCustomStyle();
         $data['cindexBtnHideOrStrike'] = $this->instantHelper->getCindexBtnShouldHideOrStrike();
+
+        $data['gaVersion'] = $this->instantHelper->getGoogleAnalyticsVersion();
+        $data['gaId'] = $this->instantHelper->getGoogleAnalyticsId();
+
+        if ($this->customerSession->isLoggedIn()) {
+            $customer = $this->customerRepository->getById($this->customerSession->getId());
+            $data['customer'] = [
+                'email' => $customer->getEmail(),
+                'firstName' => $customer->getFirstname(),
+                'lastName' => $customer->getLastname(),
+            ];
+
+            $shippingAddressId = $customer->getDefaultShipping();
+            if ($shippingAddressId) {
+                $shippingAddress = $this->addressRepository->getById($shippingAddressId);
+                $defaultShippingAddress = [
+                    "address1" => $shippingAddress->getStreet()[0],
+                    "address2" => count($shippingAddress->getStreet()) == 2 ? $shippingAddress->getStreet()[1] : '',
+                    "city" => $shippingAddress->getCity(),
+                    "regionCode" => $shippingAddress->getRegion()->getRegionCode(),
+                    "postCode" => $shippingAddress->getPostcode(),
+                    "countryCode" => $shippingAddress->getCountryId()
+                ];
+                $data['address'] = $defaultShippingAddress;
+                $data['customer']['phone'] = $shippingAddress->getTelephone();
+            }
+        }
 
         $result->setData($data);
         return $result;

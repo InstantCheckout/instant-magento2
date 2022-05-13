@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+
+<!--
+/**
+ * Instant Checkout
+ *
+ * @package   Instant_Checkout
+ * @author    Instant <hello@instant.one>
+ * @copyright 2022 Copyright Instant. https://www.instantcheckout.com.au/
+ * @license   https://opensource.org/licenses/OSL-3.0 OSL-3.0
+ * @link      https://www.instantcheckout.com.au/
+ */
+ -->
+
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="default-src">
+            <values>
+                <value id="instant_default" type="host">api.instant.one</value>
+            </values>
+        </policy>
+        <policy id="script-src">
+            <values>
+                <value id="instant_script" type="host">js.instant.one</value>
+            </values>
+        </policy>
+        <policy id="style-src">
+            <values>
+                <value id="google_fonts_api" type="host">fonts.googleapis.com</value>
+            </values>
+        </policy>
+        <policy id="font-src">
+            <values>
+                <value id="google_fonts" type="host">fonts.gstatic.com</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="instant_checkout" type="host">checkout.instant.one</value>
+                <value id="instant_checkout_sandbox" type="host">staging.checkout.instant.one</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="instant_connect" type="host">api.instant.one</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="data" type="host">data:</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
