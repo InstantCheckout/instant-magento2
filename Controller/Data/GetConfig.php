@@ -265,6 +265,10 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['cindexBtnContainerCustomStyle'] = $this->instantHelper->getCindexBtnContainerCustomStyle();
         $data['cindexBtnHideOrStrike'] = $this->instantHelper->getCindexBtnShouldHideOrStrike();
 
+        $data['cpageBtnCustomStyle'] = $this->instantHelper->getCpageBtnCustomStyle();
+        $data['cpageBtnContainerCustomStyle'] = $this->instantHelper->getCpageBtnContainerCustomStyle();
+        $data['cpageBtnHideOrStrike'] = $this->instantHelper->getCpageBtnShouldHideOrStrike();
+
         $data['gaVersion'] = $this->instantHelper->getGoogleAnalyticsVersion();
         $data['gaId'] = $this->instantHelper->getGoogleAnalyticsId();
 

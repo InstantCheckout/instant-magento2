@@ -54,6 +54,10 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const CINDEX_BTN_CONTAINER_CUSTOM_STYLE = 'instant/cindexcustomisation/cindex_btn_container_custom_style';
     const CINDEX_BTN_HIDE_OR_STRIKE = 'instant/cindexcustomisation/cindex_btn_hide_or_strike';
 
+    const CPAGE_BTN_CUSTOM_STYLE = 'instant/cpagecustomisation/cpage_btn_custom_style';
+    const CPAGE_BTN_CONTAINER_CUSTOM_STYLE = 'instant/cpagecustomisation/cpage_btn_container_custom_style';
+    const CPAGE_BTN_HIDE_OR_STRIKE = 'instant/cpagecustomisation/cpage_btn_hide_or_strike';
+
     const GOOGLE_ANALYTICS_VERSION = 'instant/google/ga_version';
     const GOOGLE_ANALYTICS_ID = 'instant/google/ga_id';
 
@@ -289,6 +293,24 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $cIndexBtnHideOrStrike = $this->getConfig(self::CINDEX_BTN_HIDE_OR_STRIKE);
         return $cIndexBtnHideOrStrike === "1";
+    }
+
+    public function getCpageBtnCustomStyle()
+    {
+        $cPageBtnCustomStyle = $this->getConfig(self::CPAGE_BTN_CUSTOM_STYLE);
+        return $cPageBtnCustomStyle;
+    }
+
+    public function getCpageBtnContainerCustomStyle()
+    {
+        $cPageBtnContainerCustomStyle = $this->getConfig(self::CPAGE_BTN_CONTAINER_CUSTOM_STYLE);
+        return $cPageBtnContainerCustomStyle;
+    }
+
+    public function getCpageBtnShouldHideOrStrike()
+    {
+        $cPageBtnHideOrStrike = $this->getConfig(self::CPAGE_BTN_HIDE_OR_STRIKE);
+        return $cPageBtnHideOrStrike === "1";
     }
 
     public function getGoogleAnalyticsVersion()

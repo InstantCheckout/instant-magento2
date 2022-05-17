@@ -29,7 +29,6 @@ define([
     return function (config, element) {
         $(pdpBtnContainerSelector).css('display', 'flex');
 
-        console.log(config);
         $(document).on('instant-config-loaded', function () {
             let skuIsDisabled = false;
             window.Instant.disabledForSkusContaining.forEach(x => {

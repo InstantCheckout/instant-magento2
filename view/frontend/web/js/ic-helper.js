@@ -141,10 +141,28 @@ define([
             const checkoutPageBtnContainerSelector = '#ic-cpage-btn-container';
             const checkoutPageBtnWrapperSelector = '#ic-cpage-btn-wrapper';
             const checkoutPageBtnSelector = '#ic-cpage-btn';
+            const checkoutPageBtnOrStrikeSelector = '#ic-cpage-btn-strike';
 
             if (this.isWindowInstant() && !this.shouldEnableInstantBtn()) {
                 $(checkoutPageBtnContainerSelector).css('display', 'none');
                 return;
+            }
+
+            // Apply any custom styles to button specified in config
+            if (window.Instant.cpageBtnCustomStyle) {
+                const btnStyle = $(checkoutPageBtnSelector).attr('style');
+                $(checkoutPageBtnSelector).attr('style', btnStyle ? btnStyle : '' + window.Instant.cpageBtnCustomStyle);
+            }
+
+            // Apply any custom styles to button outer container specified in config
+            if (window.Instant.cpageBtnContainerCustomStyle) {
+                const containerStyle = $(checkoutPageBtnContainerSelector).attr('style');
+                $(checkoutPageBtnContainerSelector).attr('style', containerStyle ? containerStyle : '' + window.Instant.cpageBtnContainerCustomStyle);
+            }
+
+            // Hide OR strike if specified in config
+            if (window.Instant.cpageBtnHideOrStrike) {
+                $(checkoutPageBtnOrStrikeSelector).css('display', 'none');
             }
 
             const widthToSet = (window.Instant.cpageBtnWidth && parseInt(window.Instant.cpageBtnWidth) > 0) ? window.Instant.cpageBtnWidth : "60";
