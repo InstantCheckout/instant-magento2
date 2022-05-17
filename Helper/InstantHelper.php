@@ -21,30 +21,30 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const INSTANT_APP_ID_PATH = 'instant/general/app_id';
     const ACCESS_TOKEN_PATH = 'instant/general/api_access_token';
-    const ENABLE_INSTANT_CHECKOUT_PAGE_PATH = 'instant/general/enable_checkout_page';
-    const ENABLE_INSTANT_MINICART_BTN_PATH = 'instant/general/enable_minicart';
     const ENABLE_INSTANT_SANDBOX_MODE_PATH = 'instant/general/enable_sandbox';
-    const ENABLE_INSTANT_CATALOG_PAGE_PATH = 'instant/general/enable_catalog';
-    const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
-    const RETRY_FAILURES_COUNT = 'instant/general/retry_failures_count';
-    const ENABLE_COOKIE_FORWARDING = 'instant/general/enable_cookie_forwarding';
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
     const DISABLED_FOR_CUSTOMER_GROUP_IDS = 'instant/general/disabled_for_customer_group_ids';
 
+    const ENABLE_INSTANT_CATALOG_PAGE_PATH = 'instant/general/enable_catalog';
+    const ENABLE_INSTANT_MINICART_BTN_PATH = 'instant/general/enable_minicart';
+    const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
+    const ENABLE_INSTANT_CHECKOUT_PAGE_PATH = 'instant/general/enable_checkout_page';
+    const ENABLE_COOKIE_FORWARDING = 'instant/general/enable_cookie_forwarding';
+    const RETRY_FAILURES_COUNT = 'instant/general/retry_failures_count';
+
     const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
     const SHOULD_RESIZE_CART_INDEX_BTN = 'instant/visual/should_resize_cart_index_btn';
-    const CPAGE_BTN_WIDTH = 'instant/visual/cpage_btn_width';
-    const BTN_BORDER_RADIUS = 'instant/visual/btn_border_radius';
-    const BTN_HEIGHT = 'instant/visual/btn_height';
-    const BTN_COLOR = 'instant/visual/btn_color';
 
-    const PDP_SHOULD_POSITION_PDP_BELOW_ATC = 'instant/pdpcustomisation/should_position_pdp_below_atc';
+    const CPAGE_BTN_WIDTH = 'instant/visual/cpage_btn_width';
+
     const PDP_SHOULD_RESIZE_PDP_BTN = 'instant/pdpcustomisation/should_resize_pdp_btn';
+    const PDP_BTN_TEXT = 'instant/pdpcustomisation/pdp_btn_text';
+    const PDP_REPOSITION_OR_STRIKE_ABOVE_BTN = 'instant/pdpcustomisation/pdp_reposition_or_strike_above_btn';
     const PDP_BTN_CUSTOM_STYLE = 'instant/pdpcustomisation/pdp_btn_custom_style';
     const PDP_BTN_CONTAINER_CUSTOM_STYLE = 'instant/pdpcustomisation/pdp_btn_container_custom_style';
     const PDP_BTN_REPOSITION_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_div';
     const PDP_BTN_REPOSITION_WITHIN_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_within_div';
-    const PDP_REPOSITION_OR_STRIKE_ABOVE_BTN = 'instant/pdpcustomisation/pdp_reposition_or_strike_above_btn';
+    const PDP_SHOULD_POSITION_PDP_BELOW_ATC = 'instant/pdpcustomisation/should_position_pdp_below_atc';
 
     const MC_BTN_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_custom_style';
     const MC_BTN_CONTAINER_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_container_custom_style';
@@ -102,12 +102,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $retryFailuresCount = $this->getConfig(self::RETRY_FAILURES_COUNT);
         return $retryFailuresCount;
-    }
-
-    public function getBtnColor()
-    {
-        $btnColor = $this->getConfig(self::BTN_COLOR);
-        return $btnColor;
     }
 
     public function getInstantAppId()
@@ -199,16 +193,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->getConfig(self::CPAGE_BTN_WIDTH);
     }
 
-    public function getBtnBorderRadius()
-    {
-        return $this->getConfig(self::BTN_BORDER_RADIUS);
-    }
-
-    public function getBtnHeight()
-    {
-        return $this->getConfig(self::BTN_HEIGHT);
-    }
-
     public function getShouldResizePdpBtn()
     {
         $shouldResize = $this->getConfig(self::PDP_SHOULD_RESIZE_PDP_BTN);
@@ -235,6 +219,16 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $shouldRepositionOrStrikeAbovePdpBtn = $this->getConfig(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN);
         return $shouldRepositionOrStrikeAbovePdpBtn === "1";
+    }
+
+    public function getPdpBtnText()
+    {
+        $pdpBtnText = $this->getConfig(self::PDP_BTN_TEXT);
+        if (!$pdpBtnText) {
+            return "Instant Checkout";
+        }
+
+        return $pdpBtnText;
     }
 
     public function getPdpBtnCustomStyle()

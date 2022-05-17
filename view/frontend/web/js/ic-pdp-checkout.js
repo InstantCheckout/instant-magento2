@@ -2,12 +2,13 @@ define([
     'jquery',
     'underscore',
     'Instant_Checkout/js/ic-helper'
-], function ($, _, checkoutHelper) {
+], function ($, _) {
     "use strict";
 
     const pdpBtnSelector = "#ic-pdp-btn";
     const pdpBtnContainerSelector = "#ic-pdp-btn-container";
     const pdpBtnOrStrike = '#ic-pdp-btn-strike'
+    const atcBtnSelector = '#product-addtocart-button';
 
     window.MutationObserver = window.MutationObserver
         || window.WebKitMutationObserver
@@ -26,6 +27,8 @@ define([
     });
 
     return function (config, element) {
+        $(pdpBtnContainerSelector).css('display', 'flex');
+
         console.log(config);
         $(document).on('instant-config-loaded', function () {
             let skuIsDisabled = false;
@@ -37,11 +40,6 @@ define([
             $(pdpBtnContainerSelector).css('display', skuIsDisabled ? 'none' : 'flex');
         });
 
-        checkoutHelper.configurePdpBtn(
-            config.shouldResizePdpBtn,
-            config.btnHeight,
-            config.btnBorderRadius);
-
         // If we should reposition OR strike, or should reposition pdp below atc, then move the OR strike before button
         if (config.pdpShouldRepositionOrStrikeAboveBtn || config.shouldPositionPdpBelowAtc) {
             $(pdpBtnOrStrike).insertBefore(pdpBtnSelector);
@@ -49,10 +47,19 @@ define([
             $(pdpBtnSelector).css('margin-top', '5px');
         }
 
+        // If we should resize pdp button
+        // We resize it to the size of the add to cart button
+        if (config.shouldResizePdpBtn) {
+            $(pdpBtnContainerSelector).css('width', $(atcBtnSelector).outerWidth() + 'px');
+            $(window).resize(function () {
+                $(pdpBtnContainerSelector).css('width', $(atcBtnSelector).outerWidth() + 'px');
+            });
+        }
+
         // Apply any custom styles for button specified in config
         if (config.pdpBtnCustomStyle) {
             const btnStyle = $(pdpBtnSelector).attr('style');
-            $(pdpBtnSelector).attr('style', btnStyle ? btnStyle + config.pdpBtnCustomStyle : btnStyle);
+            $(pdpBtnSelector).attr('style', btnStyle ? btnStyle + config.pdpBtnCustomStyle : config.pdpBtnCustomStyle);
         }
 
         // Apply any custom styles for container specified in config
@@ -85,9 +92,6 @@ define([
                 $(pdpBtnContainerSelector).appendTo(selector);
             }
         }
-
-        $(pdpBtnContainerSelector).css('display', 'flex');
-        $(pdpBtnSelector).css('background', config.btnColor);
 
         $(element).click(function () {
             window.InstantM2.handlePdpBtnClicked(config.sku);

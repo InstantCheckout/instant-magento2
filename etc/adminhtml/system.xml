@@ -85,18 +85,6 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to yes.</comment>
                 </field>
-                <field id="btn_border_radius" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Border radius of buttons</label>
-                    <comment>Defaults to 3. (in px, provide an integer. min 0, max 10)</comment>
-                </field>
-                <field id="btn_height" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Height of buttons</label>
-                    <comment>Defaults to 45. (in px, provide an integer. min 40, max 50)</comment>
-                </field>
-                <field id="btn_color" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Color of Instant buttons. In HEX (e.g. #RRGGBB)</label>
-                    <comment>Defaults to #00D160.</comment>
-                </field>
             </group>
             <group id="pdpcustomisation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>PDP Button Customisation</label>
@@ -104,6 +92,10 @@
                     <label>Should resize Instant PDP button to Add to Cart button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to yes.</comment>
+                </field>
+                <field id="pdp_btn_text" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>PDP button text</label>
+                    <comment>If empty, defaults to Buy Now.</comment>
                 </field>
                 <field id="should_position_pdp_below_atc" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Should position Instant PDP button below Add to Cart button</label>

@@ -55,35 +55,6 @@ define([
             return cartData;
         },
 
-        setBtnAttributes: function (buttonSelector, height, borderRadius, backgroundColor) {
-            const heightToSet = height || (this.isWindowInstant() && window.Instant.btnHeight ? window.Instant.btnHeight : '45');
-            const borderRadiusToSet = borderRadius || (this.isWindowInstant() && window.Instant.btnBorderRadius ? window.Instant.btnBorderRadius : '3')
-            const backgroundToSet = backgroundColor || (this.isWindowInstant() && window.Instant.btnColor ? window.Instant.btnColor : '#00D160');
-
-            $(buttonSelector).css('min-height', heightToSet + 'px');
-            $(buttonSelector).css('border-radius', borderRadiusToSet + 'px');
-            $(buttonSelector).css('background', backgroundToSet);
-        },
-
-        configurePdpBtn: function (shouldResizePdpBtn, height, borderRadius) {
-            const pdpBtnContainerSelector = '#ic-pdp-btn-container';
-            const pdpBtnSelector = '#ic-pdp-btn';
-            const atcBtnSelector = '#product-addtocart-button';
-
-            const resizePdpBtn = this.isWindowInstant() ? window.Instant.shouldResizePdpBtn : shouldResizePdpBtn;
-
-            // If we should resize pdp button
-            // We resize it to the size of the add to cart button
-            if (resizePdpBtn) {
-                $(pdpBtnContainerSelector).css('width', $(atcBtnSelector).outerWidth() + 'px');
-                $(window).resize(function () {
-                    $(pdpBtnContainerSelector).css('width', $(atcBtnSelector).outerWidth() + 'px');
-                });
-            }
-
-            this.setBtnAttributes(pdpBtnSelector, height, borderRadius);
-        },
-
         setMinicartBtnAttributes: function () {
             const mcBtnContainerSelector = '#ic-mc-btn-container';
             const mcBtnWrapperSelector = '#ic-mc-btn-wrapper';
@@ -99,13 +70,13 @@ define([
             // Apply any custom styles to button specified in config
             if (window.Instant.mcBtnCustomStyle) {
                 const btnStyle = $(mcBtnSelector).attr('style');
-                $(mcBtnSelector).attr('style', btnStyle ? btnStyle : '' + window.Instant.mcBtnCustomStyle);
+                $(mcBtnSelector).attr('style', btnStyle ? btnStyle + window.Instant.mcBtnCustomStyle : window.Instant.mcBtnCustomStyle);
             }
 
             // Apply any custom styles to button outer container specified in config
             if (window.Instant.mcBtnContainerCustomStyle) {
                 const containerStyle = $(mcBtnContainerSelector).attr('style');
-                $(mcBtnContainerSelector).attr('style', containerStyle ? containerStyle : '' + window.Instant.mcBtnContainerCustomStyle);
+                $(mcBtnContainerSelector).attr('style', containerStyle ? containerStyle : window.Instant.mcBtnContainerCustomStyle);
             }
 
             // Hide OR strike if specified in config
@@ -117,10 +88,9 @@ define([
             $(mcBtnWrapperSelector).css('width', widthToSet + '%');
             $(mcBtnContainerSelector).css('display', 'flex');
             $(mcBtnSelector).prop('disabled', false);
-            this.setBtnAttributes(mcBtnSelector);
         },
 
-        setCartIndexBtnAttributes: function (shouldResize, height, borderRadius, btnColor) {
+        setCartIndexBtnAttributes: function (shouldResize) {
             const cartIndexBtnContainerSelector = '#ic-cindex-btn-container';
             const cartIndexBtnWrapperSelector = '#ic-cindex-btn-wrapper';
             const cartIndexBtnSelector = '#ic-cindex-btn';
@@ -165,7 +135,6 @@ define([
 
             $(cartIndexBtnSelector).prop('disabled', false);
             $(cartIndexBtnContainerSelector).css('display', 'flex');
-            this.setBtnAttributes(cartIndexBtnSelector, height, borderRadius, btnColor);
         },
 
         setCheckoutPageBtnAttributes: function () {
@@ -183,8 +152,6 @@ define([
 
             $(checkoutPageBtnContainerSelector).css('display', 'flex');
             $(checkoutPageBtnSelector).prop('disabled', false);
-            $(checkoutPageBtnSelector).css('background', window.Instant.btnColor ? window.Instant.btnColor : '#00D160');
-            this.setBtnAttributes(checkoutPageBtnSelector);
         },
 
         shouldEnableInstantBtn: function () {
@@ -207,7 +174,6 @@ define([
 
         refreshInstantButtons: function () {
             this.handleInstantAwareFunc(() => {
-                this.configurePdpBtn();
                 this.setMinicartBtnAttributes();
                 this.setCartIndexBtnAttributes();
                 this.setCheckoutPageBtnAttributes();

@@ -253,9 +253,6 @@ class GetConfig extends Action implements HttpGetActionInterface
         $data['cpageBtnWidth'] = $this->instantHelper->getCPageBtnWidth();
         $data['shouldResizeCartIndexBtn'] = $this->instantHelper->getShouldResizeCartIndexBtn();
         $data['shouldResizePdpBtn'] = $this->instantHelper->getShouldResizePdpBtn();
-        $data['btnBorderRadius'] = $this->instantHelper->getBtnBorderRadius();
-        $data['btnHeight'] = $this->instantHelper->getBtnHeight();
-        $data['btnColor'] = $this->instantHelper->getBtnColor();
         $data['disabledForCustomerGroup'] = $this->instantHelper->getDisabledForCustomerGroup();
         $data['currentCurrencyCode'] = $this->instantHelper->getCurrentCurrencyCode();
         $data['baseCurrencyCode'] = $this->instantHelper->getBaseCurrencyCode();
