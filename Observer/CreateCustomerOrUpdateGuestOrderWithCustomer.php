@@ -26,7 +26,6 @@ use Magento\Customer\Model\CustomerFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Customer\Model\AddressFactory;
 use Magento\Customer\Api\AccountManagementInterface;
-use Magento\Newsletter\Model\SubscriptionManagerInterface;
 use Magento\Sales\Api\OrderCustomerManagementInterface;
 
 /**
@@ -69,11 +68,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
     private $logger;
 
     /**
-     * @var SubscriptionManagerInterface
-     */
-    private SubscriptionManagerInterface $subscriptionManager;
-
-    /**
      * UpdateGuestOrderWithCustomer constructor.
      * @param PurchasedFactory $purchasedFactory
      * @param OrderRepositoryInterface $orderRepository
@@ -95,8 +89,7 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
         CustomerFactory $customerFactory,
         StoreManagerInterface $storeManager,
         AddressFactory $addressFactory,
-        OrderCustomerManagementInterface $orderCustomerService,
-        SubscriptionManagerInterface $subscriptionManager
+        OrderCustomerManagementInterface $orderCustomerService
     ) {
         $this->purchasedFactory = $purchasedFactory;
         $this->orderRepository = $orderRepository;
@@ -110,7 +103,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
         $this->customerAccountManagement = $customerAccountManagement;
         $this->addressFactory = $addressFactory;
         $this->orderCustomerService = $orderCustomerService;
-        $this->subscriptionManager = $subscriptionManager;
     }
 
     public function addCommentToOrder(Order $order, string $comment)
@@ -180,8 +172,15 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
 
                 if ($customer) {
                     if ($shouldSubscribeCustomerToNewsletter) {
-                        $this->addCommentToOrder($order, sprintf('Instant: Subscribing customer to newsletter.'));
-                        $this->subscriptionManager->subscribeCustomer((int)$customer->getId(), (int)$order->getStore()->getId());
+                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                        try {
+                            $subscriptionManager = $objectManager->create('Magento\Newsletter\Model\SubscriptionManager');
+                            $this->addCommentToOrder($order, sprintf('Instant: Subscribing customer to newsletter.'));
+                            $subscriptionManager->subscribeCustomer((int)$customer->getId(), (int)$order->getStore()->getId());
+                        } catch (Exception $e){
+                            $this->logger->info("Unable to subscribe customer to newsletter as this Magento instance does not have Magento\Newsletter\Model\SubscriptionManager.");
+                            // do nothing. Subscription manager does not exist in this magento version.
+                        }
                     }
                     $this->logger->info("Updating order. Converting guest order to customer order.");
                     $customerOrder = $this->orderRepository->get($orderId);
