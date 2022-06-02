@@ -38,7 +38,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const CPAGE_BTN_WIDTH = 'instant/visual/cpage_btn_width';
 
     const PDP_SHOULD_RESIZE_PDP_BTN = 'instant/pdpcustomisation/should_resize_pdp_btn';
-    const PDP_BTN_TEXT = 'instant/pdpcustomisation/pdp_btn_text';
     const PDP_REPOSITION_OR_STRIKE_ABOVE_BTN = 'instant/pdpcustomisation/pdp_reposition_or_strike_above_btn';
     const PDP_BTN_CUSTOM_STYLE = 'instant/pdpcustomisation/pdp_btn_custom_style';
     const PDP_BTN_CONTAINER_CUSTOM_STYLE = 'instant/pdpcustomisation/pdp_btn_container_custom_style';
@@ -223,16 +222,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $shouldRepositionOrStrikeAbovePdpBtn = $this->getConfig(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN);
         return $shouldRepositionOrStrikeAbovePdpBtn === "1";
-    }
-
-    public function getPdpBtnText()
-    {
-        $pdpBtnText = $this->getConfig(self::PDP_BTN_TEXT);
-        if (!$pdpBtnText) {
-            return "Instant Checkout";
-        }
-
-        return $pdpBtnText;
     }
 
     public function getPdpBtnCustomStyle()
