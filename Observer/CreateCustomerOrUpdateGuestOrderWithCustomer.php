@@ -170,10 +170,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                     $this->logError($order, "Error occurred when scanning order comments. " . $e->getMessage());
                 }
 
-                $shouldCreateCustomerIfNotExists = true;
-                $shouldSubscribeCustomerToNewsletter =  true;
-
-
                 $this->logInfo($order, "Attempting to get customer with email: " . $order->getCustomerEmail());
                 try {
                     $customer = $this->customerRepository->get($order->getCustomerEmail());
