@@ -15,12 +15,11 @@ namespace Instant\Checkout\Controller\Data;
 use Magento\Backend\App\Action\Context;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\App\Action\Action;
-use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use \Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Store\Api\StoreRepositoryInterface;
 
-class GetProduct extends Action implements HttpGetActionInterface
+class GetProduct extends Action
 {
     /**
      * @var JsonResult
@@ -87,6 +86,14 @@ class GetProduct extends Action implements HttpGetActionInterface
             $storeId = $store->getId();
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             $storeId = NULL;
+        }
+
+        /* Polyfill for < PHP 7.3 */
+        if (!function_exists('is_countable')) {
+            function is_countable($c)
+            {
+                return is_array($c) || $c instanceof Countable;
+            }
         }
 
         if (is_countable($options) && count($options) > 0) {

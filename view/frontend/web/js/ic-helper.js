@@ -68,15 +68,15 @@ define([
             }
 
             // Apply any custom styles to button specified in config
-            if (window.Instant.mcBtnCustomStyle) {
-                const btnStyle = $(mcBtnSelector).attr('style');
+            const btnStyle = $(mcBtnSelector).attr('style') || '';
+            if (window.Instant.mcBtnCustomStyle && btnStyle.indexOf(window.Instant.mcBtnCustomStyle) === -1) {
                 $(mcBtnSelector).attr('style', btnStyle ? btnStyle + window.Instant.mcBtnCustomStyle : window.Instant.mcBtnCustomStyle);
             }
 
             // Apply any custom styles to button outer container specified in config
-            if (window.Instant.mcBtnContainerCustomStyle) {
-                const containerStyle = $(mcBtnContainerSelector).attr('style');
-                $(mcBtnContainerSelector).attr('style', containerStyle ? containerStyle : window.Instant.mcBtnContainerCustomStyle);
+            const containerStyle = $(mcBtnContainerSelector).attr('style') || '';
+            if (window.Instant.mcBtnContainerCustomStyle && containerStyle.indexOf(window.Instant.mcBtnContainerCustomStyle) === -1) {
+                $(mcBtnContainerSelector).attr('style', containerStyle ? containerStyle + window.Instant.mcBtnContainerCustomStyle : window.Instant.mcBtnContainerCustomStyle);
             }
 
             // Hide OR strike if specified in config
@@ -102,15 +102,15 @@ define([
             }
 
             // Apply any custom styles to button specified in config
-            if (window.Instant.cindexBtnCustomStyle) {
-                const btnStyle = $(cartIndexBtnSelector).attr('style');
-                $(cartIndexBtnSelector).attr('style', btnStyle ? btnStyle : '' + window.Instant.cindexBtnCustomStyle);
+            const btnStyle = $(cartIndexBtnSelector).attr('style') || '';
+            if (window.Instant.cindexBtnCustomStyle && btnStyle.indexOf(window.Instant.cindexBtnCustomStyle) === -1) {
+                $(cartIndexBtnSelector).attr('style', btnStyle ? btnStyle + window.Instant.cindexBtnCustomStyle : window.Instant.cindexBtnCustomStyle);
             }
 
             // Apply any custom styles to button outer container specified in config
-            if (window.Instant.cindexBtnContainerCustomStyle) {
-                const containerStyle = $(cartIndexBtnContainerSelector).attr('style');
-                $(cartIndexBtnContainerSelector).attr('style', containerStyle ? containerStyle : '' + window.Instant.cindexBtnContainerCustomStyle);
+            const containerStyle = $(cartIndexBtnContainerSelector).attr('style') || '';
+            if (window.Instant.cindexBtnContainerCustomStyle && containerStyle.indexOf(window.Instant.cindexBtnContainerCustomStyle) === -1) {
+                $(cartIndexBtnContainerSelector).attr('style', containerStyle ? containerStyle + window.Instant.cindexBtnContainerCustomStyle : window.Instant.cindexBtnContainerCustomStyle);
             }
 
             // Hide OR strike if specified in config
@@ -149,15 +149,15 @@ define([
             }
 
             // Apply any custom styles to button specified in config
-            if (window.Instant.cpageBtnCustomStyle) {
-                const btnStyle = $(checkoutPageBtnSelector).attr('style');
-                $(checkoutPageBtnSelector).attr('style', btnStyle ? btnStyle : '' + window.Instant.cpageBtnCustomStyle);
+            const btnStyle = $(checkoutPageBtnSelector).attr('style') || '';
+            if (window.Instant.cpageBtnCustomStyle && btnStyle.indexOf(window.Instant.cpageBtnCustomStyle) === -1) {
+                $(checkoutPageBtnSelector).attr('style', btnStyle ? btnStyle + window.Instant.cpageBtnCustomStyle : window.Instant.cpageBtnCustomStyle);
             }
 
             // Apply any custom styles to button outer container specified in config
-            if (window.Instant.cpageBtnContainerCustomStyle) {
-                const containerStyle = $(checkoutPageBtnContainerSelector).attr('style');
-                $(checkoutPageBtnContainerSelector).attr('style', containerStyle ? containerStyle : '' + window.Instant.cpageBtnContainerCustomStyle);
+            const containerStyle = $(checkoutPageBtnContainerSelector).attr('style') || '';
+            if (window.Instant.cpageBtnContainerCustomStyle && btnStyle.indexOf(window.Instant.cpageBtnContainerCustomStyle) === -1) {
+                $(checkoutPageBtnContainerSelector).attr('style', containerStyle ? containerStyle + window.Instant.cpageBtnContainerCustomStyle : window.Instant.cpageBtnContainerCustomStyle);
             }
 
             // Hide OR strike if specified in config

@@ -15,7 +15,6 @@ namespace Instant\Checkout\Controller\Data;
 use Exception;
 use Instant\Checkout\Helper\InstantHelper;
 use Instant\Checkout\Service\DoRequest;
-use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Checkout\Model\CompositeConfigProvider;
@@ -27,7 +26,6 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory as ResultJsonFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\GuestCartManagementInterface;
-use Magento\Quote\Model\MaskedQuoteIdToQuoteId;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Quote\Model\QuoteIdMaskFactory;
@@ -35,7 +33,7 @@ use Psr\Log\LoggerInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 
-class GetConfig extends Action implements HttpGetActionInterface
+class GetConfig extends Action
 {
     /**
      * @var JsonFactory
@@ -74,17 +72,9 @@ class GetConfig extends Action implements HttpGetActionInterface
      */
     protected $quoteRepository;
     /**
-     * @var MaskedQuoteIdToQuoteId
-     */
-    protected $quoteIdMaskFactory;
-    /**
      * @var GuestCartManagementInterface
      */
     protected $cartManagement;
-    /**
-     * @var MaskedQuoteIdToQuoteId
-     */
-    protected $maskedQuoteIdToQuoteId;
     /**
      * @var QuoteFactory
      */
@@ -105,6 +95,10 @@ class GetConfig extends Action implements HttpGetActionInterface
      * @var AddressRepositoryInterface
      */
     private $addressRepository;
+    /**
+     * @var QuoteIdMaskFactory
+     */
+    private $quoteIdMaskFactory;
 
     /**
      * Constructor.
@@ -121,7 +115,6 @@ class GetConfig extends Action implements HttpGetActionInterface
         CustomerSession $customerSession,
         CartRepositoryInterface $quoteRepository,
         GuestCartManagementInterface $cartManagement,
-        MaskedQuoteIdToQuoteId $maskedQuoteIdToQuoteId,
         QuoteFactory $quoteFactory,
         QuoteIdMaskFactory $quoteIdMaskFactory,
         CurrencyFactory $currencyFactory,
@@ -139,7 +132,6 @@ class GetConfig extends Action implements HttpGetActionInterface
         $this->customerSession = $customerSession;
         $this->quoteRepository = $quoteRepository;
         $this->cartManagement = $cartManagement;
-        $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId;
         $this->quoteFactory = $quoteFactory;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->doRequest = $doRequest;
@@ -162,18 +154,24 @@ class GetConfig extends Action implements HttpGetActionInterface
         try {
             // Get checkout session quote
             $quote = $this->checkoutSession->getQuote();
+
+            if (empty($quote->getEntityId())){
+                return '';
+            }
+
             /** @var Quote $currentCart */
             $currentCart = $this->quoteRepository->get($quote->getEntityId());
 
             // Create an empty cart
             $maskedId = $this->cartManagement->createEmptyCart();
-
+            
             // Get quote ID of new empty cart
-            $newCartId = $this->maskedQuoteIdToQuoteId->execute($maskedId);
+            $quoteIdMask = $this->quoteIdMaskFactory->create()->load($maskedId, 'masked_id');
+            $newCartId = $quoteIdMask->getQuoteId();
 
             // Load new cart
             /** @var Quote $newCart */
-            $newCart = $this->quoteFactory->create()->load($newCartId, 'entity_id');
+            $newCart = $this->quoteFactory->create()->loadByIdWithoutStore($newCartId);
             $newCart->setActive(1);
             $newCart->setCouponCode($currentCart->getCouponCode());
 

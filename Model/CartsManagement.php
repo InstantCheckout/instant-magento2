@@ -18,8 +18,10 @@ use Magento\Catalog\Model\ProductFactory;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Quote\Model\MaskedQuoteIdToQuoteId;
-use Magento\Framework\Math\FloatComparator;
-use \Magento\Store\Api\StoreRepositoryInterface;
+use Instant\Checkout\Math\FloatComparator;
+use Magento\Store\Api\StoreRepositoryInterface;
+use Magento\Quote\Model\QuoteIdMaskFactory;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class for management of carts information.
@@ -42,9 +44,9 @@ class CartsManagement implements CartsManagementInterface
     protected $quoteFactory;
 
     /**
-     * @var MaskedQuoteIdToQuoteId
+     * @var QuoteIdMaskFactory
      */
-    protected $maskedQuoteIdToQuoteId;
+    private $quoteIdMaskFactory;
 
     /**
      * @var ProductFactory
@@ -57,22 +59,29 @@ class CartsManagement implements CartsManagementInterface
     protected $storeRepository;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @codeCoverageIgnore
      */
     public function __construct(
         JsonFactory $jsonResultFactory,
         ProductRepositoryInterface $productRepository,
         QuoteFactory $quoteFactory,
-        MaskedQuoteIdToQuoteId $maskedQuoteIdToQuoteId,
+        QuoteIdMaskFactory $quoteIdMaskFactory,
         ProductFactory $productFactory,
-        StoreRepositoryInterface $storeRepository
+        StoreRepositoryInterface $storeRepository,
+        LoggerInterface $logger
     ) {
         $this->storeRepository = $storeRepository;
         $this->productRepository = $productRepository;
         $this->jsonResultFactory = $jsonResultFactory;
         $this->quoteFactory = $quoteFactory;
-        $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId;
+        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->productFactory = $productFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -105,65 +114,69 @@ class CartsManagement implements CartsManagementInterface
         $fromCartId,
         $targetCartId
     ) {
-        $fromCartId = $this->maskedQuoteIdToQuoteId->execute($fromCartId);
-        $toCartId = $this->maskedQuoteIdToQuoteId->execute($targetCartId);
-
-        $fromQuote = $this->quoteFactory->create()->load($fromCartId, 'entity_id');
-        $finalQuote = $this->quoteFactory->create()->load($toCartId, 'entity_id');
-
-
-        $fromQuoteItems = $this->getAllVisibleItems($fromQuote);
-        $finalQuoteItems = $this->getAllVisibleItems($finalQuote);
-
-        foreach ($fromQuoteItems as $item) {
-            $found = false;
-
-            foreach ($finalQuoteItems as $quoteItem) {
+        try {
+            $fromCartId = $this->quoteIdMaskFactory->create()->load($fromCartId, 'masked_id')->getQuoteId();
+            $toCartId = $this->quoteIdMaskFactory->create()->load($targetCartId, 'masked_id')->getQuoteId();
+    
+            $fromQuote = $this->quoteFactory->create()->loadByIdWithoutStore($fromCartId);
+            $finalQuote = $this->quoteFactory->create()->loadByIdWithoutStore($toCartId);
+    
+            $fromQuoteItems = $this->getAllVisibleItems($fromQuote);
+            $finalQuoteItems = $this->getAllVisibleItems($finalQuote);
+    
+            foreach ($fromQuoteItems as $item) {
                 $found = false;
-                if ($item->getProduct()->getSku() === $quoteItem->getProduct()->getSku()) {
-                    $fromQuoteItemPrice = $item->getParentItemId() ? floatval($item->getParentItem()->getPrice()) : floatval($item->getPrice());
-                    $quoteItemPrice = $quoteItem->getParentItemId() ? floatval($quoteItem->getParentItem()->getPrice()) : floatval($quoteItem->getPrice());
-
-                    $comparator = new FloatComparator();
-
-                    if ($comparator->equal($quoteItemPrice, $fromQuoteItemPrice)) {
-                        $found = true;
-
-                        $quoteItem = $quoteItem->getParentItemId() ? $quoteItem->getParentItem() : $quoteItem;
-                        $item = $item->getParentItemId() ? $item->getParentItem() : $item;
-
-                        $quoteItem->setQty($quoteItem->getQty() + $item->getQty());
-                        $quoteItem->save();
-                        break;
+    
+                foreach ($finalQuoteItems as $quoteItem) {
+                    $found = false;
+                    if ($item->getProduct()->getSku() === $quoteItem->getProduct()->getSku()) {
+                        $fromQuoteItemPrice = $item->getParentItemId() ? floatval($item->getParentItem()->getPrice()) : floatval($item->getPrice());
+                        $quoteItemPrice = $quoteItem->getParentItemId() ? floatval($quoteItem->getParentItem()->getPrice()) : floatval($quoteItem->getPrice());
+    
+                        $comparator = new FloatComparator();
+    
+                        if ($comparator->equal($quoteItemPrice, $fromQuoteItemPrice)) {
+                            $found = true;
+    
+                            $quoteItem = $quoteItem->getParentItemId() ? $quoteItem->getParentItem() : $quoteItem;
+                            $item = $item->getParentItemId() ? $item->getParentItem() : $item;
+    
+                            $quoteItem->setQty($quoteItem->getQty() + $item->getQty());
+                            $quoteItem->save();
+                            break;
+                        }
                     }
                 }
-            }
-
-            if (!$found) {
-                $newItem = clone $item;
-
-                if ($item->getParentItemId()) {
-                    $newItem = clone $item->getParentItem();
-                }
-
-                $finalQuote->addItem($newItem);
-                if ($item->getHasChildren()) {
-                    foreach ($item->getChildren() as $child) {
-                        $newChild = clone $child;
-                        $newChild->setParentItem($newItem);
-                        $finalQuote->addItem($newChild);
+    
+                if (!$found) {
+                    $newItem = clone $item;
+    
+                    if ($item->getParentItemId()) {
+                        $newItem = clone $item->getParentItem();
                     }
+    
+                    $finalQuote->addItem($newItem);
+                    if ($item->getHasChildren()) {
+                        foreach ($item->getChildren() as $child) {
+                            $newChild = clone $child;
+                            $newChild->setParentItem($newItem);
+                            $finalQuote->addItem($newChild);
+                        }
+                    }
+                    $newItem->save();
                 }
-                $newItem->save();
             }
+    
+            if (!$finalQuote->getId()) {
+                $finalQuote->getShippingAddress();
+                $finalQuote->getBillingAddress();
+            }
+    
+            $fromQuote->setIsActive(false);
+            $finalQuote->save();
+        } catch (Exception $e){
+            $this->logger->error("Exception raised in Instant/Checkout/Model/CartsManagement");
+            $this->logger->error($e->getMessage());
         }
-
-        if (!$finalQuote->getId()) {
-            $finalQuote->getShippingAddress();
-            $finalQuote->getBillingAddress();
-        }
-
-        $fromQuote->setIsActive(false);
-        $finalQuote->save();
     }
 }

@@ -163,6 +163,10 @@ class InstantPayment extends AbstractMethod
      */
     public function refund(InfoInterface $payment, $amount)
     {
+        if ($amount <= 0) {
+            throw new LocalizedException(__('Cannot refund a zero or negative amount.'));
+        }
+
         $order = $payment->getOrder();
 
         if ($order->getPayment()->getMethod() === "instant") {
@@ -202,20 +206,11 @@ class InstantPayment extends AbstractMethod
     /**
      * @param $order
      * @param $payment
-     * @param $amount
      * @return string
      * @throws LocalizedException
      */
-    protected function sendRefund($order, $payment, $amount)
+    protected function sendRefund($order, $payment)
     {
-        if ($amount <= 0) {
-            throw new LocalizedException(__('Invalid amount for refund.'));
-        }
-
-        if ($amount > $order->getBaseGrandTotal()) {
-            throw new LocalizedException(__('Invalid amount for refund.'));
-        }
-
         $payload = [
             'platformOrderId' => $order->getId(),
             'amountToRefund' => (string)number_format($payment->getCreditMemo()->getBaseGrandTotal(), 2, '.', ''),

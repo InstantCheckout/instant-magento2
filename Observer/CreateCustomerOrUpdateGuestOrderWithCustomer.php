@@ -24,7 +24,6 @@ use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Psr\Log\LoggerInterface;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Customer\Model\AddressFactory;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Sales\Api\OrderCustomerManagementInterface;
 
@@ -48,11 +47,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
     protected $customerRepository;
 
     /**
-     * @var OrderStatusHistoryRepositoryInterface
-     */
-    protected $orderStatusRepository;
-
-    /**
      * @var Order
      */
     protected $order;
@@ -68,48 +62,71 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
     private $logger;
 
     /**
+     * @var OrderStatusHistoryRepositoryInterface
+     */
+    protected $orderStatusRepository;
+
+    /**
      * UpdateGuestOrderWithCustomer constructor.
      * @param PurchasedFactory $purchasedFactory
      * @param OrderRepositoryInterface $orderRepository
      * @param CustomerRepositoryInterface $customerRepository
-     * @param OrderStatusHistoryRepositoryInterface $orderStatusRepository
+     * @param AccountManagementInterface $customerAccountManagement
      * @param Order $order
      * @param OrderSender $orderSender
-     * @param Logger $logger
+     * @param LoggerInterface $logger
+     * @param CustomerFactory $customerFactory
+     * @param StoreManagerInterface $storeManager
+     * @param Logger $logger     
      */
     public function __construct(
         PurchasedFactory $purchasedFactory,
         OrderRepositoryInterface $orderRepository,
         CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $customerAccountManagement,
-        OrderStatusHistoryRepositoryInterface $orderStatusRepository,
         Order $order,
         OrderSender $orderSender,
         LoggerInterface $logger,
         CustomerFactory $customerFactory,
         StoreManagerInterface $storeManager,
-        AddressFactory $addressFactory,
-        OrderCustomerManagementInterface $orderCustomerService
+        OrderCustomerManagementInterface $orderCustomerService,
+        OrderStatusHistoryRepositoryInterface $orderStatusRepository
     ) {
         $this->purchasedFactory = $purchasedFactory;
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
-        $this->orderStatusRepository = $orderStatusRepository;
+        $this->customerAccountManagement = $customerAccountManagement;
         $this->order = $order;
         $this->orderSender = $orderSender;
         $this->logger = $logger;
         $this->customerFactory = $customerFactory;
         $this->storeManager = $storeManager;
-        $this->customerAccountManagement = $customerAccountManagement;
-        $this->addressFactory = $addressFactory;
         $this->orderCustomerService = $orderCustomerService;
+        $this->orderStatusRepository = $orderStatusRepository;
     }
 
     public function addCommentToOrder(Order $order, string $comment)
     {
-        $orderComment = sprintf($comment);
-        $comment = $order->addCommentToStatusHistory($orderComment);
-        $this->orderStatusRepository->save($comment);
+        $commentToAdd = '[INSTANT] (Order ID: ' . $order->getId() . '): ' . sprintf($comment);
+        $statusComment = NULL;
+
+        try {
+            $statusComment = $order->addCommentToStatusHistory($commentToAdd);
+            $this->orderStatusRepository->save($statusComment);
+        } catch (Exception $e) {
+            $order->addStatusHistoryComment($commentToAdd);
+            $order->save();
+        }
+    }
+
+    public function logInfo(Order $order, string $log)
+    {
+        $this->logger->info('[INSTANT] (Order ID: ' . $order->getId() .  '): ' . $log);
+    }
+
+    public function logError(Order $order, string $log)
+    {
+        $this->logger->error('[INSTANT] (Order ID: ' . $order->getId() .  '): ' . $log);
     }
 
     /**
@@ -118,9 +135,9 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
      */
     public function execute(EventObserver $observer)
     {
-        $this->logger->error("in CreateCustomerOrUpdateGuestOrderWithCustomer");
         /** @var Order $order */
         $order = $observer->getEvent()->getInvoice()->getOrder();
+        $this->logInfo($order, "In CreateCustomerOrUpdateGuestOrderWithCustomer");
 
         $incrementId = $order->getIncrementId();
         $orderId = $order->getEntityId();
@@ -128,7 +145,7 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
 
         // If this is an Instant order, then proceed
         if ($orderPaymentMethod == "instant") {
-            $this->logger->info("Instant order detected.");
+            $this->logInfo($order, "Instant order detected.");
             try {
                 $customer = NULL;
                 $shouldCreateCustomerIfNotExists = false;
@@ -138,22 +155,26 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                 try {
                     foreach ($order->getStatusHistoryCollection() as $status) {
                         if ($status->getComment()) {
-                            if (str_contains($status->getComment(), 'SUBSCRIBE_TO_NEWSLETTER')) {
+                            if (strpos($status->getComment(), 'SUBSCRIBE_TO_NEWSLETTER') !== false) {
                                 $shouldSubscribeCustomerToNewsletter =  true;
-                                $this->logger->info("Detected that we should subscribe new/existing customer to newsletter.");
+                                $this->logInfo($order, "Detected that we should subscribe new/existing customer to newsletter.");
                             }
 
-                            if (str_contains($status->getComment(), 'CREATE_CUSTOMER')) {
+                            if (strpos($status->getComment(), 'CREATE_WEBSITE_USER') !== false) {
                                 $shouldCreateCustomerIfNotExists = true;
-                                $this->logger->info("Detected that we should create customer if not exists.");
+                                $this->logInfo($order, "Detected that we should create customer if not exists.");
                             }
                         }
                     }
                 } catch (Exception $e) {
-                    $this->logger->error("Error occurred when scanning order comments.");
+                    $this->logError($order, "Error occurred when scanning order comments. " . $e->getMessage());
                 }
 
-                $this->logger->info("Attempting to get customer with email: " . $order->getCustomerEmail());
+                $shouldCreateCustomerIfNotExists = true;
+                $shouldSubscribeCustomerToNewsletter =  true;
+
+
+                $this->logInfo($order, "Attempting to get customer with email: " . $order->getCustomerEmail());
                 try {
                     $customer = $this->customerRepository->get($order->getCustomerEmail());
                 } catch (Exception $e) {
@@ -161,13 +182,15 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                 }
 
                 if ($order->getCustomerIsGuest() && $customer) {
-                    $this->logger->info("Customer with email: " . $order->getCustomerEmail() . " exists.");
-                    $this->addCommentToOrder($order, sprintf('Instant: Customer with email ' . $order->getCustomerEmail() . ' exists. Assigning order to this customer.'));
+                    $this->logInfo($order, "Customer with email: " . $order->getCustomerEmail() . " exists.");
+                    $this->addCommentToOrder($order, sprintf('Customer with email ' . $order->getCustomerEmail() . ' exists. Assigning order to this customer.'));
                 } else if ($shouldCreateCustomerIfNotExists) {
-                    $this->logger->info("Customer with email: " . $order->getCustomerEmail() . " does not exist.");
-                    $this->addCommentToOrder($order, sprintf('Instant: Creating account for customer with email: ' . $order->getCustomerEmail()));
+                    $this->logInfo($order, "Customer with email: " . $order->getCustomerEmail() . " does not exist.");
+                    $this->addCommentToOrder($order, sprintf('Creating account for customer with email: ' . $order->getCustomerEmail()));
                     $customer = $this->orderCustomerService->create($orderId);
-                    $this->logger->info("New customer account created.");
+                    $this->logInfo($order, "New customer account created.");
+                } else {
+                    $this->logInfo($order, "Customer does not exist.");
                 }
 
                 if ($customer) {
@@ -175,21 +198,22 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                         try {
                             $subscriptionManager = $objectManager->create('Magento\Newsletter\Model\SubscriptionManager');
-                            $this->addCommentToOrder($order, sprintf('Instant: Subscribing customer to newsletter.'));
+                            $this->logInfo($order, "Subscribing customer to newsletter");
+                            $this->addCommentToOrder($order, sprintf('Subscribing customer to newsletter.'));
                             $subscriptionManager->subscribeCustomer((int)$customer->getId(), (int)$order->getStore()->getId());
-                        } catch (Exception $e){
-                            $this->logger->info("Unable to subscribe customer to newsletter as this Magento instance does not have Magento\Newsletter\Model\SubscriptionManager.");
+                        } catch (Exception $e) {
+                            $this->logInfo($order, "Unable to subscribe customer to newsletter as this Magento instance does not have Magento\Newsletter\Model\SubscriptionManager.");
                             // do nothing. Subscription manager does not exist in this magento version.
                         }
                     }
-                    $this->logger->info("Updating order. Converting guest order to customer order.");
+                    $this->logInfo($order, "Updating order. Converting guest order to customer order.");
                     $customerOrder = $this->orderRepository->get($orderId);
                     $customerOrder->setCustomerIsGuest(0);
                     $customerOrder->setCustomerId($customer->getId());
                     $customerOrder->setCustomerGroupId($customer->getGroupId());
                     $this->orderSender->send($customerOrder, true);
 
-                    $this->logger->info("Saving order.");
+                    $this->logInfo($order, "Saving order.");
                     $this->orderRepository->save($customerOrder);
                     $purchased = $this->purchasedFactory->create()->load(
                         $incrementId,
@@ -201,8 +225,8 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                     }
                 }
             } catch (Exception $e) {
-                $this->logger->error("Exception raised in Instant/Checkout/Observer/UpdateGuestOrderWithCustomer");
-                $this->logger->error($e->getMessage());
+                $this->logError($order, "Exception raised in Instant/Checkout/Observer/UpdateGuestOrderWithCustomer");
+                $this->logError($order, $e->getMessage());
             }
         }
     }

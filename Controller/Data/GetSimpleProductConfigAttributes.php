@@ -15,11 +15,10 @@ namespace Instant\Checkout\Controller\Data;
 use Magento\Backend\App\Action\Context;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\App\Action\Action;
-use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use \Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
-class GetSimpleProductConfigAttributes extends Action implements HttpGetActionInterface
+class GetSimpleProductConfigAttributes extends Action
 {
     /**
      * @var JsonResult
