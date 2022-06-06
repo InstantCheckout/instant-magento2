@@ -138,30 +138,34 @@ class DoRequest
             $this->logger->info('Result: ' . $result);
             $this->logger->info('Status Code ' . $status);
 
-            if ($enableRetry) {
-                $repository = $this->requestLogRepositoryInterfaceFactory->create();
-                if ($requestLogId > 0) {
-                    $model = $repository->get($requestLogId);
-                    $model->setAttempts($model->getAttempts() + 1);
-                    $model->setResponseContent($result);
-                    $model->setIdempotencyKey($idempotencyKey);
-                    $model->setRetryRequired($this->checkShouldRetry($status));
-                    $model->setStatus($status);
-                } else {
-                    $model = $this->requestLogInterfaceFactory->create();
-                    $model->setAttempts(0);
-                    $model->setRequestId($requestId);
-                    $model->setBody(json_encode(['body' => $body]));
-                    $model->setPriority(0);
-                    $model->setRequestMethod($requestMethod);
-                    $model->setIdempotencyKey($idempotencyKey);
-                    $model->setResponseContent($result);
-                    $model->setRetryRequired($this->checkShouldRetry($status));
-                    $model->setStatus($status);
-                    $model->setUriEndpoint($endpoint);
-                }
+            try {
+                if ($enableRetry) {
+                    $repository = $this->requestLogRepositoryInterfaceFactory->create();
+                    if ($requestLogId > 0) {
+                        $model = $repository->get($requestLogId);
+                        $model->setAttempts($model->getAttempts() + 1);
+                        $model->setResponseContent($result);
+                        $model->setIdempotencyKey($idempotencyKey);
+                        $model->setRetryRequired($this->checkShouldRetry($status));
+                        $model->setStatus($status);
+                    } else {
+                        $model = $this->requestLogInterfaceFactory->create();
+                        $model->setAttempts(0);
+                        $model->setRequestId($requestId);
+                        $model->setBody(json_encode(['body' => $body]));
+                        $model->setPriority(0);
+                        $model->setRequestMethod($requestMethod);
+                        $model->setIdempotencyKey($idempotencyKey);
+                        $model->setResponseContent($result);
+                        $model->setRetryRequired($this->checkShouldRetry($status));
+                        $model->setStatus($status);
+                        $model->setUriEndpoint($endpoint);
+                    }
 
-                $repository->save($model);
+                    $repository->save($model);
+                }
+            } catch (Exception $e) {
+                $this->logger->info('Could not create request log.');
             }
 
             return ['result' => $result, 'status' => $status];
