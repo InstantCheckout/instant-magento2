@@ -20,7 +20,6 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Psr\Log\LoggerInterface;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Store\Model\StoreManagerInterface;
@@ -28,7 +27,7 @@ use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Sales\Api\OrderCustomerManagementInterface;
 
 /**
- * Class UpdateGuestOrderWithCustomer
+ * Class CreateCustomerOrUpdateGuestOrderWithCustomer
  */
 class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
 {
@@ -52,11 +51,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
     protected $order;
 
     /**
-     * @var OrderSender
-     */
-    protected $orderSender;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -73,7 +67,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
      * @param CustomerRepositoryInterface $customerRepository
      * @param AccountManagementInterface $customerAccountManagement
      * @param Order $order
-     * @param OrderSender $orderSender
      * @param LoggerInterface $logger
      * @param CustomerFactory $customerFactory
      * @param StoreManagerInterface $storeManager
@@ -85,7 +78,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
         CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $customerAccountManagement,
         Order $order,
-        OrderSender $orderSender,
         LoggerInterface $logger,
         CustomerFactory $customerFactory,
         StoreManagerInterface $storeManager,
@@ -97,7 +89,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
         $this->customerRepository = $customerRepository;
         $this->customerAccountManagement = $customerAccountManagement;
         $this->order = $order;
-        $this->orderSender = $orderSender;
         $this->logger = $logger;
         $this->customerFactory = $customerFactory;
         $this->storeManager = $storeManager;
@@ -207,7 +198,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                     $customerOrder->setCustomerIsGuest(0);
                     $customerOrder->setCustomerId($customer->getId());
                     $customerOrder->setCustomerGroupId($customer->getGroupId());
-                    $this->orderSender->send($customerOrder, true);
 
                     $this->logInfo($order, "Saving order.");
                     $this->orderRepository->save($customerOrder);
