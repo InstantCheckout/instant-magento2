@@ -62,19 +62,23 @@ class ResendFailedRequest
      */
     public function execute()
     {
-        $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
-        $searchCriteria = $searchCriteriaBuilder->addFilter('retry_required', 1)
-            ->addFilter('attempts', $this->instantHelper->getRetryFailuresCount(), 'lt')->create();
-        $items = $this->requestLogRepository->getList($searchCriteria)->getItems();
-        foreach ($items as $item) {
-            $body = (array)json_decode($item->getBody());
-            $this->doRequest->execute(
-                $item->getUriEndpoint(),
-                json_decode(json_encode($body['body']), true),
-                $item->getRequestMethod(),
-                $item->getIdempotencyKey(),
-                (int)$item->getRequestlogId()
-            );
+        $requestLogTableExists = $this->instantHelper->doesInstantRequestLogTableExist();
+
+        if ($requestLogTableExists) {
+            $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
+            $searchCriteria = $searchCriteriaBuilder->addFilter('retry_required', 1)
+                ->addFilter('attempts', $this->instantHelper->getRetryFailuresCount(), 'lt')->create();
+            $items = $this->requestLogRepository->getList($searchCriteria)->getItems();
+            foreach ($items as $item) {
+                $body = (array)json_decode($item->getBody());
+                $this->doRequest->execute(
+                    $item->getUriEndpoint(),
+                    json_decode(json_encode($body['body']), true),
+                    $item->getRequestMethod(),
+                    $item->getIdempotencyKey(),
+                    (int)$item->getRequestlogId()
+                );
+            }
         }
     }
 }

@@ -43,7 +43,6 @@ class DoRequest
      * @var LoggerInterface
      */
     private $logger;
-
     /**
      * @var RequestLogInterfaceFactory
      * @SuppressWarnings(PHPMD.LongVariable)
@@ -51,6 +50,7 @@ class DoRequest
     private $requestLogInterfaceFactory;
     /**
      * @var RequestLogRepositoryInterfaceFactory
+     * @SuppressWarnings(PHPMD.LongVariable)
      */
     private $requestLogRepositoryInterfaceFactory;
 
@@ -77,6 +77,21 @@ class DoRequest
         $this->requestLogRepositoryInterfaceFactory = $requestLogRepositoryInterfaceFactory;
     }
 
+    public function logInfo($msg)
+    {
+        $this->logger->info('[INSTANT]: ' . $msg);
+    }
+
+    public function logWarning($msg)
+    {
+        $this->logger->warning('[INSTANT]: ' . $msg);
+    }
+
+    public function logError($msg)
+    {
+        $this->logger->error('[INSTANT]: ' . $msg);
+    }
+
     /**
      * @param string $requestUri
      * @param array $body
@@ -95,51 +110,64 @@ class DoRequest
         $enableRetry = true,
         $enableIdempotency = true
     ) {
-        $requestBody = json_encode($body);
-        $requestId = $this->instantHelper->guid();
-
-        if ($enableIdempotency && $idempotencyKey === -1) {
-            $idempotencyKey = $this->instantHelper->guid();
-        }
-
-        $headers = [
-            "Content-Type" => "application/json",
-            "User-Agent" => static::AGENT,
-            "X-Instant-App-Id" => $this->instantHelper->getInstantAppId(),
-            "X-Instant-App-Auth" => $this->instantHelper->getInstantApiAccessToken(),
-            'Expect:' => '',
-        ];
-
-        if ($enableIdempotency) {
-            $headers["Idempotency-Key"] = $idempotencyKey;
-        }
-        $this->curl->setHeaders($headers);
-        $this->curl->setTimeout(10);
-
         try {
+            $requestBody = json_encode($body);
+            $requestId = $this->instantHelper->guid();
+
+            if ($enableIdempotency && $idempotencyKey === -1) {
+                $idempotencyKey = $this->instantHelper->guid();
+            }
+
+            $headers = [
+                "Content-Type" => "application/json",
+                "User-Agent" => static::AGENT,
+                "X-Instant-App-Id" => $this->instantHelper->getInstantAppId(),
+                "X-Instant-App-Auth" => $this->instantHelper->getInstantApiAccessToken(),
+                'Expect:' => '',
+            ];
+
+            if ($enableIdempotency) {
+                $headers["Idempotency-Key"] = $idempotencyKey;
+            }
+            $this->curl->setHeaders($headers);
+            $this->curl->setTimeout(30);
+
             $baseApiUrl = $this->instantHelper->getInstantApiUrl();
             $requestUri = $baseApiUrl . $endpoint;
-            $this->logger->info('Sending ' . $requestMethod . ' request to ' . $requestUri);
 
-            switch ($requestMethod) {
-                case 'POST':
-                    $this->curl->post($requestUri, $requestBody);
-                    break;
-                case 'GET':
-                    $this->curl->get($requestUri);
-                    break;
-                default:
-                    throw new LocalizedException(__('This %1 request method is not implemented yet.', $requestMethod));
+            $this->logInfo('Sending ' . $requestMethod . ' request to ' . $requestUri);
+            $this->logInfo('Idempotency Key ' . $idempotencyKey);
+            $this->logInfo('Request Log ID ' . $requestLogId);
+
+            try {
+                switch ($requestMethod) {
+                    case 'POST':
+                        $this->curl->post($requestUri, $requestBody);
+                        break;
+                    case 'GET':
+                        $this->curl->get($requestUri);
+                        break;
+                    default:
+                        throw new LocalizedException(__('This %1 request method is not implemented yet.', $requestMethod));
+                }
+            } catch (Exception $e) {
+                $this->logError('Error sending request: ' . $e->getMessage());
             }
 
             $result = $this->curl->getBody();
             $status = $this->curl->getStatus();
+            $this->logInfo('Request response received.');
+            $this->logInfo('Result: ' . $result);
+            $this->logInfo('Status Code ' . $status);
 
-            $this->logger->info('Result: ' . $result);
-            $this->logger->info('Status Code ' . $status);
+            $requestLogTableExists = $this->instantHelper->doesInstantRequestLogTableExist();
+            $this->logInfo('Should create request log: ' . $enableRetry);
+            $this->logInfo('Request log table exists: ' . ($requestLogTableExists ? 'true' : 'false'));
 
             try {
-                if ($enableRetry) {
+                if ($enableRetry && $requestLogTableExists) {
+                    $this->logInfo('Proceeding to create request log row for this request.');
+
                     $repository = $this->requestLogRepositoryInterfaceFactory->create();
                     if ($requestLogId > 0) {
                         $model = $repository->get($requestLogId);
@@ -163,15 +191,17 @@ class DoRequest
                     }
 
                     $repository->save($model);
+                    $this->logInfo('New request log saved.');
+                } else {
+                    $this->logInfo('Either retry is not enabled for this request or request log table does not exist.');
                 }
             } catch (Exception $e) {
-                $this->logger->info('Could not create request log.');
+                $this->logError('Could not create request log. ' . $e->getMessage());
             }
 
             return ['result' => $result, 'status' => $status];
         } catch (Exception $e) {
-            $this->logger->error("Exception raised in Instant/Checkout/Service/DoRequest");
-            $this->logger->error($e->getMessage());
+            $this->logError("Exception raised in Instant/Checkout/Service/DoRequest: " . $e->getMessage());
             return false;
         }
     }

@@ -12,13 +12,17 @@
 
 namespace Instant\Checkout\Helper;
 
+use Exception;
 use Magento\Framework\App\Helper\Context;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Session\SessionManager;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\ResourceConnection;
 
 class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
+    const INSTANT_CHECKOUT_REQUESTLOG_TABLE = 'instant_checkout_requestlog';
+
     const INSTANT_APP_ID_PATH = 'instant/general/app_id';
     const ACCESS_TOKEN_PATH = 'instant/general/api_access_token';
     const ENABLE_INSTANT_SANDBOX_MODE_PATH = 'instant/general/enable_sandbox';
@@ -71,6 +75,11 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $storeManager;
 
     /**
+     * @var ResourceConnection
+     */
+    private $resourceConnection;
+
+    /**
      * Constructor.
      * @param Context $context
      * @param Session $customerSession
@@ -79,13 +88,34 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         Context $context,
         Session $customerSession,
         SessionManager $sessionManager,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        ResourceConnection $resourceConnection
     ) {
         $this->customerSession = $customerSession;
         $this->sessionManager = $sessionManager;
         $this->storeManager = $storeManager;
+        $this->resourceConnection = $resourceConnection;
 
         return parent::__construct($context);
+    }
+
+    /**
+     * Check table exists or not
+     *
+     * @return bool
+     */
+    public function doesInstantRequestLogTableExist()
+    {
+        try {
+            $connection  = $this->resourceConnection->getConnection();
+            $tableName = $connection->getTableName(self::INSTANT_CHECKOUT_REQUESTLOG_TABLE);
+
+            $isTableExist = $connection->isTableExists($tableName);
+
+            return $isTableExist;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public function getConfig($config)
