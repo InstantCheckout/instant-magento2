@@ -102,17 +102,26 @@ class Send extends Action
         // Load Instant Checkout integration
         $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
 
-        // Load consumer and access token
+        // Load consumer and access token 
         $consumer = $this->oauthService->loadConsumer($instantIntegration["consumer_id"]);
-        $token = $this->oauthToken->loadByConsumerIdAndUserType($consumer->getId(), 1)->getToken();
+        $oauthToken = $this->oauthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
+
+        $consumerKey = $consumer->getKey();
+        $consumerSecret = $consumer->getSecret();
+
+        $accessToken = $oauthToken->getToken();
+        $accessTokenSecret = $oauthToken->getSecret();
 
         // Construct payload
         $payload = [
             'baseUrl' => $this->storeManagerInterface->getStore()->getBaseUrl(),
-            'apiKey' => $token,
+            'consumerKey' => $consumerKey,
+            'consumerSecret' => $consumerSecret,
+            'accessToken' => $accessToken,
+            'accessTokenSecret' => $accessTokenSecret,
         ];
-        $valid = 0;
 
+        $valid = 0;
         $responseText = 'failure';
 
         $response = $this->doRequest->execute('admin/integration/magento', $payload);
@@ -121,13 +130,14 @@ class Send extends Action
             $valid = 1;
             $responseText = 'success';
         }
+
         $resultJson = $this->resultJsonFactory->create();
         $data = [
             'valid' => $valid,
             'responseText' => $responseText
         ];
-        $resultJson->setData($data);
 
+        $resultJson->setData($data);
         return $resultJson;
     }
 }
