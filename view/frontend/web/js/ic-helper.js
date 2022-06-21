@@ -11,7 +11,7 @@ define([
 
         reloadInstantConfig: function (callback) {
             $.ajax({
-                url: window.location.origin + "/instant/data/getconfig",
+                url: window.location.origin + "/instant/data/getconfig/",
                 type: 'GET',
                 cache: false,
                 contentType: false,
