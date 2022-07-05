@@ -26,9 +26,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory as ResultJsonFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\GuestCartManagementInterface;
-use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\QuoteFactory;
-use Magento\Quote\Model\QuoteIdMaskFactory;
 use Psr\Log\LoggerInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -51,10 +49,6 @@ class GetConfig extends Action
      * @var InstantHelper
      */
     private $instantHelper;
-    /**
-     * @var DoRequest
-     */
-    private $doRequest;
     /**
      * @var ResultJsonFactory
      */
@@ -95,10 +89,6 @@ class GetConfig extends Action
      * @var AddressRepositoryInterface
      */
     private $addressRepository;
-    /**
-     * @var QuoteIdMaskFactory
-     */
-    private $quoteIdMaskFactory;
 
     /**
      * Constructor.
@@ -116,7 +106,6 @@ class GetConfig extends Action
         CartRepositoryInterface $quoteRepository,
         GuestCartManagementInterface $cartManagement,
         QuoteFactory $quoteFactory,
-        QuoteIdMaskFactory $quoteIdMaskFactory,
         CurrencyFactory $currencyFactory,
         LoggerInterface $logger,
         CustomerRepositoryInterface $customerRepository,
@@ -133,7 +122,6 @@ class GetConfig extends Action
         $this->quoteRepository = $quoteRepository;
         $this->cartManagement = $cartManagement;
         $this->quoteFactory = $quoteFactory;
-        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->doRequest = $doRequest;
         $this->currencyFactory = $currencyFactory;
         $this->logger = $logger;
@@ -144,62 +132,11 @@ class GetConfig extends Action
     }
 
 
-    /**
-     * Get equivalent invisible quote from current checkout quote.
-     *
-     * @return string
-     */
-    public function getInvisibleCartFromCart()
+    public function getSessionCartId()
     {
         try {
-            // Get checkout session quote
-            $quote = $this->checkoutSession->getQuote();
-
-            if (empty($quote->getEntityId())){
-                return '';
-            }
-
-            /** @var Quote $currentCart */
-            $currentCart = $this->quoteRepository->get($quote->getEntityId());
-
-            // Create an empty cart
-            $maskedId = $this->cartManagement->createEmptyCart();
-            
-            // Get quote ID of new empty cart
-            $quoteIdMask = $this->quoteIdMaskFactory->create()->load($maskedId, 'masked_id');
-            $newCartId = $quoteIdMask->getQuoteId();
-
-            // Load new cart
-            /** @var Quote $newCart */
-            $newCart = $this->quoteFactory->create()->loadByIdWithoutStore($newCartId);
-            $newCart->setActive(1);
-            $newCart->setCouponCode($currentCart->getCouponCode());
-
-            // For each item in the current cart; copy over to new cart
-            foreach ($currentCart->getAllVisibleItems() as $item) {
-                $newItem = clone $item;
-                $newCart->addItem($newItem);
-                if ($item->getHasChildren()) {
-                    foreach ($item->getChildren() as $child) {
-                        $newChild = clone $child;
-                        $newChild->setParentItem($newItem);
-                        $newCart->addItem($newChild);
-                    }
-                }
-            }
-
-            // Init shipping & billing
-            if (!$newCart->getId()) {
-                $newCart->getShippingAddress();
-                $newCart->getBillingAddress();
-            }
-
-            // Save
-            $newCart->setId($newCartId);
-            $newCart->collectTotals()->save();
-            $newCart->save();
-
-            return $maskedId;
+            $cartId = $this->checkoutSession->getQuote()->getEntityId();
+            return $cartId;
         } catch (Exception $e) {
             $this->logger->error("Exception raised in Instant/Checkout/Controller/Data/GetConfig");
             $this->logger->error($e->getMessage());
@@ -208,42 +145,15 @@ class GetConfig extends Action
     }
 
     /**
-     * Create Instant session if enabled (experimental)
-     *
-     * @return bool|string
-     */
-    public function createInstantSession()
-    {
-        // If cookie forwarding is enabled, then generate sessionId, retrieve cookies and make call to Instant.
-        if ($this->instantHelper->getCookieForwardingEnabled()) {
-            $instantSessionId = $this->instantHelper->guid();
-            $data['sessId'] = $instantSessionId;
-
-            $cookieStr = '';
-            foreach ($_COOKIE as $cookieKey => $cookieValue) {
-                $cookieStr = $cookieStr . $cookieKey . '=' . $this->instantHelper->encodeURIComponent($cookieValue) . '; ';
-            }
-
-            $payload = [
-                'cookie' => substr(trim($cookieStr), 0, -1),
-                'id' => $instantSessionId,
-                'storeCode' => $this->storeManager->getStore()->getCode()
-            ];
-            $this->doRequest->execute('session', $payload, 'POST', -1, 0, false, false);
-        }
-    }
-
-    /**
      * Execute function
      */
     public function execute()
     {
-        $this->createInstantSession();
         $result = $this->jsonResultFactory->create();
 
         $data['enableMinicartBtn'] = $this->instantHelper->getInstantMinicartBtnEnabled();
         $data['appId'] = $this->instantHelper->getInstantAppId();
-        $data['cartId'] = $this->getInvisibleCartFromCart();
+        $data['cartId'] = $this->getSessionCartId();
         $data['enableSandbox'] = $this->instantHelper->getSandboxEnabledConfig();
         $data['disabledForSkusContaining'] = $this->instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $this->storeManager->getStore()->getCode();

@@ -13,11 +13,9 @@
 namespace Instant\Checkout\Controller\Cart;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory as ResultJsonFactory;
-use Magento\Quote\Api\CartRepositoryInterface;
 
 class Clear extends Action
 {
@@ -25,19 +23,11 @@ class Clear extends Action
      * @var ResultJsonFactory
      */
     protected $resultJsonFactory;
-    /**
-     * @var CustomerSession
-     */
-    protected $customerSession;
+
     /**
      * @var CheckoutSession
      */
     protected $checkoutSession;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    protected $quoteRepository;
 
     /**
      * Constructor.
@@ -46,14 +36,10 @@ class Clear extends Action
     public function __construct(
         Context $context,
         ResultJsonFactory $resultJsonFactory,
-        CheckoutSession $checkoutSession,
-        CustomerSession $customerSession,
-        CartRepositoryInterface $quoteRepository
+        CheckoutSession $checkoutSession
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
-        $this->customerSession = $customerSession;
-        $this->quoteRepository = $quoteRepository;
 
         return parent::__construct($context);
     }
@@ -63,16 +49,8 @@ class Clear extends Action
      */
     public function execute()
     {
-        $quote = $this->checkoutSession->getQuote();
-        $quoteId = $quote->getId();
+        $this->checkoutSession->getQuote()->setIsActive(false)->save();
 
-        if ($quoteId) {
-            $cart = $this->quoteRepository->get($quoteId);
-            $cart->delete();
-        }
-        $this->checkoutSession->clearQuote();
-        $this->checkoutSession->clearStorage();
-        $this->checkoutSession->restoreQuote();
         $result = $this->resultJsonFactory->create();
         return $result->setData(['success' => true]);
     }

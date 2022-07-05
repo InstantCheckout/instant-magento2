@@ -61,7 +61,7 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
     protected $orderStatusRepository;
 
     /**
-     * UpdateGuestOrderWithCustomer constructor.
+     * CreateCustomerOrUpdateGuestOrderWithCustomer constructor.
      * @param PurchasedFactory $purchasedFactory
      * @param OrderRepositoryInterface $orderRepository
      * @param CustomerRepositoryInterface $customerRepository
@@ -161,53 +161,59 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                     $this->logError($order, "Error occurred when scanning order comments. " . $e->getMessage());
                 }
 
-                $this->logInfo($order, "Attempting to get customer with email: " . $order->getCustomerEmail());
-                try {
-                    $customer = $this->customerRepository->get($order->getCustomerEmail());
-                } catch (Exception $e) {
-                    // do nothing. Customer with order email does not exist.
-                }
 
-                if ($order->getCustomerIsGuest() && $customer) {
-                    $this->logInfo($order, "Customer with email: " . $order->getCustomerEmail() . " exists.");
-                    $this->addCommentToOrder($order, sprintf('Customer with email ' . $order->getCustomerEmail() . ' exists. Assigning order to this customer.'));
-                } else if ($shouldCreateCustomerIfNotExists) {
-                    $this->logInfo($order, "Customer with email: " . $order->getCustomerEmail() . " does not exist.");
-                    $this->addCommentToOrder($order, sprintf('Creating account for customer with email: ' . $order->getCustomerEmail()));
-                    $customer = $this->orderCustomerService->create($orderId);
-                    $this->logInfo($order, "New customer account created.");
-                } else {
-                    $this->logInfo($order, "Customer does not exist.");
-                }
+                if ($order->getCustomerIsGuest()) {
+                    $this->logInfo($order, "Attempting to get customer with email: " . $order->getCustomerEmail());
+                    try {
+                        $customer = $this->customerRepository->get($order->getCustomerEmail());
+                    } catch (Exception $e) {
+                        // do nothing. Customer with order email does not exist.
+                    }
 
-                if ($customer) {
-                    if ($shouldSubscribeCustomerToNewsletter) {
-                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                        try {
-                            $subscriptionManager = $objectManager->create('Magento\Newsletter\Model\SubscriptionManager');
-                            $this->logInfo($order, "Subscribing customer to newsletter");
-                            $this->addCommentToOrder($order, sprintf('Subscribing customer to newsletter.'));
-                            $subscriptionManager->subscribeCustomer((int)$customer->getId(), (int)$order->getStore()->getId());
-                        } catch (Exception $e) {
-                            $this->logInfo($order, "Unable to subscribe customer to newsletter as this Magento instance does not have Magento\Newsletter\Model\SubscriptionManager.");
-                            // do nothing. Subscription manager does not exist in this magento version.
+                    if ($customer) {
+                        $this->logInfo($order, "Order is guest order and customer exists.");
+                        $this->addCommentToOrder($order, sprintf('Customer with email ' . $order->getCustomerEmail() . ' exists. Assigning order to this customer.'));
+                    } else if ($shouldCreateCustomerIfNotExists) {
+                        $this->logInfo($order, "Customer with email: " . $order->getCustomerEmail() . " does not exist.");
+                        $this->addCommentToOrder($order, sprintf('Creating account for customer with email: ' . $order->getCustomerEmail()));
+                        $customer = $this->orderCustomerService->create($orderId);
+                        $this->logInfo($order, "New customer account created.");
+                    }
+
+                    if ($customer) {
+                        $this->logInfo($order, "Updating order. Converting guest order to customer order.");
+                        $customerOrder = $this->orderRepository->get($orderId);
+                        $customerOrder->setCustomerIsGuest(0);
+                        $customerOrder->setCustomerId($customer->getId());
+                        $customerOrder->setCustomerGroupId($customer->getGroupId());
+
+                        $this->logInfo($order, "Saving order.");
+                        $this->orderRepository->save($customerOrder);
+                        $purchased = $this->purchasedFactory->create()->load(
+                            $incrementId,
+                            'order_increment_id'
+                        );
+                        if ($purchased->getId()) {
+                            $purchased->setCustomerId($customer->getId());
+                            $purchased->save();
                         }
                     }
-                    $this->logInfo($order, "Updating order. Converting guest order to customer order.");
-                    $customerOrder = $this->orderRepository->get($orderId);
-                    $customerOrder->setCustomerIsGuest(0);
-                    $customerOrder->setCustomerId($customer->getId());
-                    $customerOrder->setCustomerGroupId($customer->getGroupId());
+                } else {
+                    $customer = $order->getCustomer();
+                    $this->addCommentToOrder($order, sprintf('Customer order detected. Skipping guest order customer assignment.'));
+                    $this->logInfo($order, "Customer order detected. Skipping guest order customer assignment.");
+                }
 
-                    $this->logInfo($order, "Saving order.");
-                    $this->orderRepository->save($customerOrder);
-                    $purchased = $this->purchasedFactory->create()->load(
-                        $incrementId,
-                        'order_increment_id'
-                    );
-                    if ($purchased->getId()) {
-                        $purchased->setCustomerId($customer->getId());
-                        $purchased->save();
+                if ($customer && $shouldSubscribeCustomerToNewsletter) {
+                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                    try {
+                        $subscriptionManager = $objectManager->create('Magento\Newsletter\Model\SubscriptionManager');
+                        $this->logInfo($order, "Subscribing customer to newsletter");
+                        $this->addCommentToOrder($order, sprintf('Subscribing customer to newsletter.'));
+                        $subscriptionManager->subscribeCustomer((int)$customer->getId(), (int)$order->getStore()->getId());
+                    } catch (Exception $e) {
+                        $this->logInfo($order, "Unable to subscribe customer to newsletter as this Magento instance does not have Magento\Newsletter\Model\SubscriptionManager.");
+                        // do nothing. Subscription manager does not exist in this magento version.
                     }
                 }
             } catch (Exception $e) {

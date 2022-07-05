@@ -3,7 +3,19 @@
     <route url="/V1/instant/:storeCode/cart/merge" method="POST">
         <service class="Instant\Checkout\Api\CartsManagementInterface" method="merge" />
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="Magento_Cart::manage" />
+        </resources>
+    </route>
+    <route url="/V1/instant/:storeCode/cart/set-active" method="POST">
+        <service class="Instant\Checkout\Api\CartsManagementInterface" method="setActive" />
+        <resources>
+            <resource ref="Magento_Cart::manage" />
+        </resources>
+    </route>
+    <route url="/V1/instant/:storeCode/cart/amend-cart-customer-id" method="POST">
+        <service class="Instant\Checkout\Api\CartsManagementInterface" method="amendCustomerIdNullForGuestCarts" />
+        <resources>
+            <resource ref="Magento_Cart::manage" />
         </resources>
     </route>
 </routes>

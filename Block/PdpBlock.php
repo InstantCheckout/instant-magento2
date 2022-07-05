@@ -12,33 +12,56 @@
 
 namespace Instant\Checkout\Block;
 
+use Magento\Framework\Registry;
+use Instant\Checkout\Helper\InstantHelper;
+use Magento\Backend\Block\Template\Context;
+
 class PdpBlock extends \Magento\Framework\View\Element\Template
 {
-    protected $_registry;
+    /**
+     * @var JsonFactory
+     */
+    protected $registry;
+
+    /**
+     * @var JsonFactory
+     */
     private $instantHelper;
 
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Instant\Checkout\Helper\InstantHelper $instantHelper,
+        Context $context,
+        Registry $registry,
+        InstantHelper $instantHelper,
         array $data = []
     ) {
-        $this->_registry = $registry;
+        $this->registry = $registry;
         $this->instantHelper = $instantHelper;
+
         parent::__construct($context, $data);
     }
 
     public function getProduct()
     {
-        return $this->_registry->registry('current_product');
+        return $this->registry->registry('current_product');
     }
 
     public function _toHtml()
     {
         $catalogPageBtnEnabled = $this->instantHelper->getInstantBtnCatalogPageEnabled();
         $disabledForCustomerGroup = $this->instantHelper->getDisabledForCustomerGroup();
+        $disabledSkus = $this->instantHelper->getDisabledForSkusContaining();
+        $productSku = $this->getProduct()->getSku();
 
-        if ($catalogPageBtnEnabled && !$disabledForCustomerGroup) {
+        $isProductDisabled = false;
+
+        foreach ($disabledSkus as $disabledSku) {
+            if (strpos($productSku, $disabledSku) !== false) {
+                $isProductDisabled = true;
+                break;
+            }
+        }
+
+        if ($catalogPageBtnEnabled && !$disabledForCustomerGroup && !$isProductDisabled) {
             return parent::_toHtml();
         }
 

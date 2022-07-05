@@ -12,16 +12,19 @@
 
 namespace Instant\Checkout\Model;
 
+use Exception;
 use Instant\Checkout\Api\CartsManagementInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Quote\Model\QuoteFactory;
-use Magento\Quote\Model\MaskedQuoteIdToQuoteId;
 use Instant\Checkout\Math\FloatComparator;
 use Magento\Store\Api\StoreRepositoryInterface;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 use Psr\Log\LoggerInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Framework\Controller\Result\JsonFactory as ResultJsonFactory;
+use Magento\Framework\App\ResourceConnection;
 
 /**
  * Class for management of carts information.
@@ -64,6 +67,22 @@ class CartsManagement implements CartsManagementInterface
     private $logger;
 
     /**
+     * @var CartRepositoryInterface
+     */
+    private $cartRepository;
+
+    /**
+     * @var ResultJsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var ResourceConnection
+     */
+    protected $resourceConnection;
+
+
+    /**
      * @codeCoverageIgnore
      */
     public function __construct(
@@ -73,7 +92,10 @@ class CartsManagement implements CartsManagementInterface
         QuoteIdMaskFactory $quoteIdMaskFactory,
         ProductFactory $productFactory,
         StoreRepositoryInterface $storeRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        CartRepositoryInterface $cartRepository,
+        ResultJsonFactory $resultJsonFactory,
+        ResourceConnection $resourceConnection
     ) {
         $this->storeRepository = $storeRepository;
         $this->productRepository = $productRepository;
@@ -82,6 +104,9 @@ class CartsManagement implements CartsManagementInterface
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->productFactory = $productFactory;
         $this->logger = $logger;
+        $this->cartRepository = $cartRepository;
+        $this->resultJsonFactory = $resultJsonFactory;
+        $this->resourceConnection = $resourceConnection;
     }
 
     /**
@@ -104,6 +129,35 @@ class CartsManagement implements CartsManagementInterface
     }
 
     /*
+    * @return string
+    */
+    public function amendCustomerIdNullForGuestCarts()
+    {
+        $connection = $this->resourceConnection->getConnection();
+        $query = "UPDATE quote SET customer_id = NULL WHERE customer_is_guest = true";
+        $connection->query($query);
+    }
+
+
+    /*
+    * @param string $cartId
+    * @param bool $active
+    * @return string
+    */
+    public function setActive($cartId, $active)
+    {
+        $quote = $this->quoteFactory->create()->loadByIdWithoutStore($cartId);
+        if (!$quote->getId()) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __("The quote wasn't found. Verify the quote ID and try again.")
+            );
+        }
+
+        $quote->setIsActive((bool)$active)->save();
+        return true;
+    }
+
+    /*
     * @param string $storeCode
     * @param string $fromCartId
     * @param string $targetCartId
@@ -115,46 +169,57 @@ class CartsManagement implements CartsManagementInterface
         $targetCartId
     ) {
         try {
-            $fromCartId = $this->quoteIdMaskFactory->create()->load($fromCartId, 'masked_id')->getQuoteId();
-            $toCartId = $this->quoteIdMaskFactory->create()->load($targetCartId, 'masked_id')->getQuoteId();
-    
-            $fromQuote = $this->quoteFactory->create()->loadByIdWithoutStore($fromCartId);
-            $finalQuote = $this->quoteFactory->create()->loadByIdWithoutStore($toCartId);
-    
+            $fromQuote = NULL;
+            $finalQuote = NULL;
+
+            if (strlen($fromCartId) === 32) {
+                $fromCartId = $this->quoteIdMaskFactory->create()->load($fromCartId, 'masked_id')->getQuoteId();
+                $fromQuote = $this->quoteFactory->create()->loadByIdWithoutStore($fromCartId);
+            } else {
+                $fromQuote = $this->quoteFactory->create()->loadByIdWithoutStore($fromCartId);
+            }
+
+            if (strlen($targetCartId) === 32) {
+                $toCartId = $this->quoteIdMaskFactory->create()->load($targetCartId, 'masked_id')->getQuoteId();
+                $finalQuote = $this->quoteFactory->create()->loadByIdWithoutStore($toCartId);
+            } else {
+                $finalQuote = $this->cartRepository->get($targetCartId);
+            }
+
             $fromQuoteItems = $this->getAllVisibleItems($fromQuote);
             $finalQuoteItems = $this->getAllVisibleItems($finalQuote);
-    
+
             foreach ($fromQuoteItems as $item) {
                 $found = false;
-    
+
                 foreach ($finalQuoteItems as $quoteItem) {
                     $found = false;
                     if ($item->getProduct()->getSku() === $quoteItem->getProduct()->getSku()) {
                         $fromQuoteItemPrice = $item->getParentItemId() ? floatval($item->getParentItem()->getPrice()) : floatval($item->getPrice());
                         $quoteItemPrice = $quoteItem->getParentItemId() ? floatval($quoteItem->getParentItem()->getPrice()) : floatval($quoteItem->getPrice());
-    
+
                         $comparator = new FloatComparator();
-    
+
                         if ($comparator->equal($quoteItemPrice, $fromQuoteItemPrice)) {
                             $found = true;
-    
+
                             $quoteItem = $quoteItem->getParentItemId() ? $quoteItem->getParentItem() : $quoteItem;
                             $item = $item->getParentItemId() ? $item->getParentItem() : $item;
-    
+
                             $quoteItem->setQty($quoteItem->getQty() + $item->getQty());
                             $quoteItem->save();
                             break;
                         }
                     }
                 }
-    
+
                 if (!$found) {
                     $newItem = clone $item;
-    
+
                     if ($item->getParentItemId()) {
                         $newItem = clone $item->getParentItem();
                     }
-    
+
                     $finalQuote->addItem($newItem);
                     if ($item->getHasChildren()) {
                         foreach ($item->getChildren() as $child) {
@@ -166,15 +231,15 @@ class CartsManagement implements CartsManagementInterface
                     $newItem->save();
                 }
             }
-    
+
             if (!$finalQuote->getId()) {
                 $finalQuote->getShippingAddress();
                 $finalQuote->getBillingAddress();
             }
-    
+
             $fromQuote->setIsActive(false);
             $finalQuote->save();
-        } catch (Exception $e){
+        } catch (Exception $e) {
             $this->logger->error("Exception raised in Instant/Checkout/Model/CartsManagement");
             $this->logger->error($e->getMessage());
         }

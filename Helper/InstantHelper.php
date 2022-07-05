@@ -33,7 +33,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const ENABLE_INSTANT_MINICART_BTN_PATH = 'instant/general/enable_minicart';
     const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
     const ENABLE_INSTANT_CHECKOUT_PAGE_PATH = 'instant/general/enable_checkout_page';
-    const ENABLE_COOKIE_FORWARDING = 'instant/general/enable_cookie_forwarding';
     const RETRY_FAILURES_COUNT = 'instant/general/retry_failures_count';
 
     const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
@@ -171,12 +170,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $catalogPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CATALOG_PAGE_PATH);
         return $catalogPageBtnEnabled === "1";
-    }
-
-    public function getCookieForwardingEnabled()
-    {
-        $cookieForwardingEnabled = $this->getConfig(self::ENABLE_COOKIE_FORWARDING);
-        return $cookieForwardingEnabled === "1";
     }
 
     public function getSandboxEnabledConfig()

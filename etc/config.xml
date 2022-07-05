@@ -35,7 +35,6 @@
                 <should_position_pdp_below_atc>1</should_position_pdp_below_atc>
                 <pdp_btn_custom_style></pdp_btn_custom_style>
                 <disabled_for_skus_containing></disabled_for_skus_containing>
-                <enable_cookie_forwarding>0</enable_cookie_forwarding>
                 <retry_failures_cron>*/5 * * * *</retry_failures_cron>
                 <retry_failures_count>3</retry_failures_count>
             </general>

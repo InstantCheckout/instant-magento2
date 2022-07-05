@@ -30,4 +30,23 @@ interface CartsManagementInterface
         $fromCartId,
         $targetCartId
     );
+
+    /**
+     * Set cart active status
+     *
+     * @param string $cartId
+     * @param bool $active
+     * @return string
+     */
+    public function setActive(
+        $cartId,
+        $active
+    );
+
+    /**
+     * Amend carts to ensure all guest carts do not have customer id associated
+     *
+     * @return string
+     */
+    public function amendCustomerIdNullForGuestCarts();
 }
