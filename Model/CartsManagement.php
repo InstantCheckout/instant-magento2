@@ -25,6 +25,9 @@ use Psr\Log\LoggerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Framework\Controller\Result\JsonFactory as ResultJsonFactory;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface;
 
 /**
  * Class for management of carts information.
@@ -95,7 +98,8 @@ class CartsManagement implements CartsManagementInterface
         LoggerInterface $logger,
         CartRepositoryInterface $cartRepository,
         ResultJsonFactory $resultJsonFactory,
-        ResourceConnection $resourceConnection
+        ResourceConnection $resourceConnection,
+        QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId
     ) {
         $this->storeRepository = $storeRepository;
         $this->productRepository = $productRepository;
@@ -107,6 +111,7 @@ class CartsManagement implements CartsManagementInterface
         $this->cartRepository = $cartRepository;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->resourceConnection = $resourceConnection;
+        $this->quoteIdToMaskedQuoteId = $quoteIdToMaskedQuoteId;
     }
 
     /**
@@ -129,6 +134,22 @@ class CartsManagement implements CartsManagementInterface
     }
 
     /*
+    * @param string $cartId
+    * @return string
+    */
+    public function getMaskedIdForCartId($cartId)
+    {
+        $maskedId = null;
+        try {
+            $maskedId = $this->quoteIdToMaskedQuoteId->execute($cartId);
+        } catch (NoSuchEntityException $exception) {
+            throw new LocalizedException(__("The quote wasn't found. Verify the quote ID and try again."));
+        }
+
+        return $maskedId;
+    }
+
+    /*
     * @return string
     */
     public function amendCustomerIdNullForGuestCarts()
@@ -148,7 +169,7 @@ class CartsManagement implements CartsManagementInterface
     {
         $quote = $this->quoteFactory->create()->loadByIdWithoutStore($cartId);
         if (!$quote->getId()) {
-            throw new \Magento\Framework\Exception\LocalizedException(
+            throw new LocalizedException(
                 __("The quote wasn't found. Verify the quote ID and try again.")
             );
         }

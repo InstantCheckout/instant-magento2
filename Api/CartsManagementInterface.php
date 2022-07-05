@@ -49,4 +49,11 @@ interface CartsManagementInterface
      * @return string
      */
     public function amendCustomerIdNullForGuestCarts();
+
+    /**
+     * Get masked id for cart (quote) id
+     * @param string $cartId
+     * @return string
+     */
+    public function getMaskedIdForCartId($cartId);
 }

@@ -18,4 +18,10 @@
             <resource ref="Magento_Cart::manage" />
         </resources>
     </route>
+    <route url="/V1/instant/:storeCode/cart/get-masked-id" method="POST">
+        <service class="Instant\Checkout\Api\CartsManagementInterface" method="getMaskedIdForCartId" />
+        <resources>
+            <resource ref="Magento_Cart::manage" />
+        </resources>
+    </route>
 </routes>
