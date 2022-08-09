@@ -55,7 +55,7 @@ class PdpBlock extends \Magento\Framework\View\Element\Template
         $isProductDisabled = false;
 
         foreach ($disabledSkus as $disabledSku) {
-            if (strpos($productSku, $disabledSku) !== false) {
+            if (!empty($disabledSku) && strpos($productSku, $disabledSku) !== false) {
                 $isProductDisabled = true;
                 break;
             }
