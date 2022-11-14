@@ -181,14 +181,14 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getDisabledForSkusContaining()
     {
         $disableForSkusContaining = $this->getConfig(self::DISABLED_FOR_SKUS_CONTAINING);
-        return explode(',', $disableForSkusContaining);
+        return explode(',', $disableForSkusContaining ?? '');
     }
 
     public function getDisabledForCustomerGroup()
     {
         $disabledForCustomerGroupIdsConfig = $this->getConfig(self::DISABLED_FOR_CUSTOMER_GROUP_IDS);
 
-        $disabledCustomerGroupIds = explode(',', $disabledForCustomerGroupIdsConfig);
+        $disabledCustomerGroupIds = explode(',', $disabledForCustomerGroupIdsConfig ?? '');
         $customerGroupId = $this->getCustomerGroupId();
 
         return in_array($customerGroupId, $disabledCustomerGroupIds);
