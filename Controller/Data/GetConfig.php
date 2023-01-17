@@ -160,13 +160,12 @@ class GetConfig extends Action
 
             if (empty($cartId)) {
                 $customerId = $this->instantHelper->getCustomerId();
-                $customerLoggedIn = $customerId &&  $customerId > -1;
+                $customerLoggedIn = $customerId && $customerId > -1;
 
                 $maskedQuoteId = $customerLoggedIn
                     ? $this->createEmptyCartForCustomer->execute($customerId)
                     : $this->createEmptyCartForGuest->execute();
                 $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
-
 
                 if (!$customerLoggedIn) {
                     $this->checkoutSession->setQuoteId($cartId);
