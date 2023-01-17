@@ -203,6 +203,15 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return -1;
     }
 
+    public function getCustomerId()
+    {
+        if ($this->customerSession->isLoggedIn()) {
+            return $this->customerSession->getCustomerData()->getId();
+        }
+
+        return -1;
+    }
+
     public function getMcBtnWidth()
     {
         return $this->getConfig(self::MC_BTN_WIDTH);
