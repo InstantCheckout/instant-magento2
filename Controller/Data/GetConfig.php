@@ -215,7 +215,7 @@ class GetConfig extends Action
 
         $data['gaVersion'] = $this->instantHelper->getGoogleAnalyticsVersion();
         $data['gaId'] = $this->instantHelper->getGoogleAnalyticsId();
-        $data['version'] = "1.9.00";
+        $data['version'] = "1.9.01";
         $data['platform'] = "M2";
 
         if ($this->customerSession->isLoggedIn()) {
