@@ -151,6 +151,16 @@ class InstantPayment extends AbstractMethod
      * @param string $currencyCode
      * @return bool
      */
+    public function canAuthorize()
+    {
+        return true;
+    }
+
+
+    /**
+     * @param string $currencyCode
+     * @return bool
+     */
     public function canUseForCurrency($currencyCode)
     {
         return true;
