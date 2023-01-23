@@ -3,4 +3,11 @@
     <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
         <plugin name="CPageBtnDisable" type="Instant\Checkout\Plugin\CPageBtnDisable" sortOrder="-999" />
     </type>
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="test_module_configprovider" xsi:type="object">Instant\Checkout\Model\TestpaymentConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
