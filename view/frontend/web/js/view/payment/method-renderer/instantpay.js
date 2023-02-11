@@ -108,13 +108,22 @@ define(
                     return true;
                 }
             },
+
+            /**
+             * @return {*}
+             */
+            getPlaceOrderDeferredObject: function () {
+                return placeOrderAction({
+                    'method': this.item.method
+                }, this.messageContainer);
+            },
+
             placeNewOrder: function () {
                 var self = this;
                 console.log('this.item', this.item)
 
-                placeOrderAction({
-                    'method': this.item.method
-                }, this.messageContainer)
+                this.isLoading(false); // Needed for the terms and conditions checkbox
+                this.getPlaceOrderDeferredObject()
                     .fail(this.handlePlaceOrderErrors.bind(this))
                     .done(this.onOrderPlaced.bind(this))
                     .always(function (response, status, xhr) {
@@ -210,7 +219,6 @@ define(
                 var reConfirmPayment = this.onOrderPlaced.bind(this);
                 var self = this;
 
-                console.log('this.isOrderPlaced()', this.isOrderPlaced());
                 if (this.isOrderPlaced()) {
                     updateCartAction(null, function (result, outcome, response) {
                         placeNewOrder();
@@ -241,9 +249,9 @@ define(
                 else {
                     try {
                         console.log('placing new order');
-                        updateCartAction(null, function (result, outcome, response) {
-                            placeNewOrder();
-                        });
+                        placeNewOrder();
+                        // updateCartAction(null, function (result, outcome, response) {
+                        // });
                     }
                     catch (e) {
                         console.log('err', e)
