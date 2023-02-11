@@ -18,7 +18,6 @@ use Instant\Checkout\Service\DoRequest;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Checkout\Model\CompositeConfigProvider;
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\App\Action\Action;
@@ -27,7 +26,6 @@ use Magento\Framework\Controller\Result\JsonFactory as ResultJsonFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\GuestCartManagementInterface;
 use Magento\Quote\Model\QuoteFactory;
-use Psr\Log\LoggerInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 
@@ -58,10 +56,6 @@ class GetConfig extends Action
      */
     protected $customerSession;
     /**
-     * @var CheckoutSession
-     */
-    protected $checkoutSession;
-    /**
      * @var CartRepositoryInterface
      */
     protected $quoteRepository;
@@ -77,10 +71,6 @@ class GetConfig extends Action
      * @var CurrencyFactory
      */
     protected $currencyFactory;
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
     /**
      * @var CustomerRepositoryInterface
      */
@@ -101,13 +91,11 @@ class GetConfig extends Action
         InstantHelper $instantHelper,
         DoRequest $doRequest,
         ResultJsonFactory $resultJsonFactory,
-        CheckoutSession $checkoutSession,
         CustomerSession $customerSession,
         CartRepositoryInterface $quoteRepository,
         GuestCartManagementInterface $cartManagement,
         QuoteFactory $quoteFactory,
         CurrencyFactory $currencyFactory,
-        LoggerInterface $logger,
         CustomerRepositoryInterface $customerRepository,
         AddressRepositoryInterface $addressRepository
     ) {
@@ -117,31 +105,16 @@ class GetConfig extends Action
         $this->configProvider = $configProvider;
         $this->instantHelper = $instantHelper;
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->checkoutSession = $checkoutSession;
         $this->customerSession = $customerSession;
         $this->quoteRepository = $quoteRepository;
         $this->cartManagement = $cartManagement;
         $this->quoteFactory = $quoteFactory;
         $this->doRequest = $doRequest;
         $this->currencyFactory = $currencyFactory;
-        $this->logger = $logger;
         $this->customerRepository = $customerRepository;
         $this->addressRepository = $addressRepository;
 
         return parent::__construct($context);
-    }
-
-
-    public function getSessionCartId()
-    {
-        try {
-            $cartId = $this->checkoutSession->getQuote()->getEntityId();
-            return $cartId;
-        } catch (Exception $e) {
-            $this->logger->error("Exception raised in Instant/Checkout/Controller/Data/GetConfig");
-            $this->logger->error($e->getMessage());
-            return '';
-        }
     }
 
     /**
@@ -153,7 +126,7 @@ class GetConfig extends Action
 
         $data['enableMinicartBtn'] = $this->instantHelper->getInstantMinicartBtnEnabled();
         $data['appId'] = $this->instantHelper->getInstantAppId();
-        $data['cartId'] = $this->getSessionCartId();
+        $data['cartId'] = $this->instantHelper->getSessionCartId();
         $data['enableSandbox'] = $this->instantHelper->getSandboxEnabledConfig();
         $data['disabledForSkusContaining'] = $this->instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $this->storeManager->getStore()->getCode();
@@ -179,6 +152,8 @@ class GetConfig extends Action
 
         $data['gaVersion'] = $this->instantHelper->getGoogleAnalyticsVersion();
         $data['gaId'] = $this->instantHelper->getGoogleAnalyticsId();
+        $data['version'] = "1.9.02";
+        $data['platform'] = "M2";
 
         if ($this->customerSession->isLoggedIn()) {
             $customer = $this->customerRepository->getById($this->customerSession->getId());

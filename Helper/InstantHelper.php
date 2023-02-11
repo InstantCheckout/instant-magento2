@@ -18,6 +18,11 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Session\SessionManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForCustomer;
+use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForGuest;
+use Magento\Quote\Model\QuoteIdMaskFactory;
+use Psr\Log\LoggerInterface;
 
 class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -79,6 +84,31 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     private $resourceConnection;
 
     /**
+     * @var CheckoutSession
+     */
+    protected $checkoutSession;
+
+    /**
+     * @var CreateEmptyCartForCustomer
+     */
+    private $createEmptyCartForCustomer;
+
+    /**
+     * @var CreateEmptyCartForGuest
+     */
+    private $createEmptyCartForGuest;
+
+    /**
+     * @var QuoteIdMaskFactory
+     */
+    private $quoteIdMaskFactory;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Constructor.
      * @param Context $context
      * @param Session $customerSession
@@ -88,12 +118,22 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         Session $customerSession,
         SessionManager $sessionManager,
         StoreManagerInterface $storeManager,
-        ResourceConnection $resourceConnection
+        ResourceConnection $resourceConnection,
+        CheckoutSession $checkoutSession,
+        LoggerInterface $logger,
+        CreateEmptyCartForCustomer $createEmptyCartForCustomer,
+        CreateEmptyCartForGuest $createEmptyCartForGuest,
+        QuoteIdMaskFactory $quoteIdMaskFactory
     ) {
         $this->customerSession = $customerSession;
         $this->sessionManager = $sessionManager;
         $this->storeManager = $storeManager;
         $this->resourceConnection = $resourceConnection;
+        $this->checkoutSession = $checkoutSession;
+        $this->createEmptyCartForCustomer = $createEmptyCartForCustomer;
+        $this->createEmptyCartForGuest = $createEmptyCartForGuest;
+        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
+        $this->logger = $logger;
 
         return parent::__construct($context);
     }
@@ -198,6 +238,15 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         if ($this->customerSession->isLoggedIn()) {
             return $this->customerSession->getCustomer()->getGroupId();
+        }
+
+        return -1;
+    }
+
+    public function getCustomerId()
+    {
+        if ($this->customerSession->isLoggedIn()) {
+            return $this->customerSession->getCustomerData()->getId();
         }
 
         return -1;
@@ -369,5 +418,32 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
         return strtr(rawurlencode($str), $revert);
+    }
+
+    public function getSessionCartId()
+    {
+        try {
+            $cartId = $this->checkoutSession->getQuote()->getEntityId();
+
+            // if (empty($cartId)) {
+            //     $customerId = $this->getCustomerId();
+            //     $customerLoggedIn = $customerId && $customerId > -1;
+
+            //     $maskedQuoteId = $customerLoggedIn
+            //         ? $this->createEmptyCartForCustomer->execute($customerId)
+            //         : $this->createEmptyCartForGuest->execute();
+            //     $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
+
+            //     if (!$customerLoggedIn) {
+            //         $this->checkoutSession->setQuoteId($cartId);
+            //     }
+            // }
+
+            return $cartId;
+        } catch (Exception $e) {
+            $this->logger->error("Exception raised in Instant/Checkout/Controller/Data/GetConfig");
+            $this->logger->error($e->getMessage());
+            return '';
+        }
     }
 }

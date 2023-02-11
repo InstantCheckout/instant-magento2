@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <route url="/V1/instant/:storeCode/cart/merge" method="POST">
         <service class="Instant\Checkout\Api\CartsManagementInterface" method="merge" />
         <resources>
@@ -13,7 +14,8 @@
         </resources>
     </route>
     <route url="/V1/instant/:storeCode/cart/amend-cart-customer-id" method="POST">
-        <service class="Instant\Checkout\Api\CartsManagementInterface" method="amendCustomerIdNullForGuestCarts" />
+        <service class="Instant\Checkout\Api\CartsManagementInterface"
+            method="amendCustomerIdNullForGuestCarts" />
         <resources>
             <resource ref="Magento_Cart::manage" />
         </resources>
@@ -22,6 +24,147 @@
         <service class="Instant\Checkout\Api\CartsManagementInterface" method="getMaskedIdForCartId" />
         <resources>
             <resource ref="Magento_Cart::manage" />
+        </resources>
+    </route>
+    <route url="/V1/instant/redirect_url" method="GET">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="redirect_url" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <!-- Express Checkout -->
+    <route url="/V1/instant/set_billing_address" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface"
+            method="set_billing_address" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/estimate_cart" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="estimate_cart" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/apply_shipping" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="apply_shipping" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/place_order" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="place_order" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/addtocart" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="addtocart" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/get_cart" method="GET">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="get_cart" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/get_prapi_params" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="get_prapi_params" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/get_trialing_subscriptions" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface"
+            method="get_trialing_subscriptions" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/get_checkout_payment_methods" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface"
+            method="get_checkout_payment_methods" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/get_checkout_session_id" method="GET">
+        <service class="Instant\Checkout\Api\ServiceInterface"
+            method="get_checkout_session_id" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/get_client_secret" method="GET">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="get_client_secret" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/get_upcoming_invoice" method="GET">
+        <service class="Instant\Checkout\Api\ServiceInterface"
+            method="get_upcoming_invoice" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/update_subscription" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface"
+            method="update_subscription" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/restore_quote" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="restore_quote" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/confirm_payment" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="confirm_payment" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/instant/update_cart" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="update_cart" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <!-- Multishipping -->
+    <route url="/V1/instant/place_multishipping_order" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface"
+            method="place_multishipping_order" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/instant/finalize_multishipping_order" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface"
+            method="finalize_multishipping_order" />
+        <resources>
+            <resource ref="anonymous" />
         </resources>
     </route>
 </routes>
