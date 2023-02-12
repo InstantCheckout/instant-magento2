@@ -5,16 +5,15 @@
         <section id="payment">
             <group id="instantpay" translate="label" sortOrder="2" showInDefault="1"
                 showInWebsite="1" showInStore="1">
-                <comment>Accept payments with Instant Pay.</comment>
+                <comment>Accept payments, increase conversions and bring frictionless checkout to
+                    your customers with Instant Pay.</comment>
                 <fieldset_css>complex instant-admin-config</fieldset_css>
                 <frontend_model>Instant\Checkout\Block\Adminhtml\Config\Fieldset</frontend_model>
                 <attribute type="displayIn">recommended_solutions</attribute>
                 <label>Instant Pay</label>
-                <field id="active" translate="label comment" sortOrder="1" type="select"
-                    showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Enable</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
+                <include path="Instant_Checkout::system/general.xml" />
+                <include path="Instant_Checkout::system/verification_element.xml" />
+                <include path="Instant_Checkout::system/banner_element.xml" />
             </group>
         </section>
         <tab id="instant" translate="label" sortOrder="110" class="instant-tab">
@@ -23,7 +22,7 @@
         <section id="instant" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1"
             showInStore="1">
             <class>separator-top</class>
-            <label>Instant</label>
+            <label>App Configuration</label>
             <tab>instant</tab>
             <resource>Instant_Checkout::config</resource>
             <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1"

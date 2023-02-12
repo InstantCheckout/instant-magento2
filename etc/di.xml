@@ -11,6 +11,6 @@
         type="Magento\Framework\Api\SearchResults" />
     <!-- End request logger -->
 
-    <preference for="StripeIntegration\Payments\Api\ServiceInterface"
-        type="StripeIntegration\Payments\Api\Service" />
+    <preference for="Instant\Checkout\Api\ServiceInterface"
+        type="Instant\Checkout\Api\Service" />
 </config>

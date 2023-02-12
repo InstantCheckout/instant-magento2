@@ -23,8 +23,9 @@ use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForCustomer;
 use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForGuest;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 use Psr\Log\LoggerInterface;
+use Magento\Store\Model\ScopeInterface;
 
-class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
+class InstantPayHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const INSTANT_CHECKOUT_REQUESTLOG_TABLE = 'instant_checkout_requestlog';
 
@@ -109,6 +110,11 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     private $logger;
 
     /**
+     * @var InstantHelper
+     */
+    private $instantHelper;
+
+    /**
      * Constructor.
      * @param Context $context
      * @param Session $customerSession
@@ -123,7 +129,9 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         LoggerInterface $logger,
         CreateEmptyCartForCustomer $createEmptyCartForCustomer,
         CreateEmptyCartForGuest $createEmptyCartForGuest,
-        QuoteIdMaskFactory $quoteIdMaskFactory
+        QuoteIdMaskFactory $quoteIdMaskFactory,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        InstantHelper $instantHelper
     ) {
         $this->customerSession = $customerSession;
         $this->sessionManager = $sessionManager;
@@ -134,8 +142,24 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->createEmptyCartForGuest = $createEmptyCartForGuest;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->logger = $logger;
+        $this->scopeConfig = $scopeConfig;
+        $this->instantHelper = $instantHelper;
 
         return parent::__construct($context);
+    }
+
+    public function getConfigData($field, $method = null, $storeId = null)
+    {
+        if (empty($storeId))
+            $storeId = $this->instantHelper->getStoreId();
+
+        $section = "";
+        if ($method)
+            $section = "_$method";
+
+        $data = $this->scopeConfig->getValue("payment/instant_pay$section/$field", ScopeInterface::SCOPE_STORE, $storeId);
+
+        return $data;
     }
 
     /**
@@ -277,11 +301,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getCurrentCurrencyCode()
     {
         return $this->storeManager->getStore()->getCurrentCurrencyCode();
-    }
-
-    public function getStoreId()
-    {
-        return $this->storeManager->getStore()->getId();
     }
 
     public function getBaseCurrencyCode()
@@ -430,19 +449,19 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         try {
             $cartId = $this->checkoutSession->getQuote()->getEntityId();
 
-            // if (empty($cartId)) {
-            //     $customerId = $this->getCustomerId();
-            //     $customerLoggedIn = $customerId && $customerId > -1;
+            if (empty($cartId)) {
+                $customerId = $this->getCustomerId();
+                $customerLoggedIn = $customerId && $customerId > -1;
 
-            //     $maskedQuoteId = $customerLoggedIn
-            //         ? $this->createEmptyCartForCustomer->execute($customerId)
-            //         : $this->createEmptyCartForGuest->execute();
-            //     $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
+                $maskedQuoteId = $customerLoggedIn
+                    ? $this->createEmptyCartForCustomer->execute($customerId)
+                    : $this->createEmptyCartForGuest->execute();
+                $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
 
-            //     if (!$customerLoggedIn) {
-            //         $this->checkoutSession->setQuoteId($cartId);
-            //     }
-            // }
+                if (!$customerLoggedIn) {
+                    $this->checkoutSession->setQuoteId($cartId);
+                }
+            }
 
             return $cartId;
         } catch (Exception $e) {

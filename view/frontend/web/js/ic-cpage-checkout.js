@@ -10,6 +10,7 @@ define([
         },
 
         render: function () {
+            console.log("RENDER")
             checkoutHelper.refreshInstantButtons();
         },
     });

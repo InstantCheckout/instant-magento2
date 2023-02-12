@@ -3,6 +3,7 @@
 namespace Instant\Checkout\Model;
 
 use Instant\Checkout\Helper\InstantHelper;
+use Instant\Checkout\Helper\InstantPayHelper;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -85,6 +86,11 @@ class PaymentMethod extends AbstractMethod
     protected $instantHelper;
 
     /**
+     * @var InstantPayHelper
+     */
+    protected $instantPayHelper;
+
+    /**
      * @var DoRequest
      */
     protected $doRequest;
@@ -114,12 +120,15 @@ class PaymentMethod extends AbstractMethod
         PaymentLogger $logger,
         DoRequest $request,
         InstantHelper $instantHelper,
+        InstantPayHelper $instantPayHelper,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->doRequest = $request;
         $this->instantHelper = $instantHelper;
+        $this->instantPayHelper = $instantPayHelper;
+
         parent::__construct(
             $context,
             $registry,
@@ -225,5 +234,10 @@ class PaymentMethod extends AbstractMethod
         $payment = $this->getInfoInstance();
         $this->setPaymentFormUrl($payment);
         $stateObject->setIsNotified(false);
+    }
+
+    public function getTitle()
+    {
+        return $this->instantPayHelper->getConfigData("title");
     }
 }

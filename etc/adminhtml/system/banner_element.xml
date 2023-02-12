@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+  <group id="banner_element" translate="label" type="text" sortOrder="5" showInDefault="1"
+    showInWebsite="1"
+    showInStore="1">
+    <label>Banner Element settings</label>
+    <comment>
+      &lt;p&gt;For additional technical support contact &lt;a href="mailto:hello@instant.one"
+      target="_blank" rel="noopener noreferrer"&gt;hello@instant.com&lt;/a&gt;.&lt;/p&gt;</comment>
+    <field
+      id="active" translate="label comment" sortOrder="1" type="select"
+      showInDefault="1" showInWebsite="1" showInStore="0">
+      <label>Enable</label>
+      <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+    </field>
+    <field
+      id="stripe_mode" translate="label" type="select" sortOrder="30" showInDefault="1"
+      showInWebsite="1" showInStore="1">
+      <label>Light/dark mode</label>
+      <comment><![CDATA[Defaults to dark]]></comment>
+      <source_model>StripeIntegration\Payments\Model\Adminhtml\Source\Mode</source_model>
+      <config_path>payment/stripe_payments_basic/stripe_mode</config_path>
+    </field>
+    <field
+      id="title" translate="label" type="text" sortOrder="20" showInDefault="1"
+      showInWebsite="1" showInStore="1">
+      <label>Title</label>
+      <comment><![CDATA[Selector of HTML element where the Instant Banner Element should be inserted]]></comment>
+      <config_path>payment/stripe_payments/title</config_path>
+    </field>
+    <field id="appId"
+      translate="label" type="text" sortOrder="20" showInDefault="1"
+      showInWebsite="1" showInStore="1">
+      <label>App ID</label>
+      <comment><![CDATA[Prepend or append Instant Banner Element to HTML element specified above]]></comment>
+      <config_path>instant/general/appId</config_path>
+    </field>
+  </group>
+</include>
