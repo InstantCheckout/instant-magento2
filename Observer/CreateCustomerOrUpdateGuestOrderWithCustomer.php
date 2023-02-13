@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Customer\Api\AccountManagementInterface;
+use Magento\Customer\Model\AccountManagement;
 use Magento\Sales\Api\OrderCustomerManagementInterface;
 
 /**
@@ -59,6 +60,16 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
      * @var OrderStatusHistoryRepositoryInterface
      */
     protected $orderStatusRepository;
+
+    /**
+     * @var AccountManagementInterface
+     */
+    protected $customerAccountManagement;
+
+    /**
+     * @var OrderCustomerManagementInterface
+     */
+    protected $orderCustomerService;
 
     /**
      * CreateCustomerOrUpdateGuestOrderWithCustomer constructor.
@@ -177,6 +188,8 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                         $this->logInfo($order, "Customer with email: " . $order->getCustomerEmail() . " does not exist.");
                         $this->addCommentToOrder($order, sprintf('Creating account for customer with email: ' . $order->getCustomerEmail()));
                         $customer = $this->orderCustomerService->create($orderId);
+                        $this->customerAccountManagement->initiatePasswordReset($customer->getEmail(), AccountManagement::EMAIL_RESET);
+                        $this->addCommentToOrder($order, sprintf('New account created. Password reset email sent to new account email.'));
                         $this->logInfo($order, "New customer account created.");
                     }
 
