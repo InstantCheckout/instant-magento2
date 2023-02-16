@@ -1,8 +1,9 @@
 define([
     'jquery',
     'underscore',
-    'Instant_Checkout/js/ic-helper'
-], function ($, _) {
+    'Instant_Checkout/js/ic-helper',
+    'Magento_Customer/js/customer-data'
+], function ($, _, icHelper, customerData) {
     "use strict";
 
     const pdpBtnSelector = "#ic-pdp-btn";
@@ -25,6 +26,8 @@ define([
     }).observe(document.querySelector('#product-addtocart-button'), {
         attributes: true
     });
+
+    let shouldCheckout = false;
 
     return function (config, element) {
         $(pdpBtnContainerSelector).css('display', 'flex');
@@ -93,7 +96,26 @@ define([
         }
 
         $(element).click(function () {
-            window.InstantM2.handlePdpBtnClicked(config.sku);
+            shouldCheckout = true;
+            let cartCount = customerData.get('cart')().summary_count;
+
+            if ($(element).attr('type') === 'simple' || $(element).attr('type') === 'configurable') {
+                window.InstantM2.handlePdpBtnClicked(config.sku);
+                return;
+            }
+
+            var cart = customerData.get('cart');
+            cart.subscribe(function () {
+                var newCount = customerData.get('cart')().summary_count;
+                if (newCount !== cartCount && shouldCheckout) {
+                    shouldCheckout = false;
+                    cartCount = cart().summary_count;
+                    window.InstantJS.checkoutCart(window.Instant.cartId, 'pdp')
+                    console.log('Number of items in cart is now: ' + count);
+                }
+            });
+
+            jQuery('.action.primary.tocart').click();
         });
     }
 });
