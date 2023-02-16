@@ -81,6 +81,72 @@
                     <comment>Defaults to yes.</comment>
                 </field>
             </group>
+            <group id="stb_visual_customisation" translate="label" type="text" sortOrder="10"
+            showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Swipe To Buy Visual Customisation</label>
+            <field id="stb_enabled" translate="label" type="select" sortOrder="90"
+                showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Enable Swipe to Buy on PDP</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <comment>Defaults to no.</comment>
+            </field>
+            <field id="stb_height" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy height</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <comment>e.g. 100px or 10%. Default is 50px.</comment>
+            </field>
+            <field id="stb_border_radius" translate="label" type="text" sortOrder="90"
+                showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy border radius</label>
+                <comment>e.g. 5px or 5%. Default is 3px.</comment>
+            </field>
+            <field id="stb_bottom_layer_border_colour" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy bottom layer border colour</label>
+                <comment>e.g. grey or #f05c63. Default is #4F8D00</comment>
+            </field>
+            <field id="stb_bottom_layer_background_colour" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy bottom layer background colour</label>
+                <comment>e.g. grey or #f05c63. Default is #EDFFC7</comment>
+            </field>
+            <field id="stb_top_layer_background_colour" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy top layer background colour</label>
+                <comment>e.g. grey or #f05c63. Default is #373434</comment>
+            </field>
+            <field id="stb_top_layer_text_colour" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy top layer text colour</label>
+                <comment>e.g. grey or #f05c63. Default is white</comment>
+            </field>
+            <field id="stb_bottom_layer_text_colour" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy bottom layer text colour</label>
+                <comment>e.g. grey or #f05c63. Default is #6b6b6b</comment>
+            </field>
+            <field id="stb_thumb_background_colour" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy drag thumb background colour</label>
+                <comment>e.g. grey or #f05c63. Default is #6b6b6b</comment>
+            </field>
+            <field id="stb_font_family" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy font family</label>
+                <comment>e.g. "Times New Roman". Default is "Open Sans".</comment>
+            </field>
+            <field id="stb_top_layer_font_size" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy top layer font size</label>
+                <comment>e.g. 10px. Default is 18px</comment>
+            </field>
+            <field id="stb_bottom_layer_font_size" translate="label" type="text"
+                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Set Swipe to Buy bottom layer font size</label>
+                <comment>e.g. 10px. Default is 18px</comment>
+            </field>
+            </group>
             <group id="pdpcustomisation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>PDP Button Customisation</label>
                 <field id="should_resize_pdp_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">

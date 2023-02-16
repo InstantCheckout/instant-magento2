@@ -47,6 +47,19 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const PDP_BTN_REPOSITION_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_div';
     const PDP_BTN_REPOSITION_WITHIN_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_within_div';
     const PDP_SHOULD_POSITION_PDP_BELOW_ATC = 'instant/pdpcustomisation/should_position_pdp_below_atc';
+    
+    const STB_ENABLED = 'instant/stb_visual_customisation/stb_enabled';
+    const STB_HEIGHT = 'instant/stb_visual_customisation/stb_height';
+    const STB_BORDER_RADIUS = 'instant/stb_visual_customisation/stb_border_radius';
+    const STB_BOTTOM_LAYER_BORDER_COLOUR = 'instant/stb_visual_customisation/stb_bottom_layer_border_colour';
+    const STB_BOTTOM_LAYER_BACKGROUND_COLOUR = 'instant/stb_visual_customisation/stb_bottom_layer_background_colour';
+    const STB_TOP_LAYER_BACKGROUND_COLOUR = 'instant/stb_visual_customisation/stb_top_layer_background_colour';
+    const STB_TOP_LAYER_TEXT_COLOUR = 'instant/stb_visual_customisation/stb_top_layer_text_colour';
+    const STB_BOTTOM_LAYER_TEXT_COLOUR = 'instant/stb_visual_customisation/stb_bottom_layer_text_colour';
+    const STB_THUMB_BACKGROUND_COLOUR = 'instant/stb_visual_customisation/stb_thumb_background_colour';
+    const STB_FONT_FAMILY = 'instant/stb_visual_customisation/stb_font_family';
+    const STB_TOP_LAYER_FONT_SIZE = 'instant/stb_visual_customisation/stb_top_layer_font_size';
+    CONST STB_BOTTOM_LAYER_FONT_SIZE = 'instant/stb_visual_customisation/stb_bottom_layer_font_size';
 
     const MC_BTN_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_custom_style';
     const MC_BTN_CONTAINER_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_container_custom_style';
@@ -279,6 +292,79 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $pdpBtnRepositionWithinDiv = $this->getConfig(self::PDP_BTN_REPOSITION_WITHIN_DIV);
         return $pdpBtnRepositionWithinDiv;
     }
+    
+    public function getStbEnabled()
+    {
+        $stbEnabled = $this->getConfig(self::STB_ENABLED);
+        return $stbEnabled;
+    }
+    
+    public function getStbHeight()
+    {
+        $stbHeight = $this->getConfig(self::STB_HEIGHT);
+        return $stbHeight;
+    }
+    
+    public function getStbBorderRadius()
+    {
+        $stbBorderRadius = $this->getConfig(self::STB_BORDER_RADIUS);
+        return $stbBorderRadius;
+    }
+    
+    public function getStbBottomLayerBorderColour()
+    {
+        $stbBottomLayerBorderColour = $this->getConfig(self::STB_BOTTOM_LAYER_BORDER_COLOUR);
+        return $stbBottomLayerBorderColour;
+    }
+    
+    public function getStbBottomLayerBackgroundColour()
+    {
+        $stbBottomLayerBackgroundColour = $this->getConfig(self::STB_BOTTOM_LAYER_BACKGROUND_COLOUR);
+        return $stbBottomLayerBackgroundColour;
+    }
+
+    public function getStbTopLayerBackgroundColour()
+    {
+        $stbTopLayerBackgroundColour = $this->getConfig(self::STB_TOP_LAYER_BACKGROUND_COLOUR);
+        return $stbTopLayerBackgroundColour;
+    }
+    
+    public function getStbTopLayerTextColour()
+    {
+        $stbTopLayerTextColour = $this->getConfig(self::STB_TOP_LAYER_TEXT_COLOUR);
+        return $stbTopLayerTextColour;
+    }
+    
+    public function getStbBottomLayerTextColour()
+    {
+        $stbBottomLayerTextColour = $this->getConfig(self::STB_BOTTOM_LAYER_TEXT_COLOUR);
+        return $stbBottomLayerTextColour;
+    }
+    
+    public function getStbThumbBackgroundColour()
+    {
+        $stbThumbBackgroundColour = $this->getConfig(self::STB_THUMB_BACKGROUND_COLOUR);
+        return $stbThumbBackgroundColour;
+    }
+    
+    public function getStbFontFamily()
+    {
+        $stbFontFamily = $this->getConfig(self::STB_FONT_FAMILY);
+        return $stbFontFamily;
+    }
+    
+    public function getStbTopLayerFontSize()
+    {
+        $stbTopLayerFontSize = $this->getConfig(self::STB_TOP_LAYER_FONT_SIZE);
+        return $stbTopLayerFontSize;
+    }
+    
+    public function getStbBottomLayerFontSize()
+    {
+        $stbBottomLayerFontSize = $this->getConfig(self::STB_BOTTOM_LAYER_FONT_SIZE);
+        return $stbBottomLayerFontSize;
+    }
+
 
     public function getMcBtnCustomStyle()
     {
