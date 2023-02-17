@@ -201,6 +201,22 @@ class GetConfig extends Action
         $data['currentCurrencyCode'] = $this->instantHelper->getCurrentCurrencyCode();
         $data['baseCurrencyCode'] = $this->instantHelper->getBaseCurrencyCode();
 
+        $data['swipeToBuy'] = [
+            'enabled' => $this->instantHelper->getStbEnabled(),
+            'height' => $this->instantHelper->getStbHeight(),
+            'borderRadius' => $this->instantHelper->getStbBorderRadius(),
+            'bottomLayerBorderColour' =>  $this->instantHelper->getStbBottomLayerBorderColour(),
+            'bottomLayerBackgroundColour' => $this->instantHelper->getStbBottomLayerBackgroundColour(),
+            'topLayerBackgroundColour' => $this->instantHelper->getStbTopLayerBackgroundColour(),
+            'topLayerTextColour' => $this->instantHelper->getStbTopLayerTextColour(),
+            'bottomLayerTextColour' => $this->instantHelper->getStbBottomLayerTextColour(),
+            'thumbBackgroundColour' => $this->instantHelper->getStbThumbBackgroundColour(),
+            'fontFamily' => $this->instantHelper->getStbFontFamily(),
+            'topLayerFontSize' => $this->instantHelper->getStbTopLayerFontSize(),
+            'bottomLayerFontSize' =>  $this->instantHelper->getStbBottomLayerFontSize(),
+            'fontWeight' => $this->instantHelper->getStbFontWeight(),
+        ];
+        
         $data['mcBtnCustomStyle'] = $this->instantHelper->getMcBtnCustomStyle();
         $data['mcBtnContainerCustomStyle'] = $this->instantHelper->getMcBtnContainerCustomStyle();
         $data['mcBtnHideOrStrike'] = $this->instantHelper->getMcBtnShouldHideOrStrike();
