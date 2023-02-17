@@ -47,7 +47,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const PDP_BTN_REPOSITION_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_div';
     const PDP_BTN_REPOSITION_WITHIN_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_within_div';
     const PDP_SHOULD_POSITION_PDP_BELOW_ATC = 'instant/pdpcustomisation/should_position_pdp_below_atc';
-    
+
     const STB_ENABLED = 'instant/stb_visual_customisation/stb_enabled';
     const STB_HEIGHT = 'instant/stb_visual_customisation/stb_height';
     const STB_BORDER_RADIUS = 'instant/stb_visual_customisation/stb_border_radius';
@@ -59,7 +59,8 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const STB_THUMB_BACKGROUND_COLOUR = 'instant/stb_visual_customisation/stb_thumb_background_colour';
     const STB_FONT_FAMILY = 'instant/stb_visual_customisation/stb_font_family';
     const STB_TOP_LAYER_FONT_SIZE = 'instant/stb_visual_customisation/stb_top_layer_font_size';
-    CONST STB_BOTTOM_LAYER_FONT_SIZE = 'instant/stb_visual_customisation/stb_bottom_layer_font_size';
+    const STB_BOTTOM_LAYER_FONT_SIZE = 'instant/stb_visual_customisation/stb_bottom_layer_font_size';
+    const STB_FONT_WEIGHT = 'instant/stb_visual_customisation/stb_font_weight';
 
     const MC_BTN_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_custom_style';
     const MC_BTN_CONTAINER_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_container_custom_style';
@@ -292,11 +293,12 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $pdpBtnRepositionWithinDiv = $this->getConfig(self::PDP_BTN_REPOSITION_WITHIN_DIV);
         return $pdpBtnRepositionWithinDiv;
     }
-    
+
+
     public function getStbEnabled()
     {
         $stbEnabled = $this->getConfig(self::STB_ENABLED);
-        return $stbEnabled;
+        return $stbEnabled === '1';
     }
     
     public function getStbHeight()
@@ -353,6 +355,12 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $stbFontFamily;
     }
     
+    public function getStbFontWeight()
+    {
+        $stbFontWeight = $this->getConfig(self::STB_FONT_WEIGHT);
+        return $stbFontWeight;
+    }
+    
     public function getStbTopLayerFontSize()
     {
         $stbTopLayerFontSize = $this->getConfig(self::STB_TOP_LAYER_FONT_SIZE);
@@ -364,7 +372,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $stbBottomLayerFontSize = $this->getConfig(self::STB_BOTTOM_LAYER_FONT_SIZE);
         return $stbBottomLayerFontSize;
     }
-
+    
 
     public function getMcBtnCustomStyle()
     {
