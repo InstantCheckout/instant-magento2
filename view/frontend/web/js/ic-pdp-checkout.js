@@ -25,6 +25,32 @@ define([
     }).observe(document.querySelector('#product-addtocart-button'), {
         attributes: true
     });
+    
+    const loadSwipeToBuy = setInterval(() => {
+        const targetElement = document.querySelector('#ic-pdp-btn')
+        if (targetElement && window.InstantJS && window.Instant && window.Instant.swipeToBuy.enabled) {
+            try {
+                window.InstantJS.createSwipeToBuyElement(targetElement, {
+                    enabled: Instant.swipeToBuy.enabled,
+                    height: Instant.swipeToBuy.height,
+                    topLayerTextColour: Instant.swipeToBuy.topLayerTextColour,
+                    topLayerBackgroundColour: Instant.swipeToBuy.topLayerBackgroundColour,
+                    borderRadius: Instant.swipeToBuy.borderRadius,
+                    bottomLayerBackgroundColour: Instant.swipeToBuy.bottomLayerBackgroundColour,
+                    bottomLayerBorderColour: Instant.swipeToBuy.bottomLayerBorderColour,
+                    bottomLayerTextColour: Instant.swipeToBuy.bottomLayerTextColour,
+                    thumbBackgroundColour: Instant.swipeToBuy.thumbBackgroundColour || '#6b6b6b',
+                    bottomLayerFontSize: Instant.swipeToBuy.bottomLayerFontSize,
+                    topLayerFontSize: Instant.swipeToBuy.topLayerFontSize,
+                    fontFamily: Instant.swipeToBuy.fontFamily,
+                    fontWeight: Instant.swipeToBuy.fontWeight,
+                });
+                clearInterval(loadSwipeToBuy);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    }, 10);
 
     return function (config, element) {
         $(pdpBtnContainerSelector).css('display', 'flex');

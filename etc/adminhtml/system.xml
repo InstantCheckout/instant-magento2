@@ -1,243 +1,310 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <tab id="instant" translate="label" sortOrder="110" class="instant-tab">
             <label>Instant Checkout</label>
         </tab>
-        <section id="instant" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="instant" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1"
+            showInStore="1">
             <class>separator-top</class>
             <label>Instant</label>
             <tab>instant</tab>
             <resource>Instant_Checkout::config</resource>
-            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1"
+                showInWebsite="1" showInStore="1">
                 <label>Application Config</label>
-                <field id="app_id" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="app_id" translate="label" type="text" sortOrder="90" showInDefault="1"
+                    showInWebsite="1" showInStore="1">
                     <label>Instant App ID</label>
                     <comment>Enter the Application ID provided by Instant</comment>
                 </field>
-                <field id="api_access_token" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_access_token" translate="label" type="text" sortOrder="100"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Instant Access Token</label>
-                    <comment>Enter the Access Token provided by Instant (This is used to authenticate your API calls to Instant. IMPORTANT: This is private, do not make publicly available)</comment>
+                    <comment>Enter the Access Token provided by Instant (This is used to
+                        authenticate your API calls to Instant. IMPORTANT: This is private, do not
+                        make publicly available)</comment>
                 </field>
-                <field id="enable_sandbox" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enable_sandbox" translate="label" type="select" sortOrder="110"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Is in Sandbox/Staging Environment</label>
-                    <comment>Defaults to Yes. CRITICAL: Set to No if in LIVE/PRODUCTION environment. Set to Yes if this site is a SANDBOX/STAGING environment. </comment>
+                    <comment>Defaults to Yes. CRITICAL: Set to No if in LIVE/PRODUCTION environment.
+                        Set to Yes if this site is a SANDBOX/STAGING environment. </comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="activate_button" translate="label comment" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="activate_button" translate="label comment" sortOrder="120"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <button_label>Activate</button_label>
                     <button_url>adminhtml/instant/activation/send</button_url>
                     <frontend_model>Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send</frontend_model>
-                    <comment>Important: Ensure config is correct and saved before activating Instant. Clicking this
-                 will send an access token to Instant, allowing Instant to make secure API calls to your store.
-             </comment>
+                    <comment>Important: Ensure config is correct and saved before activating
+                        Instant. Clicking this
+                        will send an access token to Instant, allowing Instant to make secure API
+                        calls to your store.
+                    </comment>
                 </field>
-                <field id="disabled_for_skus_containing" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Disable Instant for products where the SKU contains the following specified phrases (provide a comma delimited list)</label>
-                    <comment>Defaults to empty. Enter a comma delimited list. If a product's SKU contains any of phrases in this comma delimited list, then Instant will be disabled. (e.g. ABC,DEF will ensure Instant is disabled for all products where the SKU contains either ABC or DEF.) To enable Instant for all products, leave empty.</comment>
+                <field id="disabled_for_skus_containing" translate="label" type="text"
+                    sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable Instant for products where the SKU contains the following
+                        specified phrases (provide a comma delimited list)</label>
+                    <comment>Defaults to empty. Enter a comma delimited list. If a product's SKU
+                        contains any of phrases in this comma delimited list, then Instant will be
+                        disabled. (e.g. ABC,DEF will ensure Instant is disabled for all products
+                        where the SKU contains either ABC or DEF.) To enable Instant for all
+                        products, leave empty.</comment>
                 </field>
-                <field id="disabled_for_customer_group_ids" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Disable Instant for specific customer groups (provide a comma delimited list of IDs)</label>
-                    <comment>Defaults to empty. Enter a comma delimited list. Any customer group contained in this comma delimited list, will have Instant disabled (e.g. 1,2 will ensure Instant is disabled for all customers in groups with ID 1 or 2.)</comment>
+                <field id="disabled_for_customer_group_ids" translate="label" type="text"
+                    sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable Instant for specific customer groups (provide a comma delimited
+                        list of IDs)</label>
+                    <comment>Defaults to empty. Enter a comma delimited list. Any customer group
+                        contained in this comma delimited list, will have Instant disabled (e.g. 1,2
+                        will ensure Instant is disabled for all customers in groups with ID 1 or 2.)</comment>
                 </field>
-                <field id="enable_catalog" translate="label" type="select" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enable_catalog" translate="label" type="select" sortOrder="140"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Product Catalog Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="enable_minicart" translate="label" type="select" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enable_minicart" translate="label" type="select" sortOrder="150"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Minicart</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="enable_checkout_summary" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enable_checkout_summary" translate="label" type="select" sortOrder="160"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Cart Summary Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="enable_checkout_page" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enable_checkout_page" translate="label" type="select" sortOrder="160"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable on Checkout Page</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="retry_failures_cron" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="retry_failures_cron" translate="label" type="text" sortOrder="160"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Retry failures cron schedule</label>
                     <comment>Schedule for resending failed requests - default is */5 * * * *</comment>
                 </field>
-                <field id="retry_failures_count" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="retry_failures_count" translate="label" type="text" sortOrder="160"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Retry failure count</label>
                     <comment>Number of attempts to retry failed requests to Instant. Default is 3</comment>
                 </field>
             </group>
-            <group id="visual" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="visual" translate="label" type="text" sortOrder="10" showInDefault="1"
+                showInWebsite="1" showInStore="1">
                 <label>Visual Config</label>
-                <field id="mc_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="mc_btn_width" translate="label" type="text" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Width of minicart button</label>
                     <comment>Defaults to 90%. (%) Low values may cause visual glitching.</comment>
                 </field>
-                <field id="cpage_btn_width" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cpage_btn_width" translate="label" type="text" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Width of checkout page button</label>
                     <comment>Defaults to 60%. (%) Low values may cause visual glitching.</comment>
                 </field>
-                <field id="should_resize_cart_index_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="should_resize_cart_index_btn" translate="label" type="select"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Should resize Instant cart summary button to primary proceed button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to yes.</comment>
                 </field>
             </group>
-            <group id="stb_visual_customisation" translate="label" type="text" sortOrder="10"
-            showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Swipe To Buy Visual Customisation</label>
-            <field id="stb_enabled" translate="label" type="select" sortOrder="90"
+            <group id="pdpcustomisation" translate="label" type="text" sortOrder="10"
                 showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Enable Swipe to Buy on PDP</label>
-                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                <comment>Defaults to no.</comment>
-            </field>
-            <field id="stb_height" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy height</label>
-                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                <comment>e.g. 100px or 10%. Default is 50px.</comment>
-            </field>
-            <field id="stb_border_radius" translate="label" type="text" sortOrder="90"
-                showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy border radius</label>
-                <comment>e.g. 5px or 5%. Default is 3px.</comment>
-            </field>
-            <field id="stb_bottom_layer_border_colour" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy bottom layer border colour</label>
-                <comment>e.g. grey or #f05c63. Default is #4F8D00</comment>
-            </field>
-            <field id="stb_bottom_layer_background_colour" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy bottom layer background colour</label>
-                <comment>e.g. grey or #f05c63. Default is #EDFFC7</comment>
-            </field>
-            <field id="stb_top_layer_background_colour" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy top layer background colour</label>
-                <comment>e.g. grey or #f05c63. Default is #373434</comment>
-            </field>
-            <field id="stb_top_layer_text_colour" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy top layer text colour</label>
-                <comment>e.g. grey or #f05c63. Default is white</comment>
-            </field>
-            <field id="stb_bottom_layer_text_colour" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy bottom layer text colour</label>
-                <comment>e.g. grey or #f05c63. Default is #6b6b6b</comment>
-            </field>
-            <field id="stb_thumb_background_colour" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy drag thumb background colour</label>
-                <comment>e.g. grey or #f05c63. Default is #6b6b6b</comment>
-            </field>
-            <field id="stb_font_family" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy font family</label>
-                <comment>e.g. "Times New Roman". Default is "Open Sans".</comment>
-            </field>
-            <field id="stb_top_layer_font_size" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy top layer font size</label>
-                <comment>e.g. 10px. Default is 18px</comment>
-            </field>
-            <field id="stb_bottom_layer_font_size" translate="label" type="text"
-                sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Set Swipe to Buy bottom layer font size</label>
-                <comment>e.g. 10px. Default is 18px</comment>
-            </field>
-            </group>
-            <group id="pdpcustomisation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>PDP Button Customisation</label>
-                <field id="should_resize_pdp_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="should_resize_pdp_btn" translate="label" type="select" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Should resize Instant PDP button to Add to Cart button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to yes.</comment>
                 </field>
-                <field id="should_position_pdp_below_atc" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="should_position_pdp_below_atc" translate="label" type="select"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Should position Instant PDP button below Add to Cart button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to no.</comment>
                 </field>
-                <field id="pdp_btn_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="pdp_btn_custom_style" translate="label" type="text" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for PDP button</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
                 </field>
-                <field id="pdp_btn_container_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="pdp_btn_container_custom_style" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for PDP button container</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
                 </field>
-                <field id="pdp_btn_reposition_div" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="pdp_btn_reposition_div" translate="label" type="text" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Setting for repositioning the PDP button before or after a div</label>
-                    <comment>Provide in the format {AFTER or BEFORE}|{element selector} e.g. AFTER|.product-social-links will reposition the PDP button after the HTML element matching the selector .product-social-links"</comment>
+                    <comment>Provide in the format {AFTER or BEFORE}|{element selector} e.g.
+                        AFTER|.product-social-links will reposition the PDP button after the HTML
+                        element matching the selector .product-social-links"</comment>
                 </field>
-                <field id="pdp_btn_reposition_within_div" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Setting for repositioning the PDP button as first or last element within a parent div</label>
-                    <comment>Provide in the format {PREPEND or APPEND}|{element selector} e.g. PREPEND|.product-info-price will reposition the PDP button as the first element within the div matching the selector .product-info-price"</comment>
+                <field id="pdp_btn_reposition_within_div" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Setting for repositioning the PDP button as first or last element within
+                        a parent div</label>
+                    <comment>Provide in the format {PREPEND or APPEND}|{element selector} e.g.
+                        PREPEND|.product-info-price will reposition the PDP button as the first
+                        element within the div matching the selector .product-info-price"</comment>
                 </field>
-                <field id="pdp_reposition_or_strike_above_btn" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="pdp_reposition_or_strike_above_btn" translate="label" type="select"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Move OR strike to above the Instant PDP button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Defaults to no. By default, the OR strike is below the Instant PDP button. Setting this to yes will reposition it above the PDP button.</comment>
+                    <comment>Defaults to no. By default, the OR strike is below the Instant PDP
+                        button. Setting this to yes will reposition it above the PDP button.</comment>
                 </field>
             </group>
-            <group id="mccustomisation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="stb_visual_customisation" translate="label" type="text" sortOrder="10"
+                showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Swipe To Buy Visual Customisation</label>
+                <field id="stb_enabled" translate="label" type="select" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Swipe to Buy on PDP</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to no.</comment>
+                </field>
+                <field id="stb_height" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy height</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>e.g. 100px or 10%. Default is 50px.</comment>
+                </field>
+                <field id="stb_border_radius" translate="label" type="text" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy border radius</label>
+                    <comment>e.g. 5px or 5%. Default is 3px.</comment>
+                </field>
+                <field id="stb_bottom_layer_border_colour" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy bottom layer border colour</label>
+                    <comment>e.g. grey or #f05c63. Default is #4F8D00</comment>
+                </field>
+                <field id="stb_bottom_layer_background_colour" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy bottom layer background colour</label>
+                    <comment>e.g. grey or #f05c63. Default is #EDFFC7</comment>
+                </field>
+                <field id="stb_top_layer_background_colour" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy top layer background colour</label>
+                    <comment>e.g. grey or #f05c63. Default is #373434</comment>
+                </field>
+                <field id="stb_top_layer_text_colour" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy top layer text colour</label>
+                    <comment>e.g. grey or #f05c63. Default is white</comment>
+                </field>
+                <field id="stb_bottom_layer_text_colour" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy bottom layer text colour</label>
+                    <comment>e.g. grey or #f05c63. Default is #6b6b6b</comment>
+                </field>
+                <field id="stb_thumb_background_colour" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy drag thumb background colour</label>
+                    <comment>e.g. grey or #f05c63. Default is #6b6b6b</comment>
+                </field>
+                <field id="stb_font_family" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy font family</label>
+                    <comment>e.g. "Times New Roman". Default is "Open Sans".</comment>
+                </field>
+                <field id="stb_top_layer_font_size" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy top layer font size</label>
+                    <comment>e.g. 10px. Default is 18px</comment>
+                </field>
+                <field id="stb_bottom_layer_font_size" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set Swipe to Buy bottom layer font size</label>
+                    <comment>e.g. 10px. Default is 18px</comment>
+                </field>
+                <field id="stb_font_weight" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Set font weight</label>
+                    <comment>e.g. 400. Default is 600.</comment>
+                </field>
+            </group>
+            <group id="mccustomisation" translate="label" type="text" sortOrder="10"
+                showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Minicart Button Customisation</label>
-                <field id="mc_btn_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="mc_btn_custom_style" translate="label" type="text" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for minicart button</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
                 </field>
-                <field id="mc_btn_container_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="mc_btn_container_custom_style" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for outer minicart button container</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
                 </field>
-                <field id="mc_btn_hide_or_strike" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="mc_btn_hide_or_strike" translate="label" type="select" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Hide OR strike for minicart button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to no.</comment>
                 </field>
             </group>
-            <group id="cindexcustomisation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="cindexcustomisation" translate="label" type="text" sortOrder="10"
+                showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Cart Index Button Customisation</label>
-                <field id="cindex_btn_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cindex_btn_custom_style" translate="label" type="text" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for cart index button</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
                 </field>
-                <field id="cindex_btn_container_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cindex_btn_container_custom_style" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for outer cart index button container</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
                 </field>
-                <field id="cindex_btn_hide_or_strike" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cindex_btn_hide_or_strike" translate="label" type="select" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Hide OR strike for cart index button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to no.</comment>
                 </field>
             </group>
-            <group id="cpagecustomisation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="cpagecustomisation" translate="label" type="text" sortOrder="10"
+                showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Checkout Page Button Customisation</label>
-                <field id="cpage_btn_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cpage_btn_custom_style" translate="label" type="text" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for checkout page</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
                 </field>
-                <field id="cpage_btn_container_custom_style" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cpage_btn_container_custom_style" translate="label" type="text"
+                    sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Custom style for outer checkout page container</label>
                     <comment>e.g. margin-top:10px;margin-bottom:10px</comment>
                 </field>
-                <field id="cpage_btn_hide_or_strike" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="cpage_btn_hide_or_strike" translate="label" type="select" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Hide OR strike for checkout page button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to no.</comment>
                 </field>
             </group>
-            <group id="google" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="google" translate="label" type="text" sortOrder="10" showInDefault="1"
+                showInWebsite="1" showInStore="1">
                 <label>Google API</label>
-                <field id="ga_version" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="ga_version" translate="label" type="text" sortOrder="90"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Google Analytics Version</label>
                     <comment>3 for UA, 4 for GA4</comment>
                 </field>
-                <field id="ga_id" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="ga_id" translate="label" type="text" sortOrder="90" showInDefault="1"
+                    showInWebsite="1" showInStore="1">
                     <label>Measurement ID or Tracking ID</label>
-                    <comment>If GA3/UA, then tracking ID e.g. UA-000000-2 should be specified. If GA4, measurement ID e.g. G-XXXXXXX should be specified.</comment>
+                    <comment>If GA3/UA, then tracking ID e.g. UA-000000-2 should be specified. If
+                        GA4, measurement ID e.g. G-XXXXXXX should be specified.</comment>
                 </field>
             </group>
         </section>

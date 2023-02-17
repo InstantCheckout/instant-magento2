@@ -201,19 +201,22 @@ class GetConfig extends Action
         $data['currentCurrencyCode'] = $this->instantHelper->getCurrentCurrencyCode();
         $data['baseCurrencyCode'] = $this->instantHelper->getBaseCurrencyCode();
 
-        $data['stbEnabled'] = $this->instantHelper->getStbEnabled();
-        $data['stbHeight'] = $this->instantHelper->getStbHeight();
-        $data['stbBorderRadius'] = $this->instantHelper->getStbBorderRadius();
-        $data['stbBottomLayerBorderColour'] = $this->instantHelper->getStbBottomLayerBorderColour();
-        $data['stbBottomLayerBackgroundColour'] = $this->instantHelper->getStbBottomLayerBackgroundColour();
-        $data['stbTopLayerBackgroundColour'] = $this->instantHelper->getStbTopLayerBackgroundColour();
-        $data['stbTopLayerTextColour'] = $this->instantHelper->getStbTopLayerTextColour();
-        $data['stbBottomLayerTextColour'] = $this->instantHelper->getStbBottomLayerTextColour();
-        $data['stbThumbBackgroundColour'] = $this->instantHelper->getStbThumbBackgroundColour();
-        $data['stbFontFamily'] = $this->instantHelper->getStbFontFamily();
-        $data['stbTopLayerFontSize'] = $this->instantHelper->getStbTopLayerFontSize();
-        $data['stbBottomLayerFontSize'] = $this->instantHelper->getStbBottomLayerFontSize();
-
+        $data['swipeToBuy'] = [
+            'enabled' => $this->instantHelper->getStbEnabled(),
+            'height' => $this->instantHelper->getStbHeight(),
+            'borderRadius' => $this->instantHelper->getStbBorderRadius(),
+            'bottomLayerBorderColour' =>  $this->instantHelper->getStbBottomLayerBorderColour(),
+            'bottomLayerBackgroundColour' => $this->instantHelper->getStbBottomLayerBackgroundColour(),
+            'topLayerBackgroundColour' => $this->instantHelper->getStbTopLayerBackgroundColour(),
+            'topLayerTextColour' => $this->instantHelper->getStbTopLayerTextColour(),
+            'bottomLayerTextColour' => $this->instantHelper->getStbBottomLayerTextColour(),
+            'thumbBackgroundColour' => $this->instantHelper->getStbThumbBackgroundColour(),
+            'fontFamily' => $this->instantHelper->getStbFontFamily(),
+            'topLayerFontSize' => $this->instantHelper->getStbTopLayerFontSize(),
+            'bottomLayerFontSize' =>  $this->instantHelper->getStbBottomLayerFontSize(),
+            'fontWeight' => $this->instantHelper->getStbFontWeight(),
+        ];
+        
         $data['mcBtnCustomStyle'] = $this->instantHelper->getMcBtnCustomStyle();
         $data['mcBtnContainerCustomStyle'] = $this->instantHelper->getMcBtnContainerCustomStyle();
         $data['mcBtnHideOrStrike'] = $this->instantHelper->getMcBtnShouldHideOrStrike();
