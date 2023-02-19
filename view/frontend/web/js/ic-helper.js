@@ -10,10 +10,10 @@ define([
         },
 
         getInstantPayParams: function () {
-            if (typeof window.checkoutConfig.payment.instantpay == "undefined")
+            if (typeof window.checkoutConfig.payment.instant == "undefined")
                 return null;
 
-            return window.checkoutConfig.payment.instantpay;
+            return window.checkoutConfig.payment.instant;
         },
 
         reloadInstantConfig: function (callback) {

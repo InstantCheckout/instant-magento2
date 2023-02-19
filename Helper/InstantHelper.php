@@ -284,6 +284,11 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->storeManager->getStore()->getId();
     }
 
+    public function getStoreCode()
+    {
+        return $this->storeManager->getStore()->getCode();
+    }
+
     public function getBaseCurrencyCode()
     {
         return $this->storeManager->getStore()->getBaseCurrencyCode();

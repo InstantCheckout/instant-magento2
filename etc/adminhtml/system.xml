@@ -3,7 +3,7 @@
     xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="instantpay" translate="label" sortOrder="2" showInDefault="1"
+            <group id="instant" translate="label" sortOrder="2" showInDefault="1"
                 showInWebsite="1" showInStore="1">
                 <comment>Accept payments, increase conversions and bring frictionless checkout to
                     your customers with Instant Pay.</comment>

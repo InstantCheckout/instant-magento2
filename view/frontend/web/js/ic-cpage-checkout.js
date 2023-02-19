@@ -38,8 +38,8 @@ define([
             const bannerElementLoad = setInterval(() => {
                 if (document.querySelector(bannerElementTargetElementSelector) && window.checkoutConfig) {
                     window.InstantJS.createInstantPayBanner(
-                        window.checkoutConfig && window.checkoutConfig.customerData && window.checkoutConfig.customerData.email || '',
                         bannerElementTargetElementSelector,
+                        window.checkoutConfig && window.checkoutConfig.customerData && window.checkoutConfig.customerData.email || '',
                         bannerElementShowAfterElement,
                         bannerElementDarkMode
                     );
