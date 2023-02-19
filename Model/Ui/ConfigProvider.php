@@ -3,6 +3,7 @@
 namespace Instant\Checkout\Model\Ui;
 
 use Instant\Checkout\Helper\InstantHelper;
+use Instant\Checkout\Helper\InstantPayHelper;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use StripeIntegration\Payments\Gateway\Http\Client\ClientMock;
@@ -26,6 +27,10 @@ class ConfigProvider implements ConfigProviderInterface
      */
     private $instantHelper;
     /**
+     * @var InstantPayHelper
+     */
+    private $instantPayHelper;
+    /**
      * @var StoreManagerInterface
      */
     protected $storeManager;
@@ -46,6 +51,7 @@ class ConfigProvider implements ConfigProviderInterface
         \StripeIntegration\Payments\Helper\InitParams $initParams,
         \StripeIntegration\Payments\Helper\PaymentMethod $paymentMethodHelper,
         InstantHelper $instantHelper,
+        InstantPayHelper $instantPayHelper,
         StoreManagerInterface $storeManager
     ) {
         $this->localeResolver = $localeResolver;
@@ -65,6 +71,7 @@ class ConfigProvider implements ConfigProviderInterface
         $this->paymentMethodHelper = $paymentMethodHelper;
         $this->instantHelper = $instantHelper;
         $this->storeManager = $storeManager;
+        $this->instantPayHelper = $instantPayHelper;
     }
 
     /**
@@ -81,7 +88,15 @@ class ConfigProvider implements ConfigProviderInterface
                 self::CODE => [
                     'merchantId' => $this->instantHelper->getInstantAppId(),
                     'storeCode' => $this->storeManager->getStore()->getCode(),
-                    'cartId' => $this->instantHelper->getSessionCartId()
+                    'cartId' => $this->instantHelper->getSessionCartId(),
+                    'verificationElement' => [
+                        'emailFieldSelector' => $this->instantPayHelper->getVerificationElementEmailFieldSelector(),
+                    ],
+                    'bannerElement' => [
+                        'targetElementSelector' => $this->instantPayHelper->getBannerElementTargetElementSelector(),
+                        'shouldAppendToElement' => $this->instantPayHelper->getBannerElementShouldAppendToElement(),
+                        'theme' => $this->instantPayHelper->getBannerElementTheme(),
+                    ]
                 ]
             ]
         ];

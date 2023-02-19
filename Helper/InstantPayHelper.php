@@ -69,6 +69,8 @@ class InstantPayHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const GOOGLE_ANALYTICS_VERSION = 'instant/google/ga_version';
     const GOOGLE_ANALYTICS_ID = 'instant/google/ga_id';
 
+    const INSTANT_PAY_VERIFICATION_ELEMENT_EMAIL_FIELD_SELECTOR = 'payment/instantpay/verificationElementEmailFieldSelector';
+
     /**
      * @var \Magento\Framework\SessionSessionManager
      */
@@ -148,326 +150,49 @@ class InstantPayHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return parent::__construct($context);
     }
 
-    public function getConfigData($field, $method = null, $storeId = null)
+    public function getConfig($section, $field)
     {
         if (empty($storeId))
             $storeId = $this->instantHelper->getStoreId();
 
-        $section = "";
-        if ($method)
-            $section = "_$method";
 
-        $data = $this->scopeConfig->getValue("payment/instant_pay$section/$field", ScopeInterface::SCOPE_STORE, $storeId);
+        $data = $this->scopeConfig->getValue("payment/instant_pay/$section" . "_" . $field, ScopeInterface::SCOPE_STORE, $storeId);
 
         return $data;
     }
 
-    /**
-     * Check table exists or not
-     *
-     * @return bool
-     */
-    public function doesInstantRequestLogTableExist()
+    public function getGeneralConfig($field)
     {
-        try {
-            $connection  = $this->resourceConnection->getConnection();
-            $tableName = $connection->getTableName(self::INSTANT_CHECKOUT_REQUESTLOG_TABLE);
-
-            $isTableExist = $connection->isTableExists($tableName);
-
-            return $isTableExist;
-        } catch (Exception $e) {
-            return false;
-        }
+        return $this->getConfig('general', $field);
     }
 
-    public function getConfig($config)
+    public function getVerificationElementConfig($field)
     {
-        return $this->scopeConfig->getValue(
-            $config,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        return $this->getConfig('verificationElement', $field);
     }
 
-    public function getSessionId()
+    public function getBannerElementConfig($field)
     {
-        return $this->sessionManager->getSessionId();
+        return $this->getConfig('bannerElement', $field);
     }
 
-    public function getRetryFailuresCount()
+    public function getVerificationElementEmailFieldSelector()
     {
-        $retryFailuresCount = $this->getConfig(self::RETRY_FAILURES_COUNT);
-        return $retryFailuresCount;
+        return $this->getVerificationElementConfig('emailFieldSelector');
     }
 
-    public function getInstantAppId()
+    public function getBannerElementTargetElementSelector()
     {
-        $instantAppId = $this->getConfig(self::INSTANT_APP_ID_PATH);
-        return $instantAppId;
+        return $this->getBannerElementConfig('targetElementSelector');
     }
 
-    public function getInstantApiAccessToken()
+    public function getBannerElementShouldAppendToElement()
     {
-        $instantAccessToken = $this->getConfig(self::ACCESS_TOKEN_PATH);
-        return $instantAccessToken;
+        return $this->getBannerElementConfig('shouldAppendToElement') === 'append';
     }
 
-    public function getInstantMinicartBtnEnabled()
+    public function getBannerElementTheme()
     {
-        $minicartBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_MINICART_BTN_PATH);
-        return $minicartBtnEnabled === "1";
-    }
-
-    public function getInstantBtnCheckoutPageEnabled()
-    {
-        $checkoutPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH);
-        return $checkoutPageBtnEnabled === "1";
-    }
-
-    public function getInstantBtnCheckoutSummaryEnabled()
-    {
-        $checkoutSummaryEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_SUMMARY);
-        return $checkoutSummaryEnabled === "1";
-    }
-
-    public function getInstantBtnCatalogPageEnabled()
-    {
-        $catalogPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CATALOG_PAGE_PATH);
-        return $catalogPageBtnEnabled === "1";
-    }
-
-    public function getSandboxEnabledConfig()
-    {
-        $sandboxEnabled = $this->getConfig(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
-        return $sandboxEnabled === "1";
-    }
-
-    public function getDisabledForSkusContaining()
-    {
-        $disableForSkusContaining = $this->getConfig(self::DISABLED_FOR_SKUS_CONTAINING);
-        return explode(',', $disableForSkusContaining ?? '');
-    }
-
-    public function getDisabledForCustomerGroup()
-    {
-        $disabledForCustomerGroupIdsConfig = $this->getConfig(self::DISABLED_FOR_CUSTOMER_GROUP_IDS);
-
-        $disabledCustomerGroupIds = explode(',', $disabledForCustomerGroupIdsConfig ?? '');
-        $customerGroupId = $this->getCustomerGroupId();
-
-        return in_array($customerGroupId, $disabledCustomerGroupIds);
-    }
-
-    public function getCustomerGroupId()
-    {
-        if ($this->customerSession->isLoggedIn()) {
-            return $this->customerSession->getCustomer()->getGroupId();
-        }
-
-        return -1;
-    }
-
-    public function getCustomerId()
-    {
-        if ($this->customerSession->isLoggedIn()) {
-            return $this->customerSession->getCustomerData()->getId();
-        }
-
-        return -1;
-    }
-
-    public function getMcBtnWidth()
-    {
-        return $this->getConfig(self::MC_BTN_WIDTH);
-    }
-
-    public function getShouldResizeCartIndexBtn()
-    {
-        $shouldResize = $this->getConfig(self::SHOULD_RESIZE_CART_INDEX_BTN);
-        return $shouldResize === '1';
-    }
-
-    public function getCPageBtnWidth()
-    {
-        return $this->getConfig(self::CPAGE_BTN_WIDTH);
-    }
-
-    public function getShouldResizePdpBtn()
-    {
-        $shouldResize = $this->getConfig(self::PDP_SHOULD_RESIZE_PDP_BTN);
-        return $shouldResize === "1";
-    }
-
-    public function getCurrentCurrencyCode()
-    {
-        return $this->storeManager->getStore()->getCurrentCurrencyCode();
-    }
-
-    public function getBaseCurrencyCode()
-    {
-        return $this->storeManager->getStore()->getBaseCurrencyCode();
-    }
-
-    public function getShouldPositionPdpBelowAtc()
-    {
-        $shouldPosition = $this->getConfig(self::PDP_SHOULD_POSITION_PDP_BELOW_ATC);
-        return $shouldPosition === "1";
-    }
-
-    public function getShouldRepositionOrStrikeAbovePdpBtn()
-    {
-        $shouldRepositionOrStrikeAbovePdpBtn = $this->getConfig(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN);
-        return $shouldRepositionOrStrikeAbovePdpBtn === "1";
-    }
-
-    public function getPdpBtnCustomStyle()
-    {
-        $pdpBtnCustomStyle = $this->getConfig(self::PDP_BTN_CUSTOM_STYLE);
-        return $pdpBtnCustomStyle;
-    }
-
-    public function getPdpBtnContainerCustomStyle()
-    {
-        $pdpBtnContainerCustomStyle = $this->getConfig(self::PDP_BTN_CONTAINER_CUSTOM_STYLE);
-        return $pdpBtnContainerCustomStyle;
-    }
-
-    public function getPdpBtnRepositionDiv()
-    {
-        $pdpBtnRepositionDiv = $this->getConfig(self::PDP_BTN_REPOSITION_DIV);
-        return $pdpBtnRepositionDiv;
-    }
-
-    public function getPdpBtnRepositionWithinDiv()
-    {
-        $pdpBtnRepositionWithinDiv = $this->getConfig(self::PDP_BTN_REPOSITION_WITHIN_DIV);
-        return $pdpBtnRepositionWithinDiv;
-    }
-
-    public function getMcBtnCustomStyle()
-    {
-        $mcBtnCustomStyle = $this->getConfig(self::MC_BTN_CUSTOM_STYLE);
-        return $mcBtnCustomStyle;
-    }
-
-    public function getMcBtnContainerCustomStyle()
-    {
-        $mcBtnContainerCustomStyle = $this->getConfig(self::MC_BTN_CONTAINER_CUSTOM_STYLE);
-        return $mcBtnContainerCustomStyle;
-    }
-
-    public function getMcBtnShouldHideOrStrike()
-    {
-        $mcBtnContainerCustomStyle = $this->getConfig(self::MC_BTN_HIDE_OR_STRIKE);
-        return $mcBtnContainerCustomStyle === "1";
-    }
-
-    public function getCindexBtnCustomStyle()
-    {
-        $cIndexBtnCustomStyle = $this->getConfig(self::CINDEX_BTN_CUSTOM_STYLE);
-        return $cIndexBtnCustomStyle;
-    }
-
-    public function getCindexBtnContainerCustomStyle()
-    {
-        $cIndexBtnContainerCustomStyle = $this->getConfig(self::CINDEX_BTN_CONTAINER_CUSTOM_STYLE);
-        return $cIndexBtnContainerCustomStyle;
-    }
-
-    public function getCindexBtnShouldHideOrStrike()
-    {
-        $cIndexBtnHideOrStrike = $this->getConfig(self::CINDEX_BTN_HIDE_OR_STRIKE);
-        return $cIndexBtnHideOrStrike === "1";
-    }
-
-    public function getCpageBtnCustomStyle()
-    {
-        $cPageBtnCustomStyle = $this->getConfig(self::CPAGE_BTN_CUSTOM_STYLE);
-        return $cPageBtnCustomStyle;
-    }
-
-    public function getCpageBtnContainerCustomStyle()
-    {
-        $cPageBtnContainerCustomStyle = $this->getConfig(self::CPAGE_BTN_CONTAINER_CUSTOM_STYLE);
-        return $cPageBtnContainerCustomStyle;
-    }
-
-    public function getCpageBtnShouldHideOrStrike()
-    {
-        $cPageBtnHideOrStrike = $this->getConfig(self::CPAGE_BTN_HIDE_OR_STRIKE);
-        return $cPageBtnHideOrStrike === "1";
-    }
-
-    public function getGoogleAnalyticsVersion()
-    {
-        $gaVersion = $this->getConfig(self::GOOGLE_ANALYTICS_VERSION);
-        return $gaVersion;
-    }
-
-    public function getGoogleAnalyticsId()
-    {
-        $gaId = $this->getConfig(self::GOOGLE_ANALYTICS_ID);
-        return $gaId;
-    }
-
-
-    public function getInstantApiUrl()
-    {
-        $apiUrl = 'api.instant.one/';
-        $isStaging = $this->getSandboxEnabledConfig();
-
-        if ($isStaging) {
-            $apiUrl = 'staging.' . $apiUrl;
-        }
-
-        return "https://" . $apiUrl;
-    }
-
-    public function guid()
-    {
-        return sprintf(
-            '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
-            random_int(0, 65535),
-            random_int(0, 65535),
-            random_int(0, 65535),
-            random_int(16384, 20479),
-            random_int(32768, 49151),
-            random_int(0, 65535),
-            random_int(0, 65535),
-            random_int(0, 65535)
-        );
-    }
-
-    public function encodeURIComponent($str)
-    {
-        $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
-        return strtr(rawurlencode($str), $revert);
-    }
-
-    public function getSessionCartId()
-    {
-        try {
-            $cartId = $this->checkoutSession->getQuote()->getEntityId();
-
-            if (empty($cartId)) {
-                $customerId = $this->getCustomerId();
-                $customerLoggedIn = $customerId && $customerId > -1;
-
-                $maskedQuoteId = $customerLoggedIn
-                    ? $this->createEmptyCartForCustomer->execute($customerId)
-                    : $this->createEmptyCartForGuest->execute();
-                $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
-
-                if (!$customerLoggedIn) {
-                    $this->checkoutSession->setQuoteId($cartId);
-                }
-            }
-
-            return $cartId;
-        } catch (Exception $e) {
-            $this->logger->error("Exception raised in Instant/Checkout/Controller/Data/GetConfig");
-            $this->logger->error($e->getMessage());
-            return '';
-        }
+        return $this->getBannerElementConfig('theme');
     }
 }

@@ -9,6 +9,13 @@ define([
             alert("An error occurred during checkout. Please try again.")
         },
 
+        getInstantPayParams: function () {
+            if (typeof window.checkoutConfig.payment.instantpay == "undefined")
+                return null;
+
+            return window.checkoutConfig.payment.instantpay;
+        },
+
         reloadInstantConfig: function (callback) {
             $.ajax({
                 url: window.location.origin + "/instant/data/getconfig/",

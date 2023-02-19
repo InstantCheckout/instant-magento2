@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
     xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="checkout.root">
@@ -42,6 +41,13 @@
                                         </item>
                                     </item>
                                 </item>
+                                <item name="cpage-btn" xsi:type="array">
+                                    <item name="displayArea" xsi:type="string">progressBar</item>
+                                    <item name="sortOrder" xsi:type="string">0</item>
+                                    <item name="component" xsi:type="string">
+                                        Instant_Checkout/js/ic-cpage-checkout</item>
+                                </item>
+
                             </item>
                         </item>
                     </item>

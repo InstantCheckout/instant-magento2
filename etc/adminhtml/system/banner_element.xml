@@ -7,29 +7,29 @@
     <label>Banner Element settings</label>
     <comment>
       &lt;p&gt;For additional technical support contact &lt;a href="mailto:hello@instant.one"
-      target="_blank" rel="noopener noreferrer"&gt;hello@instant.com&lt;/a&gt;.&lt;/p&gt;</comment>
+      target="_blank" rel="noopener noreferrer"&gt;hello@instant.one&lt;/a&gt;.&lt;/p&gt;</comment>
     <field
-      id="title" translate="label" type="text" sortOrder="20" showInDefault="1"
+      id="targetElementSelector" translate="label" type="text" sortOrder="20" showInDefault="1"
       showInWebsite="1" showInStore="1">
-      <label>Target HTML element ID</label>
-      <comment><![CDATA[Selector of HTML element where the Instant Banner Element should be inserted. e.g. #shipping-section-title]]></comment>
-      <config_path>payment/stripe_payments/title</config_path>
+      <label>Target HTML element selector</label>
+      <comment><![CDATA[HTML element selector of where the Instant Banner Element should be inserted. e.g. #shipping-section-title. Use the config below to prepend or append to this specified element.]]></comment>
+      <config_path>payment/instant_pay/bannerElement_targetElementSelector</config_path>
     </field>
     <field
-      id="stripe_mode1" translate="label" type="select" sortOrder="30" showInDefault="1"
+      id="shouldAppendToElement" translate="label" type="select" sortOrder="30" showInDefault="1"
       showInWebsite="1" showInStore="1">
-      <label>Show before or after target</label>
-      <comment><![CDATA[Should appear before or after the target element specified above]]></comment>
-      <source_model>StripeIntegration\Payments\Model\Adminhtml\Source\Mode</source_model>
-      <config_path>payment/stripe_payments_basic/stripe_mode</config_path>
+      <label>Show append or prepend to target</label>
+      <comment><![CDATA[Should appear before or after the target element specified above. Defaults to Prepend.]]></comment>
+      <source_model>Instant\Checkout\Model\Adminhtml\Source\AppendPrepend</source_model>
+      <config_path>payment/instant_pay/bannerElement_shouldAppendToElement</config_path>
     </field>
     <field
-      id="stripe_mode" translate="label" type="select" sortOrder="30" showInDefault="1"
+      id="theme" translate="label" type="select" sortOrder="30" showInDefault="1"
       showInWebsite="1" showInStore="1">
       <label>Light/dark mode</label>
       <comment><![CDATA[Defaults to light mode]]></comment>
-      <source_model>StripeIntegration\Payments\Model\Adminhtml\Source\Mode</source_model>
-      <config_path>payment/stripe_payments_basic/stripe_mode</config_path>
+      <source_model>Instant\Checkout\Model\Adminhtml\Source\LightDarkMode</source_model>
+      <config_path>payment/instant_pay/bannerElement_theme</config_path>
     </field>
   </group>
 </include>

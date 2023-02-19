@@ -7,13 +7,13 @@
     <label>Verification Element settings</label>
     <comment>
       &lt;p&gt;For additional technical support contact &lt;a href="mailto:hello@instant.one"
-      target="_blank" rel="noopener noreferrer"&gt;hello@instant.com&lt;/a&gt;.&lt;/p&gt;</comment>
-    <field id="accessToken"
+      target="_blank" rel="noopener noreferrer"&gt;hello@instant.one&lt;/a&gt;.&lt;/p&gt;</comment>
+    <field id="emailFieldSelector"
       translate="label" type="text" sortOrder="20" showInDefault="1"
       showInWebsite="1" showInStore="1">
-      <label>Email field selector</label>
+      <label>Email HTML field selector</label>
       <comment><![CDATA[HTML element selector of email field that the Instant Verification Element should be listening to. e.g. "#email-input"]]></comment>
-      <config_path>payment/stripe_payments/title</config_path>
+      <config_path>payment/instant_pay/verificationElement_emailFieldSelector</config_path>
     </field>
   </group>
 </include>

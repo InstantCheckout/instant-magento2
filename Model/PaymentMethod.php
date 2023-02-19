@@ -238,6 +238,6 @@ class PaymentMethod extends AbstractMethod
 
     public function getTitle()
     {
-        return $this->instantPayHelper->getConfigData("title");
+        return $this->instantPayHelper->getGeneralConfig("title");
     }
 }
