@@ -25,7 +25,19 @@ define([
     }).observe(document.querySelector('#product-addtocart-button'), {
         attributes: true
     });
-
+    
+    const loadSwipeToBuy = setInterval(() => {
+        const targetElement = document.querySelector('#ic-pdp-btn')
+        if (targetElement && window.InstantJS && window.Instant && window.Instant.swipeToBuy.enabled) {
+            try {
+                window.InstantJS.createSwipeToBuyElement(targetElement, Instant.swipeToBuy);
+                clearInterval(loadSwipeToBuy);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    }, 10);
+    
     return function (config, element) {
         $(pdpBtnContainerSelector).css('display', 'flex');
 
