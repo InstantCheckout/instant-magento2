@@ -39,6 +39,7 @@ define([
                     window.InstantJS.createInstantPayBannerElement(
                         bannerElementTargetElementSelector,
                         window.checkoutConfig && window.checkoutConfig.customerData && window.checkoutConfig.customerData.email || '',
+                        window.checkoutConfig && window.checkoutConfig.customerData && window.checkoutConfig.customerData.firstname || '',
                         bannerElementShowAfterElement,
                         bannerElementTheme
                     );
