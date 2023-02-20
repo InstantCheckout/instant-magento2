@@ -40,6 +40,13 @@ class PdpBlock extends \Magento\Framework\View\Element\Template
         parent::__construct($context, $data);
     }
 
+    public function getProductHasCustomOptions()
+    {
+        $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $customOptions = $_objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($this->getProduct());
+        return $customOptions->getSize() > 0;
+    }
+
     public function getProduct()
     {
         return $this->registry->registry('current_product');
