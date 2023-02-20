@@ -15,15 +15,14 @@ define([
             const verificationElementEmailFieldSelector = checkoutHelper.getInstantPayParams().verificationElement.emailFieldSelector;
             const bannerElementTargetElementSelector = checkoutHelper.getInstantPayParams().bannerElement.targetElementSelector;
             const bannerElementShowAfterElement = checkoutHelper.getInstantPayParams().bannerElement.shouldAppendToElement;
-            const bannerElementDarkMode = checkoutHelper.getInstantPayParams().bannerElement.theme;
+            const bannerElementTheme = checkoutHelper.getInstantPayParams().bannerElement.theme;
 
             console.log('verificationElementEmailFieldSelector', verificationElementEmailFieldSelector)
             console.log('bannerElementTargetElementSelector', bannerElementTargetElementSelector)
             console.log('bannerElementShowAfterElement', bannerElementShowAfterElement)
-            console.log('bannerElementDarkMode', bannerElementDarkMode)
 
             const verificationElementLoad = setInterval(() => {
-                if (document.querySelector(verificationElementEmailFieldSelector) && window.checkoutConfig) {
+                if (document.querySelector(verificationElementEmailFieldSelector)) {
                     window.InstantJS.createVerificationElement(
                         verificationElementEmailFieldSelector,
                         {
@@ -36,24 +35,21 @@ define([
             }, 10)
 
             const bannerElementLoad = setInterval(() => {
-                if (document.querySelector(bannerElementTargetElementSelector) && window.checkoutConfig) {
-                    window.InstantJS.createInstantPayBanner(
+                if (document.querySelector(bannerElementTargetElementSelector)) {
+                    window.InstantJS.createInstantPayBannerElement(
                         bannerElementTargetElementSelector,
                         window.checkoutConfig && window.checkoutConfig.customerData && window.checkoutConfig.customerData.email || '',
                         bannerElementShowAfterElement,
-                        bannerElementDarkMode
+                        bannerElementTheme
                     );
                     clearInterval(bannerElementLoad);
                 }
             }, 10)
 
-            console.log("@#@#");
             return this;
         },
 
         render: function () {
-            console.log("RENDER");
-            wadjiawdjwadiojawdioj
             checkoutHelper.refreshInstantButtons();
         },
     });
