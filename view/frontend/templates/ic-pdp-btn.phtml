@@ -7,7 +7,7 @@
 <div id="ic-pdp-btn-container" class="ic-btn-container">
     <div class='ic-css-reset'>
         <div id="ic-pdp-btn-wrapper" class="ic-btn-wrapper" style="margin-top:0px !important;">
-            <button id="ic-pdp-btn" style="" type="button" title="Instant Checkout" class="ic-btn" data-instant="true" data-mage-init='
+            <button id="ic-pdp-btn" hasCustomOptions="<?= $block->getProductHasCustomOptions() ? 'true' : 'false' ?>" sku="<?= $block->escapeHtmlAttr($block->getProduct()->getSku()) ?>" type="<?= $block->escapeHtmlAttr($block->getProduct()->getTypeId()) ?>" style="" type="button" title="Instant Checkout" class="ic-btn" data-instant="true" data-mage-init='
             {
                 "Instant_Checkout/js/ic-pdp-checkout": {
                     "sku": "<?= $block->escapeHtmlAttr($block->getProduct()->getSku()) ?>",
