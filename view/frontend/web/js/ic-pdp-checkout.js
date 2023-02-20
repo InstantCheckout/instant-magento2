@@ -107,26 +107,7 @@ define([
         }
 
         $(element).click(function () {
-            shouldCheckout = true;
-            let cartCount = customerData.get('cart')().summary_count;
-
-            if ($(element).attr('type') === 'simple' || $(element).attr('type') === 'configurable') {
-                window.InstantM2.handlePdpBtnClicked(config.sku);
-                return;
-            }
-
-            var cart = customerData.get('cart');
-            cart.subscribe(function () {
-                var newCount = customerData.get('cart')().summary_count;
-                if (newCount !== cartCount && shouldCheckout) {
-                    shouldCheckout = false;
-                    cartCount = cart().summary_count;
-                    window.InstantJS.checkoutCart(window.Instant.cartId, 'pdp')
-                    console.log('Number of items in cart is now: ' + count);
-                }
-            });
-
-            jQuery('.action.primary.tocart').click();
+            window.InstantM2.handlePdpBtnClicked(config.sku);
         });
     }
 });
