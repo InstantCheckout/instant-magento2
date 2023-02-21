@@ -12,7 +12,8 @@
             <!--/ko-->
         </div>
 
-        <div data-bind="if: permanentError, visible: permanentError" class="stripe-permanent-error">
+        <div data-bind="if: permanentError, visible: permanentError"
+            style="text-align: center;padding: 0 2em 2em 2em;font-size: large;">
             <span><!-- ko i18n: permanentError --><!-- /ko --></span>
         </div>
 
@@ -23,7 +24,9 @@
             <!--/ko-->
         </div>
 
-        <div id="instant-payment-element" data-bind="afterRender: onRender"></div>
+        <!-- <div data-bind="visible: !permanentError"> -->
+            <div id="instant-payment-element" data-bind="afterRender: onRender"></div>
+        <!-- </div> -->
 
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->

@@ -9,11 +9,12 @@
       &lt;p&gt;For additional technical support contact &lt;a href="mailto:hello@instant.one"
       target="_blank" rel="noopener noreferrer"&gt;hello@instant.one&lt;/a&gt;.&lt;/p&gt;</comment>
     <field
-      id="bannerElementEnabled" translate="label" type="text" sortOrder="20" showInDefault="1"
+      id="bannerElementEnabled" translate="label" type="select" sortOrder="20" showInDefault="1"
       showInWebsite="1" showInStore="1">
       <label>Enable Banner element</label>
       <comment><![CDATA[Specifies whether the banner element should be enabled.]]></comment>
       <config_path>payment/instant/bannerElement_enabled</config_path>
+      <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
     </field>
     <field
       id="targetElementSelector" translate="label" type="text" sortOrder="20" showInDefault="1"
