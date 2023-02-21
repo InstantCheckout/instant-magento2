@@ -4,9 +4,10 @@
   <field
     id="active" translate="label comment" sortOrder="1" type="select"
     showInDefault="1" showInWebsite="1" showInStore="0">
-    <label>Enable</label>
+    <label>Enabled</label>
     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
     <comment><![CDATA[Important: Instant MUST be activated before this payment method is enabled.<br>Ensure that the Instant integration is activated via Configuration > Instant > App Configuration before Instant Pay is enabled.]]></comment>
+    <config_path>payment/instant/enabled</config_path>
   </field>
   <field
     id="title" translate="label" type="text" sortOrder="2" showInDefault="1"

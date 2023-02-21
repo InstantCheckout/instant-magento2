@@ -164,6 +164,11 @@ class InstantPayHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->getConfig('general', $field);
     }
 
+    public function getInstantPayEnabled()
+    {
+        return $this->getGeneralConfig('enabled') === '1';
+    }
+
     public function getVerificationElementConfig($field)
     {
         return $this->getConfig('verificationElement', $field);

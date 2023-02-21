@@ -41,6 +41,7 @@ class ConfigProvider implements ConfigProviderInterface
         $data = [
             'payment' => [
                 'instant' => [
+                    'enabled' => $this->instantPayHelper->getInstantPayEnabled(),
                     'merchantId' => $this->instantHelper->getInstantAppId(),
                     'storeCode' => $this->instantHelper->getStoreCode(),
                     'cartId' => $this->instantHelper->getSessionCartId(),

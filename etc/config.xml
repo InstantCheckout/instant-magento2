@@ -13,8 +13,8 @@
         </csp>
         <payment>
             <instant>
-                <general_title>Pay By Card</general_title>
-                <active>1</active>
+                <general_title>Pay by Card</general_title>
+                <enabled>0</enabled>
                 <title>Pay by Card</title>
                 <model>Instant\Checkout\Model\Payment\InstantPayment</model>
                 <order_status>pending</order_status>
