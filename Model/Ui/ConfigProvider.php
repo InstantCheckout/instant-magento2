@@ -45,9 +45,11 @@ class ConfigProvider implements ConfigProviderInterface
                     'storeCode' => $this->instantHelper->getStoreCode(),
                     'cartId' => $this->instantHelper->getSessionCartId(),
                     'verificationElement' => [
+                        'enabled' => $this->instantPayHelper->getVerificationElementEnabled(),
                         'emailFieldSelector' => $this->instantPayHelper->getVerificationElementEmailFieldSelector(),
                     ],
                     'bannerElement' => [
+                        'enabled' => $this->instantPayHelper->getBannerElementEnabled(),
                         'targetElementSelector' => $this->instantPayHelper->getBannerElementTargetElementSelector(),
                         'shouldAppendToElement' => $this->instantPayHelper->getBannerElementShouldAppendToElement(),
                         'theme' => $this->instantPayHelper->getBannerElementTheme(),

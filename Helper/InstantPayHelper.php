@@ -154,7 +154,7 @@ class InstantPayHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $storeId = $this->instantHelper->getStoreId();
 
 
-        $data = $this->scopeConfig->getValue("payment/instant_pay/$section" . "_" . $field, ScopeInterface::SCOPE_STORE, $storeId);
+        $data = $this->scopeConfig->getValue("payment/instant/$section" . "_" . $field, ScopeInterface::SCOPE_STORE, $storeId);
 
         return $data;
     }
@@ -192,5 +192,15 @@ class InstantPayHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getBannerElementTheme()
     {
         return $this->getBannerElementConfig('theme');
+    }
+
+    public function getBannerElementEnabled()
+    {
+        return $this->getBannerElementConfig('enabled') === '1';
+    }
+
+    public function getVerificationElementEnabled()
+    {
+        return $this->getVerificationElementConfig('enabled') === '1';
     }
 }

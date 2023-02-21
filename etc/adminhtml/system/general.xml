@@ -13,7 +13,7 @@
     showInWebsite="1" showInStore="1">
     <label>Title</label>
     <comment><![CDATA[This is the payment method title used at the checkout page]]></comment>
-    <config_path>payment/instant_pay/general_title</config_path>
+    <config_path>payment/instant/general_title</config_path>
   </field>
   <field id="sortOrder" translate="label comment" type="text" sortOrder="3"
     showInDefault="1" showInWebsite="1" showInStore="1">
@@ -21,6 +21,6 @@
     <comment>Adjust this to move Instant Pay above or below other payment
       methods</comment>
     <frontend_class>validate-number</frontend_class>
-    <config_path>payment/instant_pay/general_sortOrder</config_path>
+    <config_path>payment/instant/general_sortOrder</config_path>
   </field>
 </include>

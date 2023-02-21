@@ -13,6 +13,7 @@
         </csp>
         <payment>
             <instant>
+                <general_title>Pay By Card</general_title>
                 <active>1</active>
                 <title>Pay by Card</title>
                 <model>Instant\Checkout\Model\Payment\InstantPayment</model>
