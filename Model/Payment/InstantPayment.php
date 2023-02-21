@@ -31,6 +31,7 @@ use Magento\Payment\Model\Method\Logger as PaymentLogger;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\OrderItemRepositoryInterface;
 use Instant\Checkout\Service\DoRequest;
+use Instant\Checkout\Helper\InstantPayHelper;
 
 /**
  * Payment Method for all orders placed through Instant
@@ -102,6 +103,11 @@ class InstantPayment extends AbstractMethod
     protected $doRequest;
 
     /**
+     * @var InstantPayHelper
+     */
+    protected $instantPayHelper;
+
+    /**
      * InstantPayment constructor.
      * @param Context $context
      * @param Registry $registry
@@ -126,12 +132,15 @@ class InstantPayment extends AbstractMethod
         PaymentLogger $logger,
         DoRequest $request,
         InstantHelper $instantHelper,
+        InstantPayHelper $instantPayHelper,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->doRequest = $request;
         $this->instantHelper = $instantHelper;
+        $this->instantPayHelper = $instantPayHelper;
+
         parent::__construct(
             $context,
             $registry,
@@ -227,5 +236,11 @@ class InstantPayment extends AbstractMethod
         $payment = $this->getInfoInstance();
         $this->setPaymentFormUrl($payment);
         $stateObject->setIsNotified(false);
+    }
+
+    public function getTitle()
+    {
+        $configTitle = $this->instantPayHelper->getGeneralConfig("title");
+        return $configTitle ? $configTitle : 'Pay By Card';
     }
 }

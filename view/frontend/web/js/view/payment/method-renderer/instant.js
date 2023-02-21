@@ -65,6 +65,7 @@ define(
                 window.InstantJS.createPaymentElement('instant-payment-element', {
                     storeCode,
                     merchantId,
+                    userEmail: window.checkoutConfig.customerData.email,
                 }, () => {
                     this.isLoading(false);
                 }, (err) => {

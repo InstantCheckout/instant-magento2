@@ -14,6 +14,7 @@
         <payment>
             <instant>
                 <active>1</active>
+                <title>Pay by Card</title>
                 <model>Instant\Checkout\Model\Payment\InstantPayment</model>
                 <order_status>pending</order_status>
                 <allowspecific>0</allowspecific>
