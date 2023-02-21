@@ -16,7 +16,6 @@
                 <active>1</active>
                 <model>Instant\Checkout\Model\Payment\InstantPayment</model>
                 <order_status>pending</order_status>
-                <title>Instant Pay</title>
                 <allowspecific>0</allowspecific>
                 <can_use_checkout>0</can_use_checkout>
                 <can_use_internal>1</can_use_internal>

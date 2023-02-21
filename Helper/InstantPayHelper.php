@@ -69,8 +69,6 @@ class InstantPayHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const GOOGLE_ANALYTICS_VERSION = 'instant/google/ga_version';
     const GOOGLE_ANALYTICS_ID = 'instant/google/ga_id';
 
-    const INSTANT_PAY_VERIFICATION_ELEMENT_EMAIL_FIELD_SELECTOR = 'payment/instantpay/verificationElementEmailFieldSelector';
-
     /**
      * @var \Magento\Framework\SessionSessionManager
      */

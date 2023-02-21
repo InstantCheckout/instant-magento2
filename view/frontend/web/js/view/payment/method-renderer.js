@@ -10,8 +10,8 @@ define(
         'use strict';
         rendererList.push(
             {
-                type: 'instantpay',
-                component: 'Instant_Checkout/js/view/payment/method-renderer/instantpay'
+                type: 'instant',
+                component: 'Instant_Checkout/js/view/payment/method-renderer/instant'
             }
         );
         return Component.extend({});

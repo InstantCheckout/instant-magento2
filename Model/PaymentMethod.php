@@ -32,7 +32,7 @@ class PaymentMethod extends AbstractMethod
     /**
      * @var string
      */
-    protected $_code = "instantpay";
+    protected $_code = "instant";
     /**
      * @var bool
      */

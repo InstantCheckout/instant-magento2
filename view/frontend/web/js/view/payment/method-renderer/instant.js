@@ -8,13 +8,14 @@ define(
         'Magento_Customer/js/customer-data',
         'jquery',
         'Magento_Checkout/js/model/quote',
-        'Instant_Checkout/js/action/post-handle-failed-payment'
+        'Instant_Checkout/js/action/post-handle-failed-payment',
+        'Instant_Checkout/js/ic-helper'
     ],
-    function (ko, Component, agreementValidator, additionalValidators, placeOrderAction, customerData, $, quote, handlePaymentFailedAction) {
+    function (ko, Component, agreementValidator, additionalValidators, placeOrderAction, customerData, $, quote, handlePaymentFailedAction, instantHelper) {
         'use strict';
         return Component.extend({
             defaults: {
-                template: 'Instant_Checkout/payment/instantpay'
+                template: 'Instant_Checkout/payment/instant'
             },
 
             initObservable: function () {
@@ -30,21 +31,27 @@ define(
                 return this;
             },
 
-            getInstantParam: function (param) {
-                if (typeof window.checkoutConfig.payment.instantpay == "undefined")
-                    return null;
+            crash: function (message, softCrash = false) {
+                this.isLoading(false);
 
-                if (typeof window.checkoutConfig.payment.instantpay[param] == "undefined")
-                    return null;
+                const msg = "Sorry, this payment method is not available. Please contact us for assistance.";
 
-                return window.checkoutConfig.payment.instantpay[param];
+                if (softCrash){
+                    this.showError(msg);
+                } else {
+                    this.permanentError(msg);
+                }
+
+                console.error("Instant Pay Error: " + message);
             },
 
             onRender: function () {
                 this.isLoading(true);
 
-                const storeCode = this.getInstantParam('storeCode');
-                const merchantId = this.getInstantParam('merchantId');
+                console.log("ON RENDER: InstantPay.js")
+
+                const storeCode = instantHelper.getInstantPayParams().storeCode;
+                const merchantId = instantHelper.getInstantPayParams().merchantId;
 
                 if (document.getElementById('instant-payment-element') === null)
                     return this.crash("Cannot initialize Payment Element on a DOM that does not contain a div.instant-payment-element.");
@@ -54,7 +61,7 @@ define(
 
                 if (!storeCode || !merchantId)
                     return this.crash("Cannot initialize Payment Element as either merchantId or storeCode is unavailable.");
-
+                
                 window.InstantJS.createPaymentElement('instant-payment-element', {
                     storeCode,
                     merchantId,
@@ -108,14 +115,14 @@ define(
                     })
                     .done(function (orderId, outcome, response) {
                         if (!self.isOrderPlaced() && isNaN(orderId))
-                            return self.softCrash("The order was placed but the response from the server did not include a numeric order ID.");
+                            return self.crash("The order was placed but the response from the server did not include a numeric order ID.", true);
                         else
                             self.isOrderPlaced(true);
 
                         self.isLoading(true);
 
                         window.InstantJS.confirmPaymentElement(orderId, (res) => {
-                            console.log("Successfully confirmed payment element", res)
+                            console.log("Successfully confirmed payment element", res);
                             self.isLoading(false);
                             customerData.invalidate(['cart']);
                             var successUrl = 'http://178.128.81.251/checkout/onepage/success/';
