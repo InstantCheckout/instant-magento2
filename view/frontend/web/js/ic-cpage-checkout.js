@@ -19,19 +19,23 @@ define([
 
             const verificationElementLoad = setInterval(() => {
                 if (window.InstantJS && document.querySelector(verificationElementEmailFieldSelector)) {
+                    clearInterval(verificationElementLoad);
+
                     window.InstantJS.createVerificationElement(
                         verificationElementEmailFieldSelector,
                         {
                             merchantId: window.Instant.appId,
                             storeCode: window.Instant.storeCode,
                             cartId: window.Instant.cartId
-                        });
-                    clearInterval(verificationElementLoad);
+                        }
+                    );
                 }
             }, 100);
 
             const bannerElementLoad = setInterval(() => {
                 if (window.InstantJS && document.querySelector(bannerElementTargetElementSelector)) {
+                    clearInterval(bannerElementLoad);
+
                     window.InstantJS.createInstantPayBannerElement(
                         bannerElementTargetElementSelector,
                         window.checkoutConfig?.customerData?.email ?? '',
@@ -39,8 +43,6 @@ define([
                         bannerElementShowAfterElement,
                         bannerElementTheme
                     );
-
-                    clearInterval(bannerElementLoad);
                 }
             }, 100);
 
