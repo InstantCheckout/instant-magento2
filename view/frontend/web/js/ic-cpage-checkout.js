@@ -18,7 +18,7 @@ define([
             const bannerElementTheme = checkoutHelper.getInstantPayParams().bannerElement.theme;
 
             const verificationElementLoad = setInterval(() => {
-                if (document.querySelector(verificationElementEmailFieldSelector)) {
+                if (window.InstantJS && document.querySelector(verificationElementEmailFieldSelector)) {
                     window.InstantJS.createVerificationElement(
                         verificationElementEmailFieldSelector,
                         {
@@ -28,20 +28,32 @@ define([
                         });
                     clearInterval(verificationElementLoad);
                 }
-            }, 10)
+            }, 100);
 
             const bannerElementLoad = setInterval(() => {
-                if (document.querySelector(bannerElementTargetElementSelector)) {
+                if (window.InstantJS && document.querySelector(bannerElementTargetElementSelector)) {
                     window.InstantJS.createInstantPayBannerElement(
                         bannerElementTargetElementSelector,
-                        window.checkoutConfig && window.checkoutConfig.customerData && window.checkoutConfig.customerData.email || '',
-                        window.checkoutConfig && window.checkoutConfig.customerData && window.checkoutConfig.customerData.firstname || '',
+                        window.checkoutConfig?.customerData?.email ?? '',
+                        window.checkoutConfig?.customerData?.firstname ?? '',
                         bannerElementShowAfterElement,
                         bannerElementTheme
                     );
+
                     clearInterval(bannerElementLoad);
                 }
-            }, 10)
+            },100);
+
+            // Clear the intervals if we don't find either dom element after 30 seconds.
+            setTimeout(() => {
+                if (verificationElementLoad) {
+                    clearInterval(verificationElementLoad);
+                }
+
+                if (bannerElementLoad) {
+                    clearInterval(bannerElementLoad);
+                }
+            }, 30000)
 
             return this;
         },
