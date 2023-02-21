@@ -42,7 +42,7 @@ define([
 
                     clearInterval(bannerElementLoad);
                 }
-            },100);
+            }, 100);
 
             // Clear the intervals if we don't find either dom element after 30 seconds.
             setTimeout(() => {
