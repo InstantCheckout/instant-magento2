@@ -17,10 +17,6 @@ define([
             const bannerElementShowAfterElement = checkoutHelper.getInstantPayParams().bannerElement.shouldAppendToElement;
             const bannerElementTheme = checkoutHelper.getInstantPayParams().bannerElement.theme;
 
-            console.log('verificationElementEmailFieldSelector', verificationElementEmailFieldSelector)
-            console.log('bannerElementTargetElementSelector', bannerElementTargetElementSelector)
-            console.log('bannerElementShowAfterElement', bannerElementShowAfterElement)
-
             const verificationElementLoad = setInterval(() => {
                 if (document.querySelector(verificationElementEmailFieldSelector)) {
                     window.InstantJS.createVerificationElement(
