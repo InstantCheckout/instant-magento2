@@ -30,9 +30,9 @@ define([
                         window.InstantJS.createVerificationElement(
                             verificationElementEmailFieldSelector,
                             {
-                                merchantId: window.Instant.appId,
-                                storeCode: window.Instant.storeCode,
-                                cartId: window.Instant.cartId
+                                merchantId: checkoutHelper.getInstantPayParams().merchantId,
+                                storeCode: checkoutHelper.getInstantPayParams().storeCode,
+                                cartId: checkoutHelper.getInstantPayParams().cartId
                             }
                         );
                     }
