@@ -7,7 +7,7 @@
     <label>Enabled</label>
     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
     <comment><![CDATA[Important: Instant MUST be activated before this payment method is enabled.<br>Ensure that the Instant integration is activated via Configuration > Instant > App Configuration before Instant Pay is enabled.]]></comment>
-    <config_path>payment/instant/enabled</config_path>
+    <config_path>payment/instant/general_enabled</config_path>
   </field>
   <field
     id="title" translate="label" type="text" sortOrder="2" showInDefault="1"

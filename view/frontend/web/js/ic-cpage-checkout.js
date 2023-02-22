@@ -24,7 +24,7 @@ define([
             let bannerElementLoadInterval;
             if (verificationElementEnabled){
                 const verificationElementLoadInterval = setInterval(() => {
-                    if (window.InstantJS && document.querySelector(verificationElementEmailFieldSelector)) {
+                    if (window.InstantJS && (document.querySelector(verificationElementEmailFieldSelector) || window.checkoutConfig?.customerData?.email)) {
                         clearInterval(verificationElementLoadInterval);
     
                         window.InstantJS.createVerificationElement(
