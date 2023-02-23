@@ -10,9 +10,9 @@
             <block class="Instant\Checkout\Block\PdpBlock" name="ic-pdp-additional-btn" before="-"
                 template="Instant_Checkout::ic-pdp-btn.phtml" />
         </referenceBlock>
-        <!-- <referenceBlock name="product.info.main">
-            <block class="Instant\Checkout\Block\PdpBlock" name="ic-pdp-additional-btn" before="-"
+        <referenceBlock name="product.info.addtocart.bundle">
+            <block class="Instant\Checkout\Block\PdpBlock" name="ic-pdp-btn-bundle" before="-"
                 template="Instant_Checkout::ic-pdp-btn.phtml" />
-        </referenceBlock> -->
+        </referenceBlock>
     </body>
 </page>

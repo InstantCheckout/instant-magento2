@@ -56,11 +56,34 @@ define([
         // If we should resize pdp button
         // We resize it to the size of the add to cart button
         if (config.shouldResizePdpBtn) {
-            $(pdpBtnContainerSelector).css('width', $(atcBtnSelector).outerWidth() + 'px');
-            $(window).resize(function () {
-                $(pdpBtnContainerSelector).css('width', $(atcBtnSelector).outerWidth() + 'px');
+            const targetButton = document.querySelector(atcBtnSelector);
+            const myButton = document.querySelector(pdpBtnContainerSelector);
+
+            // Set initial width of my button to match target button
+            myButton.style.width = `${targetButton.offsetWidth}px`;
+
+            // Debounce resize event to prevent frequent updates
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    myButton.style.width = `${targetButton.offsetWidth}px`;
+                }, 250);
+            });
+
+            // Observe changes to target button text content and font
+            const observer = new MutationObserver(() => {
+                myButton.style.width = `${targetButton.offsetWidth}px`;
+            });
+
+            observer.observe(targetButton, {
+                attributes: true,
+                attributeFilter: ['style', 'class'],
+                childList: true,
+                subtree: true,
             });
         }
+
         // Apply any custom styles for button specified in config
         if (config.pdpBtnCustomStyle) {
             const btnStyle = $(pdpBtnSelector).attr('style');

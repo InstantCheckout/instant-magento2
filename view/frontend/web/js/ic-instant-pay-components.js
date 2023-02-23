@@ -9,19 +9,17 @@ define([
             this._super();
 
             const instantPayEnabled = checkoutHelper.getInstantPayParams().enabled;
-            
+
             const verificationElementEmailFieldSelector = checkoutHelper.getInstantPayParams().verificationElement.emailFieldSelector;
             const bannerElementTargetElementSelector = checkoutHelper.getInstantPayParams().bannerElement.targetElementSelector;
             const bannerElementShowAfterElement = checkoutHelper.getInstantPayParams().bannerElement.shouldAppendToElement;
             const bannerElementTheme = checkoutHelper.getInstantPayParams().bannerElement.theme;
 
-            let verificationElementLoadInterval;
-            let bannerElementLoadInterval;
-            if (instantPayEnabled){
+            if (instantPayEnabled) {
                 const verificationElementLoadInterval = setInterval(() => {
                     if (window.InstantJS && (document.querySelector(verificationElementEmailFieldSelector) || window.checkoutConfig?.customerData?.email)) {
                         clearInterval(verificationElementLoadInterval);
-    
+
                         window.InstantJS.createVerificationElement(
                             verificationElementEmailFieldSelector,
                             {
@@ -31,11 +29,11 @@ define([
                             }
                         );
                     }
-                }, 50);
+                }, 10);
                 const bannerElementLoadInterval = setInterval(() => {
                     if (window.InstantJS && document.querySelector(bannerElementTargetElementSelector)) {
                         clearInterval(bannerElementLoadInterval);
-    
+
                         window.InstantJS.createInstantPayBannerElement(
                             bannerElementTargetElementSelector,
                             window.checkoutConfig?.customerData?.email ?? '',
@@ -44,8 +42,8 @@ define([
                             bannerElementTheme
                         );
                     }
-                }, 50);
-                
+                }, 10);
+
                 // Clear the intervals if we don't find either dom element after 30 seconds.
                 setTimeout(() => {
                     if (verificationElementLoadInterval) {
