@@ -45,17 +45,17 @@ define([
                         );
                     }
                 }, 50);
+                
+                // Clear the intervals if we don't find either dom element after 30 seconds.
+                setTimeout(() => {
+                    if (verificationElementLoadInterval) {
+                        clearInterval(verificationElementLoadInterval);
+                    }
+                    if (bannerElementLoadInterval) {
+                        clearInterval(bannerElementLoadInterval);
+                    }
+                }, 30000)
             }
-
-            // Clear the intervals if we don't find either dom element after 30 seconds.
-            setTimeout(() => {
-                if (verificationElementLoadInterval) {
-                    clearInterval(verificationElementLoadInterval);
-                }
-                if (bannerElementLoadInterval) {
-                    clearInterval(bannerElementLoadInterval);
-                }
-            }, 30000)
 
             return this;
         }

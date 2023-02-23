@@ -121,22 +121,13 @@ class Service implements ServiceInterface
 
         if ($order->getId()) {
             try {
-                /* INSTANT */
                 $id = $this->checkoutSession->getLastQuoteId();
                 $quote = $this->quoteFactory->create()->loadByIdWithoutStore($id);
                 if (!$quote->getId()) {
-                    // enter your code on fail (if quote not found) here.
-                    // action method must return Result object, not boolean.
                     return false;
                 }
                 $quote->setIsActive(true)->setReservedOrderId(null)->save();
                 $this->checkoutSession->replaceQuote($quote);
-                /* INSTANT */
-
-                // $quote = $this->paymentsHelper->loadQuoteById($order->getQuoteId());
-                // $quote->setIsActive(1)->setReservedOrderId(null);
-                // $this->paymentsHelper->saveQuote($quote);
-                // $this->checkoutSession->replaceQuote($quote)->setLastRealOrderId($order->getIncrementId());
                 return true;
             } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
                 return false;

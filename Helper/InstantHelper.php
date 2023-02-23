@@ -350,25 +350,25 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $stbEnabled = $this->getConfig(self::STB_ENABLED);
         return $stbEnabled === '1';
     }
-    
+
     public function getStbHeight()
     {
         $stbHeight = $this->getConfig(self::STB_HEIGHT);
         return $stbHeight;
     }
-    
+
     public function getStbBorderRadius()
     {
         $stbBorderRadius = $this->getConfig(self::STB_BORDER_RADIUS);
         return $stbBorderRadius;
     }
-    
+
     public function getStbBottomLayerBorderColour()
     {
         $stbBottomLayerBorderColour = $this->getConfig(self::STB_BOTTOM_LAYER_BORDER_COLOUR);
         return $stbBottomLayerBorderColour;
     }
-    
+
     public function getStbBottomLayerBackgroundColour()
     {
         $stbBottomLayerBackgroundColour = $this->getConfig(self::STB_BOTTOM_LAYER_BACKGROUND_COLOUR);
@@ -380,49 +380,49 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $stbTopLayerBackgroundColour = $this->getConfig(self::STB_TOP_LAYER_BACKGROUND_COLOUR);
         return $stbTopLayerBackgroundColour;
     }
-    
+
     public function getStbTopLayerTextColour()
     {
         $stbTopLayerTextColour = $this->getConfig(self::STB_TOP_LAYER_TEXT_COLOUR);
         return $stbTopLayerTextColour;
     }
-    
+
     public function getStbBottomLayerTextColour()
     {
         $stbBottomLayerTextColour = $this->getConfig(self::STB_BOTTOM_LAYER_TEXT_COLOUR);
         return $stbBottomLayerTextColour;
     }
-    
+
     public function getStbThumbBackgroundColour()
     {
         $stbThumbBackgroundColour = $this->getConfig(self::STB_THUMB_BACKGROUND_COLOUR);
         return $stbThumbBackgroundColour;
     }
-    
+
     public function getStbFontFamily()
     {
         $stbFontFamily = $this->getConfig(self::STB_FONT_FAMILY);
         return $stbFontFamily;
     }
-    
+
     public function getStbFontWeight()
     {
         $stbFontWeight = $this->getConfig(self::STB_FONT_WEIGHT);
         return $stbFontWeight;
     }
-    
+
     public function getStbTopLayerFontSize()
     {
         $stbTopLayerFontSize = $this->getConfig(self::STB_TOP_LAYER_FONT_SIZE);
         return $stbTopLayerFontSize;
     }
-    
+
     public function getStbBottomLayerFontSize()
     {
         $stbBottomLayerFontSize = $this->getConfig(self::STB_BOTTOM_LAYER_FONT_SIZE);
         return $stbBottomLayerFontSize;
     }
-    
+
 
     public function getMcBtnCustomStyle()
     {
@@ -529,19 +529,19 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         try {
             $cartId = $this->checkoutSession->getQuote()->getEntityId();
 
-            // if (empty($cartId)) {
-            //     $customerId = $this->getCustomerId();
-            //     $customerLoggedIn = $customerId && $customerId > -1;
+            if (empty($cartId)) {
+                $customerId = $this->getCustomerId();
+                $customerLoggedIn = $customerId && $customerId > -1;
 
-            //     $maskedQuoteId = $customerLoggedIn
-            //         ? $this->createEmptyCartForCustomer->execute($customerId)
-            //         : $this->createEmptyCartForGuest->execute();
-            //     $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
+                $maskedQuoteId = $customerLoggedIn
+                    ? $this->createEmptyCartForCustomer->execute($customerId)
+                    : $this->createEmptyCartForGuest->execute();
+                $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
 
-            //     if (!$customerLoggedIn) {
-            //         $this->checkoutSession->setQuoteId($cartId);
-            //     }
-            // }
+                if (!$customerLoggedIn) {
+                    $this->checkoutSession->setQuoteId($cartId);
+                }
+            }
 
             return $cartId;
         } catch (Exception $e) {
