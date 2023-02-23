@@ -5,7 +5,7 @@
         <section id="payment">
             <group id="instant" translate="label" sortOrder="2" showInDefault="1"
                 showInWebsite="1" showInStore="1">
-                <comment>Accept payments, increase conversions and bring frictionless checkout to
+                <comment>Increase conversions and bring a frictionless checkout experience to
                     your customers with Instant Pay.</comment>
                 <fieldset_css>complex instant-admin-config</fieldset_css>
                 <frontend_model>Instant\Checkout\Block\Adminhtml\Config\Fieldset</frontend_model>
