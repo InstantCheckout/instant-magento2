@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <csp>
             <policies>
@@ -12,10 +13,19 @@
         </csp>
         <payment>
             <instant>
-                <active>1</active>
                 <model>Instant\Checkout\Model\Payment\InstantPayment</model>
+
+                <general_enabled>0</general_enabled>
+                <general_title>Pay by Card</general_title>
+                <sort_order>1</sort_order>
+
+                <bannerElement_targetElementSelector>#shipping</bannerElement_targetElementSelector>
+                <bannerElement_shouldAppendToElement>prepend</bannerElement_shouldAppendToElement>
+                <bannerElement_theme>light</bannerElement_theme>
+
+                <verificationElement_emailFieldSelector>#shipping input#customer-email.input-text</verificationElement_emailFieldSelector>
+
                 <order_status>pending</order_status>
-                <title>Instant Pay</title>
                 <allowspecific>0</allowspecific>
                 <can_use_checkout>0</can_use_checkout>
                 <can_use_internal>1</can_use_internal>

@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <script src_type="url" async="async" src="https://js.instant.one/v1/instant-magento2.min.js" type="text/javascript"></script>
+        <script src_type="url" async="async" src="https://js.instant.one/v1/instant-magento2.min.js"
+            type="text/javascript"></script>
     </head>
     <body>
         <referenceBlock name="minicart">
@@ -13,7 +15,8 @@
                         <item name="minicart_content" xsi:type="array">
                             <item name="children" xsi:type="array">
                                 <item name="minicart-instant-btn" xsi:type="array">
-                                    <item name="component" xsi:type="string">Instant_Checkout/js/ic-mc-checkout</item>
+                                    <item name="component" xsi:type="string">
+                                        Instant_Checkout/js/ic-mc-checkout</item>
                                     <item name="config" xsi:type="array">
                                         <item name="displayArea" xsi:type="string">extraInfo</item>
                                     </item>

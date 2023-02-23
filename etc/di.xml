@@ -1,10 +1,16 @@
 <config>
-    <preference for="Instant\Checkout\Api\CartsManagementInterface" type="Instant\Checkout\Model\CartsManagement" />
+    <preference for="Instant\Checkout\Api\CartsManagementInterface"
+        type="Instant\Checkout\Model\CartsManagement" />
 
     <!-- Request logger -->
-    <preference for="Instant\Checkout\Api\RequestLogRepositoryInterface" type="Instant\Checkout\Model\RequestLogRepository" />
-    <preference for="Instant\Checkout\Api\Data\RequestLogInterface" type="Instant\Checkout\Model\Data\RequestLog" />
-    <preference for="Instant\Checkout\Api\Data\RequestLogSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+    <preference for="Instant\Checkout\Api\RequestLogRepositoryInterface"
+        type="Instant\Checkout\Model\RequestLogRepository" />
+    <preference for="Instant\Checkout\Api\Data\RequestLogInterface"
+        type="Instant\Checkout\Model\Data\RequestLog" />
+    <preference for="Instant\Checkout\Api\Data\RequestLogSearchResultsInterface"
+        type="Magento\Framework\Api\SearchResults" />
     <!-- End request logger -->
 
+    <preference for="Instant\Checkout\Api\ServiceInterface"
+        type="Instant\Checkout\Api\Service" />
 </config>

@@ -18,6 +18,11 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Session\SessionManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForCustomer;
+use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForGuest;
+use Magento\Quote\Model\QuoteIdMaskFactory;
+use Psr\Log\LoggerInterface;
 
 class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -93,6 +98,31 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     private $resourceConnection;
 
     /**
+     * @var CheckoutSession
+     */
+    protected $checkoutSession;
+
+    /**
+     * @var CreateEmptyCartForCustomer
+     */
+    private $createEmptyCartForCustomer;
+
+    /**
+     * @var CreateEmptyCartForGuest
+     */
+    private $createEmptyCartForGuest;
+
+    /**
+     * @var QuoteIdMaskFactory
+     */
+    private $quoteIdMaskFactory;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Constructor.
      * @param Context $context
      * @param Session $customerSession
@@ -102,12 +132,22 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         Session $customerSession,
         SessionManager $sessionManager,
         StoreManagerInterface $storeManager,
-        ResourceConnection $resourceConnection
+        ResourceConnection $resourceConnection,
+        CheckoutSession $checkoutSession,
+        LoggerInterface $logger,
+        CreateEmptyCartForCustomer $createEmptyCartForCustomer,
+        CreateEmptyCartForGuest $createEmptyCartForGuest,
+        QuoteIdMaskFactory $quoteIdMaskFactory
     ) {
         $this->customerSession = $customerSession;
         $this->sessionManager = $sessionManager;
         $this->storeManager = $storeManager;
         $this->resourceConnection = $resourceConnection;
+        $this->checkoutSession = $checkoutSession;
+        $this->createEmptyCartForCustomer = $createEmptyCartForCustomer;
+        $this->createEmptyCartForGuest = $createEmptyCartForGuest;
+        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
+        $this->logger = $logger;
 
         return parent::__construct($context);
     }
@@ -253,6 +293,16 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 
+    public function getStoreId()
+    {
+        return $this->storeManager->getStore()->getId();
+    }
+
+    public function getStoreCode()
+    {
+        return $this->storeManager->getStore()->getCode();
+    }
+
     public function getBaseCurrencyCode()
     {
         return $this->storeManager->getStore()->getBaseCurrencyCode();
@@ -300,25 +350,25 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $stbEnabled = $this->getConfig(self::STB_ENABLED);
         return $stbEnabled === '1';
     }
-    
+
     public function getStbHeight()
     {
         $stbHeight = $this->getConfig(self::STB_HEIGHT);
         return $stbHeight;
     }
-    
+
     public function getStbBorderRadius()
     {
         $stbBorderRadius = $this->getConfig(self::STB_BORDER_RADIUS);
         return $stbBorderRadius;
     }
-    
+
     public function getStbBottomLayerBorderColour()
     {
         $stbBottomLayerBorderColour = $this->getConfig(self::STB_BOTTOM_LAYER_BORDER_COLOUR);
         return $stbBottomLayerBorderColour;
     }
-    
+
     public function getStbBottomLayerBackgroundColour()
     {
         $stbBottomLayerBackgroundColour = $this->getConfig(self::STB_BOTTOM_LAYER_BACKGROUND_COLOUR);
@@ -330,49 +380,49 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $stbTopLayerBackgroundColour = $this->getConfig(self::STB_TOP_LAYER_BACKGROUND_COLOUR);
         return $stbTopLayerBackgroundColour;
     }
-    
+
     public function getStbTopLayerTextColour()
     {
         $stbTopLayerTextColour = $this->getConfig(self::STB_TOP_LAYER_TEXT_COLOUR);
         return $stbTopLayerTextColour;
     }
-    
+
     public function getStbBottomLayerTextColour()
     {
         $stbBottomLayerTextColour = $this->getConfig(self::STB_BOTTOM_LAYER_TEXT_COLOUR);
         return $stbBottomLayerTextColour;
     }
-    
+
     public function getStbThumbBackgroundColour()
     {
         $stbThumbBackgroundColour = $this->getConfig(self::STB_THUMB_BACKGROUND_COLOUR);
         return $stbThumbBackgroundColour;
     }
-    
+
     public function getStbFontFamily()
     {
         $stbFontFamily = $this->getConfig(self::STB_FONT_FAMILY);
         return $stbFontFamily;
     }
-    
+
     public function getStbFontWeight()
     {
         $stbFontWeight = $this->getConfig(self::STB_FONT_WEIGHT);
         return $stbFontWeight;
     }
-    
+
     public function getStbTopLayerFontSize()
     {
         $stbTopLayerFontSize = $this->getConfig(self::STB_TOP_LAYER_FONT_SIZE);
         return $stbTopLayerFontSize;
     }
-    
+
     public function getStbBottomLayerFontSize()
     {
         $stbBottomLayerFontSize = $this->getConfig(self::STB_BOTTOM_LAYER_FONT_SIZE);
         return $stbBottomLayerFontSize;
     }
-    
+
 
     public function getMcBtnCustomStyle()
     {
@@ -472,5 +522,32 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
         return strtr(rawurlencode($str), $revert);
+    }
+
+    public function getSessionCartId()
+    {
+        try {
+            $cartId = $this->checkoutSession->getQuote()->getEntityId();
+
+            if (empty($cartId)) {
+                $customerId = $this->getCustomerId();
+                $customerLoggedIn = $customerId && $customerId > -1;
+
+                $maskedQuoteId = $customerLoggedIn
+                    ? $this->createEmptyCartForCustomer->execute($customerId)
+                    : $this->createEmptyCartForGuest->execute();
+                $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
+
+                if (!$customerLoggedIn) {
+                    $this->checkoutSession->setQuoteId($cartId);
+                }
+            }
+
+            return $cartId;
+        } catch (Exception $e) {
+            $this->logger->error("Exception raised in Instant/Checkout/Controller/Data/GetConfig");
+            $this->logger->error($e->getMessage());
+            return '';
+        }
     }
 }

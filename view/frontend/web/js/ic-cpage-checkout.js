@@ -9,6 +9,11 @@ define([
             template: 'Instant_Checkout/ic-cpage-btn'
         },
 
+        initialize: function () {
+            this._super();
+            return this;
+        },
+
         render: function () {
             checkoutHelper.refreshInstantButtons();
         },

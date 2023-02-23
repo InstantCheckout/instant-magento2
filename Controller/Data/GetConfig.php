@@ -18,7 +18,6 @@ use Instant\Checkout\Service\DoRequest;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Checkout\Model\CompositeConfigProvider;
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\App\Action\Action;
@@ -27,12 +26,8 @@ use Magento\Framework\Controller\Result\JsonFactory as ResultJsonFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\GuestCartManagementInterface;
 use Magento\Quote\Model\QuoteFactory;
-use Psr\Log\LoggerInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForCustomer;
-use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForGuest;
-use Magento\Quote\Model\QuoteIdMaskFactory;
 
 class GetConfig extends Action
 {
@@ -61,10 +56,6 @@ class GetConfig extends Action
      */
     protected $customerSession;
     /**
-     * @var CheckoutSession
-     */
-    protected $checkoutSession;
-    /**
      * @var CartRepositoryInterface
      */
     protected $quoteRepository;
@@ -81,10 +72,6 @@ class GetConfig extends Action
      */
     protected $currencyFactory;
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-    /**
      * @var CustomerRepositoryInterface
      */
     private $customerRepository;
@@ -92,18 +79,6 @@ class GetConfig extends Action
      * @var AddressRepositoryInterface
      */
     private $addressRepository;
-    /**
-     * @var CreateEmptyCartForCustomer
-     */
-    private $createEmptyCartForCustomer;
-    /**
-     * @var QuoteIdMaskFactory
-     */
-    private $quoteIdMaskFactory;
-    /**
-     * @var CreateEmptyCartForGuest
-     */
-    private $createEmptyCartForGuest;
 
     /**
      * Constructor.
@@ -116,18 +91,13 @@ class GetConfig extends Action
         InstantHelper $instantHelper,
         DoRequest $doRequest,
         ResultJsonFactory $resultJsonFactory,
-        CheckoutSession $checkoutSession,
         CustomerSession $customerSession,
         CartRepositoryInterface $quoteRepository,
         GuestCartManagementInterface $cartManagement,
         QuoteFactory $quoteFactory,
         CurrencyFactory $currencyFactory,
-        LoggerInterface $logger,
         CustomerRepositoryInterface $customerRepository,
-        AddressRepositoryInterface $addressRepository,
-        CreateEmptyCartForCustomer $createEmptyCartForCustomer,
-        CreateEmptyCartForGuest $createEmptyCartForGuest,
-        QuoteIdMaskFactory $quoteIdMaskFactory
+        AddressRepositoryInterface $addressRepository
     ) {
         $this->jsonResultFactory = $jsonResultFactory;
         $this->storeManager = $storeManager;
@@ -135,49 +105,16 @@ class GetConfig extends Action
         $this->configProvider = $configProvider;
         $this->instantHelper = $instantHelper;
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->checkoutSession = $checkoutSession;
         $this->customerSession = $customerSession;
         $this->quoteRepository = $quoteRepository;
         $this->cartManagement = $cartManagement;
         $this->quoteFactory = $quoteFactory;
         $this->doRequest = $doRequest;
         $this->currencyFactory = $currencyFactory;
-        $this->logger = $logger;
         $this->customerRepository = $customerRepository;
         $this->addressRepository = $addressRepository;
-        $this->createEmptyCartForCustomer = $createEmptyCartForCustomer;
-        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
-        $this->createEmptyCartForGuest = $createEmptyCartForGuest;
 
         return parent::__construct($context);
-    }
-
-
-    public function getSessionCartId()
-    {
-        try {
-            $cartId = $this->checkoutSession->getQuote()->getEntityId();
-
-            if (empty($cartId)) {
-                $customerId = $this->instantHelper->getCustomerId();
-                $customerLoggedIn = $customerId && $customerId > -1;
-
-                $maskedQuoteId = $customerLoggedIn
-                    ? $this->createEmptyCartForCustomer->execute($customerId)
-                    : $this->createEmptyCartForGuest->execute();
-                $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
-
-                if (!$customerLoggedIn) {
-                    $this->checkoutSession->setQuoteId($cartId);
-                }
-            }
-
-            return $cartId;
-        } catch (Exception $e) {
-            $this->logger->error("Exception raised in Instant/Checkout/Controller/Data/GetConfig");
-            $this->logger->error($e->getMessage());
-            return '';
-        }
     }
 
     /**
@@ -189,7 +126,7 @@ class GetConfig extends Action
 
         $data['enableMinicartBtn'] = $this->instantHelper->getInstantMinicartBtnEnabled();
         $data['appId'] = $this->instantHelper->getInstantAppId();
-        $data['cartId'] = $this->getSessionCartId();
+        $data['cartId'] = $this->instantHelper->getSessionCartId();
         $data['enableSandbox'] = $this->instantHelper->getSandboxEnabledConfig();
         $data['disabledForSkusContaining'] = $this->instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $this->storeManager->getStore()->getCode();
