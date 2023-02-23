@@ -1,6 +1,5 @@
 define(
     [
-        'ko',
         'Magento_Checkout/js/view/payment/default',
         'Magento_CheckoutAgreements/js/model/agreement-validator',
         'Magento_Checkout/js/model/payment/additional-validators',
@@ -11,7 +10,7 @@ define(
         'Instant_Checkout/js/action/post-handle-failed-payment',
         'Instant_Checkout/js/ic-helper'
     ],
-    function (ko, Component, agreementValidator, additionalValidators, placeOrderAction, customerData, $, quote, handlePaymentFailedAction, instantHelper) {
+    function (Component, agreementValidator, additionalValidators, placeOrderAction, customerData, $, quote, handlePaymentFailedAction, instantHelper) {
         'use strict';
         return Component.extend({
             defaults: {
@@ -22,7 +21,7 @@ define(
                 this._super()
                     .observe([
                         'isLoading',
-                        'permanentError'
+                        'permanentError',
                     ]);
 
                 return this;
@@ -91,7 +90,6 @@ define(
                     'method': this.item.method
                 }, this.messageContainer)
                     .fail(function (result) {
-                        console.log(result);
                         if (result && result.responseJSON && result.responseJSON.message)
                             self.showError(result.responseJSON.message);
                         else {
@@ -110,16 +108,14 @@ define(
                         self.isLoading(true);
 
                         window.InstantJS.confirmPaymentElement(orderId, (res) => {
-                            console.log("Successfully confirmed payment element", res);
                             self.isLoading(false);
                             customerData.invalidate(['cart']);
-                            var successUrl = 'http://178.128.81.251/checkout/onepage/success/';
-                            $.mage.redirect(successUrl);
+                            $.mage.redirect(instantHelper.getInstantPayParams().successUrl);
 
                         }, (err) => {
                             handlePaymentFailedAction(function () {
                                 self.isLoading(false);
-                                self.showError(err.error.message);
+                                self.showError(err.message);
                             });
                         });
                     })

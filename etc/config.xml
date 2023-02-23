@@ -13,10 +13,18 @@
         </csp>
         <payment>
             <instant>
-                <general_title>Pay by Card</general_title>
-                <enabled>0</enabled>
-                <title>Pay by Card</title>
                 <model>Instant\Checkout\Model\Payment\InstantPayment</model>
+
+                <general_enabled>0</general_enabled>
+                <general_title>Pay by Card</general_title>
+                <sort_order>1</sort_order>
+
+                <bannerElement_targetElementSelector>#shipping</bannerElement_targetElementSelector>
+                <bannerElement_shouldAppendToElement>prepend</bannerElement_shouldAppendToElement>
+                <bannerElement_theme>light</bannerElement_theme>
+
+                <verificationElement_emailFieldSelector>#shipping input#customer-email.input-text</verificationElement_emailFieldSelector>
+
                 <order_status>pending</order_status>
                 <allowspecific>0</allowspecific>
                 <can_use_checkout>0</can_use_checkout>

@@ -8,15 +8,6 @@
     <comment>
       &lt;p&gt;For additional technical support contact &lt;a href="mailto:hello@instant.one"
       target="_blank" rel="noopener noreferrer"&gt;hello@instant.one&lt;/a&gt;.&lt;/p&gt;</comment>
-    <field
-      id="verificationElementEnabled" translate="label" type="select" sortOrder="20"
-      showInDefault="1"
-      showInWebsite="1" showInStore="1">
-      <label>Enable Verification element</label>
-      <comment><![CDATA[Specifies whether the verification element should be enabled.]]></comment>
-      <config_path>payment/instant/verificationElement_enabled</config_path>
-      <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-    </field>
     <field id="emailFieldSelector"
       translate="label" type="text" sortOrder="20" showInDefault="1"
       showInWebsite="1" showInStore="1">

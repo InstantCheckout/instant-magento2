@@ -8,17 +8,16 @@ define([
         initialize: function () {
             this._super();
 
-            const verificationElementEnabled = checkoutHelper.getInstantPayParams().bannerElement.theme;
-            const verificationElementEmailFieldSelector = checkoutHelper.getInstantPayParams().verificationElement.emailFieldSelector;
+            const instantPayEnabled = checkoutHelper.getInstantPayParams().enabled;
             
-            const bannerElementEnabled = checkoutHelper.getInstantPayParams().bannerElement.theme;
+            const verificationElementEmailFieldSelector = checkoutHelper.getInstantPayParams().verificationElement.emailFieldSelector;
             const bannerElementTargetElementSelector = checkoutHelper.getInstantPayParams().bannerElement.targetElementSelector;
             const bannerElementShowAfterElement = checkoutHelper.getInstantPayParams().bannerElement.shouldAppendToElement;
             const bannerElementTheme = checkoutHelper.getInstantPayParams().bannerElement.theme;
 
             let verificationElementLoadInterval;
             let bannerElementLoadInterval;
-            if (verificationElementEnabled){
+            if (instantPayEnabled){
                 const verificationElementLoadInterval = setInterval(() => {
                     if (window.InstantJS && (document.querySelector(verificationElementEmailFieldSelector) || window.checkoutConfig?.customerData?.email)) {
                         clearInterval(verificationElementLoadInterval);
@@ -33,9 +32,6 @@ define([
                         );
                     }
                 }, 50);
-            }
-
-            if (bannerElementEnabled){
                 const bannerElementLoadInterval = setInterval(() => {
                     if (window.InstantJS && document.querySelector(bannerElementTargetElementSelector)) {
                         clearInterval(bannerElementLoadInterval);

@@ -5,6 +5,7 @@ namespace Instant\Checkout\Model\Ui;
 use Instant\Checkout\Helper\InstantHelper;
 use Instant\Checkout\Helper\InstantPayHelper;
 use Magento\Checkout\Model\ConfigProviderInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class ConfigProvider
@@ -19,14 +20,19 @@ class ConfigProvider implements ConfigProviderInterface
      * @var InstantPayHelper
      */
     private $instantPayHelper;
-
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     public function __construct(
         InstantHelper $instantHelper,
-        InstantPayHelper $instantPayHelper
+        InstantPayHelper $instantPayHelper,
+        StoreManagerInterface $storeManager
     ) {
         $this->instantHelper = $instantHelper;
         $this->instantPayHelper = $instantPayHelper;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -54,7 +60,8 @@ class ConfigProvider implements ConfigProviderInterface
                         'targetElementSelector' => $this->instantPayHelper->getBannerElementTargetElementSelector(),
                         'shouldAppendToElement' => $this->instantPayHelper->getBannerElementShouldAppendToElement(),
                         'theme' => $this->instantPayHelper->getBannerElementTheme(),
-                    ]
+                    ],
+                    'successUrl' => $this->storeManager->getStore()->getUrl('checkout/onepage/success/')
                 ]
             ]
         ];
