@@ -241,6 +241,6 @@ class InstantPayment extends AbstractMethod
     public function getTitle()
     {
         $configTitle = $this->instantPayHelper->getGeneralConfig("title");
-        return $configTitle ? $configTitle : 'Pay by Card';
+        return $configTitle ? $configTitle : 'Instant Pay';
     }
 }
