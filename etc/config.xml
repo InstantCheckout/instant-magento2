@@ -15,7 +15,6 @@
             <instant>
                 <model>Instant\Checkout\Model\Payment\InstantPayment</model>
 
-                <title>Instant Pay</title>
                 <general_enabled>0</general_enabled>
                 <general_title>Pay by Card</general_title>
                 <sort_order>1</sort_order>

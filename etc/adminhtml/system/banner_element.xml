@@ -13,7 +13,7 @@
       showInDefault="1" showInWebsite="1" showInStore="1">
       <label>Enabled</label>
       <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-      <comment><![CDATA[Drives conversions by presenting Instant Checkout to logged in Instant users, or website users who have an email linked to an Instant account]]></comment>
+      <comment><![CDATA[Drives conversions by presenting Instant Checkout at the generic checkout, to logged in Instant users or website users who have an email linked to an Instant account]]></comment>
       <config_path>payment/instant/bannerElement_enabled</config_path>
     </field>
     <field
