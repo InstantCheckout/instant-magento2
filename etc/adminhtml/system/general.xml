@@ -37,7 +37,7 @@
     showInDefault="1" showInWebsite="1" showInStore="1">
     <label>Banner Element Enabled</label>
     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-    <comment><![CDATA[Drives conversions at the generic checkout by presenting Instant Checkout to both logged-in Instant users or website users who have an email linked to an Instant account.<br>Enabling the Payment Method will enable the Verification Element and ignore this setting.]]></comment>
+    <comment><![CDATA[Drives conversions at the generic checkout by presenting Instant Checkout to both logged-in Instant users or website users who have an email linked to an Instant account.<br>Enabling the Payment Method will enable the Banner Element and ignore this setting.]]></comment>
     <config_path>payment/instant/general_bannerElementEnabled</config_path>
   </field>
 </include>
