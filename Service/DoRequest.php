@@ -16,7 +16,6 @@ use Exception;
 use Instant\Checkout\Api\Data\RequestLogInterface;
 use Instant\Checkout\Helper\InstantHelper;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\HTTP\Client\Curl;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use Instant\Checkout\Api\Data\RequestLogInterfaceFactory;
@@ -28,11 +27,6 @@ use Instant\Checkout\Api\RequestLogRepositoryInterfaceFactory;
 class DoRequest
 {
     const AGENT = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)';
-
-    /**
-     * @var Curl
-     */
-    private $curl;
 
     /**
      * @var InstantHelper
@@ -62,19 +56,24 @@ class DoRequest
      * @SuppressWarnings(PHPMD.LongVariable)
      */
     public function __construct(
-        Curl $curl,
         StoreManagerInterface $storeManager,
         InstantHelper $instantHelper,
         LoggerInterface $logger,
         RequestLogInterfaceFactory $requestLogInterfaceFactory,
         RequestLogRepositoryInterfaceFactory $requestLogRepositoryInterfaceFactory
     ) {
-        $this->curl = $curl;
         $this->storeMananger = $storeManager;
         $this->instantHelper = $instantHelper;
         $this->logger = $logger;
         $this->requestLogInterfaceFactory = $requestLogInterfaceFactory;
         $this->requestLogRepositoryInterfaceFactory = $requestLogRepositoryInterfaceFactory;
+    }
+
+    public function getCurl()
+    {
+        // We do this manually to ensure that other extensions that override the Curl class, do not interfere with Instant.
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        return $objectManager->get('Magento\Framework\HTTP\Client\Curl');
     }
 
     public function logInfo($msg)
@@ -129,8 +128,9 @@ class DoRequest
             if ($enableIdempotency) {
                 $headers["Idempotency-Key"] = $idempotencyKey;
             }
-            $this->curl->setHeaders($headers);
-            $this->curl->setTimeout(30);
+            $curl = $this->getCurl();
+            $curl->setHeaders($headers);
+            $curl->setTimeout(30);
 
             $baseApiUrl = $this->instantHelper->getInstantApiUrl();
             $requestUri = $baseApiUrl . $endpoint;
@@ -154,8 +154,8 @@ class DoRequest
                 $this->logError('Error sending request: ' . $e->getMessage());
             }
 
-            $result = $this->curl->getBody();
-            $status = $this->curl->getStatus();
+            $result = $curl->getBody();
+            $status = $curl->getStatus();
             $this->logInfo('Request response received.');
             $this->logInfo('Result: ' . $result);
             $this->logInfo('Status Code ' . $status);
