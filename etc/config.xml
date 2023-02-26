@@ -31,6 +31,9 @@
                 <allowspecific>0</allowspecific>
                 <can_use_checkout>0</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
+
+                <payment_action>authorize</payment_action>
+                <active>1</active>
             </instant>
         </payment>
         <instant>
