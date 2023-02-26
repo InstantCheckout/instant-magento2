@@ -10,8 +10,8 @@ define([
 
             const instantPayEnabled = checkoutHelper.getInstantPayParams().enabled;
 
-            const verificationElementEnabled = instantPayEnabled ? true : checkoutHelper.getInstantPayParams().verificationElement.enabled;
-            const bannerElementEnabled = instantPayEnabled ? true : checkoutHelper.getInstantPayParams().bannerElement.enabled;
+            const verificationElementEnabled = checkoutHelper.getInstantPayParams().verificationElementEnabled;
+            const bannerElementEnabled = checkoutHelper.getInstantPayParams().bannerElementEnabled;
 
             const verificationElementEmailFieldSelector = checkoutHelper.getInstantPayParams().verificationElement.emailFieldSelector;
             const bannerElementTargetElementSelector = checkoutHelper.getInstantPayParams().bannerElement.targetElementSelector;
