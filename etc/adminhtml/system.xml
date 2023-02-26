@@ -5,8 +5,10 @@
         <section id="payment">
             <group id="instant" translate="label" sortOrder="2" showInDefault="1"
                 showInWebsite="1" showInStore="1">
-                <comment>Increase conversions and bring a frictionless checkout experience to
-                    your customers with Instant Pay.</comment>
+                <comment><![CDATA[Increase conversions and bring a frictionless checkout experience to
+                    your customers with Instant Pay.<br>Ensure that the Instant integration is
+                    activated
+                    via Configuration > Instant > App Configuration before Instant Pay is enabled.]]></comment>
                 <fieldset_css>complex instant-admin-config</fieldset_css>
                 <frontend_model>Instant\Checkout\Block\Adminhtml\Config\Fieldset</frontend_model>
                 <attribute type="displayIn">recommended_solutions</attribute>

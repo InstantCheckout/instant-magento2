@@ -106,11 +106,11 @@ class InstantPayHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getBannerElementEnabled()
     {
-        return $this->getBannerElementConfig('enabled') === '1';
+        return $this->getGeneralConfig('bannerElementEnabled') === '1';
     }
 
     public function getVerificationElementEnabled()
     {
-        return $this->getVerificationElementConfig('enabled') === '1';
+        return $this->getGeneralConfig('verificationElementEnabled') === '1';
     }
 }

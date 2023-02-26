@@ -44,19 +44,28 @@ class ConfigProvider implements ConfigProviderInterface
     {
         $data = [];
 
+        $paymentMethodEnabled = $this->instantHelper->getInstantAppId() !== '' && $this->instantHelper->getInstantAppId() !== null && $this->instantPayHelper->getInstantPayEnabled();
+        $verificationElementEnabled = $this->instantHelper->getInstantAppId() !== '' && $this->instantHelper->getInstantAppId() !== null && $this->instantPayHelper->getVerificationElementEnabled();
+        $bannerElementEnabled = $this->instantHelper->getInstantAppId() !== '' && $this->instantHelper->getInstantAppId() !== null && $this->instantPayHelper->getBannerElementEnabled();
+
+        if ($paymentMethodEnabled) {
+            $verificationElementEnabled = true;
+            $bannerElementEnabled = true;
+        }
+
         $data = [
             'payment' => [
                 'instant' => [
-                    'enabled' => $this->instantPayHelper->getInstantPayEnabled(),
+                    'enabled' => $paymentMethodEnabled,
+                    'bannerElementEnabled' => $bannerElementEnabled,
+                    'verificationElementEnabled' => $verificationElementEnabled,
                     'merchantId' => $this->instantHelper->getInstantAppId(),
                     'storeCode' => $this->instantHelper->getStoreCode(),
                     'cartId' => $this->instantHelper->getSessionCartId(),
                     'verificationElement' => [
-                        'enabled' => $this->instantPayHelper->getVerificationElementEnabled(),
                         'emailFieldSelector' => $this->instantPayHelper->getVerificationElementEmailFieldSelector(),
                     ],
                     'bannerElement' => [
-                        'enabled' => $this->instantPayHelper->getBannerElementEnabled(),
                         'targetElementSelector' => $this->instantPayHelper->getBannerElementTargetElementSelector(),
                         'shouldAppendToElement' => $this->instantPayHelper->getBannerElementShouldAppendToElement(),
                         'theme' => $this->instantPayHelper->getBannerElementTheme(),

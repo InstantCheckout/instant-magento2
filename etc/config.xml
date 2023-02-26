@@ -16,6 +16,9 @@
                 <model>Instant\Checkout\Model\Payment\InstantPayment</model>
 
                 <general_enabled>0</general_enabled>
+                <general_verificationElementEnabled>1</general_verificationElementEnabled>
+                <general_bannerElementEnabled>1</general_bannerElementEnabled>
+
                 <general_title>Pay by Card</general_title>
                 <sort_order>1</sort_order>
 
@@ -30,6 +33,7 @@
                 <can_use_checkout>0</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
 
+                <title>Instant Pay</title>
                 <payment_action>authorize</payment_action>
                 <active>1</active>
             </instant>

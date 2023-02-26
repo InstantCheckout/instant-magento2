@@ -8,6 +8,7 @@
     <comment>
       &lt;p&gt;For additional technical support contact &lt;a href="mailto:hello@instant.one"
       target="_blank" rel="noopener noreferrer"&gt;hello@instant.one&lt;/a&gt;.&lt;/p&gt;</comment>
+
     <field id="emailFieldSelector"
       translate="label" type="text" sortOrder="20" showInDefault="1"
       showInWebsite="1" showInStore="1">
