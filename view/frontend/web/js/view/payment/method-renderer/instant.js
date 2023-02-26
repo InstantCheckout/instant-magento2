@@ -16,7 +16,7 @@ define(
             defaults: {
                 template: 'Instant_Checkout/payment/instant'
             },
-
+            // 
             initObservable: function () {
                 this._super()
                     .observe([
