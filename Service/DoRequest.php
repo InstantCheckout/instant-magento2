@@ -142,10 +142,10 @@ class DoRequest
             try {
                 switch ($requestMethod) {
                     case 'POST':
-                        $this->curl->post($requestUri, $requestBody);
+                        $curl->post($requestUri, $requestBody);
                         break;
                     case 'GET':
-                        $this->curl->get($requestUri);
+                        $curl->get($requestUri);
                         break;
                     default:
                         throw new LocalizedException(__('This %1 request method is not implemented yet.', $requestMethod));
