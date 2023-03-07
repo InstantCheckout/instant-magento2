@@ -10,6 +10,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Api\OrderManagementInterface;
 
 class Service implements ServiceInterface
 {
@@ -34,7 +35,6 @@ class Service implements ServiceInterface
      */
     private $serializer;
 
-
     /**
      * @var QuoteFactory
      */
@@ -44,6 +44,11 @@ class Service implements ServiceInterface
      * @var OrderRepositoryInterface
      */
     private $orderRepository;
+
+    /**
+     * @var OrderManagementInterface
+     */
+    protected $orderManagement;
 
     /**
      * @var Order
@@ -69,6 +74,7 @@ class Service implements ServiceInterface
         Registry $registry,
         QuoteFactory $quoteFactory,
         OrderRepositoryInterface $orderRepository,
+        OrderManagementInterface $orderManagement,
         Order $order
     ) {
         $this->checkoutHelper = $checkoutHelper;
@@ -78,6 +84,7 @@ class Service implements ServiceInterface
         $this->quoteFactory = $quoteFactory;
         $this->orderRepository = $orderRepository;
         $this->order = $order;
+        $this->orderManagement = $orderManagement;
     }
 
     public function deleteLastRealOrder()
@@ -88,6 +95,7 @@ class Service implements ServiceInterface
         }
 
         $order = $this->order->loadByIncrementId($lastRealOrderId);
+        $this->orderManagement->cancel($order->getId());
         $this->orderRepository->delete($order);
     }
 
