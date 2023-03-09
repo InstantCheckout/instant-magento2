@@ -191,11 +191,18 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                     accessToken, 
                     accessTokenSecret
                  }
+
+                 Endpoint could
+                 - Create merchant (Merchant ID)
+                 - Create SSM access token (Instant Access Token)
+                 - Setup stores
+                 - Returns back to this function: MerchantID and access token
                  returns
                  {
                     appId: string,
                     accessToken: string
                  }
+
                  - Commit appId + accessToken to M2 config
                 */
             } catch (Exception $e) {
