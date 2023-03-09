@@ -182,6 +182,22 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                 $token->createVerifierToken($consumerId);
                 $token->setType('access');
                 $token->save();
+
+                /* Call Instant's new endpoint
+                 - Endpoint called with
+                 {
+                    consumerKey, 
+                    consumerSecret, 
+                    accessToken, 
+                    accessTokenSecret
+                 }
+                 returns
+                 {
+                    appId: string,
+                    accessToken: string
+                 }
+                 - Commit appId + accessToken to M2 config
+                */
             } catch (Exception $e) {
                 echo 'Error : ' . $e->getMessage();
             }
