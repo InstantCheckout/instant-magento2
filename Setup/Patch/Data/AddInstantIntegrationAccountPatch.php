@@ -19,7 +19,8 @@ use Magento\Integration\Model\AuthorizationService;
 use Magento\Integration\Model\IntegrationFactory;
 use Magento\Integration\Model\Oauth\TokenFactory as Token;
 use Magento\Integration\Model\OauthService;
-use Magento\Store\Model\StoreManagerInterface;
+
+use Instant\Checkout\Service\DoRequest;
 
 class AddInstantIntegrationAccountPatch implements DataPatchInterface
 {
@@ -49,27 +50,31 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
     private $integrationFactory;
 
     /**
+     * @var DoRequest
+     */
+    private $doRequest;
+
+    /**
      * AddInstantIntegrationAccountPatch constructor. 
      * This is a data patch that adds the Instant Checkout integration.
-     * @param StoreManagerInterface $storeManager
      * @param Token $token
      * @param AuthorizationService $authorizationService
      * @param OauthService $oAuthService
      * @param IntegrationFactory $integrationFactory
-     * @param Logger $logger
+     * @param DoRequest $doRequest
      */
     public function __construct(
-        StoreManagerInterface $storeManager,
         Token $token,
         AuthorizationService $authorizationService,
         OauthService $oAuthService,
-        IntegrationFactory $integrationFactory
+        IntegrationFactory $integrationFactory,
+        DoRequest $doRequest
     ) {
         $this->tokenFactory = $token;
-        $this->storeManager = $storeManager;
         $this->authorizationService = $authorizationService;
         $this->oAuthService = $oAuthService;
         $this->integrationFactory = $integrationFactory;
+        $this->doRequest = $doRequest;
     }
 
     /**
@@ -181,30 +186,33 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                 $token = $this->tokenFactory->create();
                 $token->createVerifierToken($consumerId);
                 $token->setType('access');
-                $token->save();
+        		$token->save();
 
-                /* Call Instant's new endpoint
-                 - Endpoint called with
-                 {
-                    consumerKey, 
-                    consumerSecret, 
-                    accessToken, 
-                    accessTokenSecret
-                 }
+                // Call new Instant Endpoint
+                $response = $this->doRequest->execute(
+                    'someUrl',
+                    [
+                        'consumerKey'       => '1234',
+                        'consumerSecret'    => '1234',
+                        'accessToken'       => '1234',
+                        'accessTokenSecret' => '1234',
+                        'platform'          => 'MAGENTO',
+                        'baseUrl'           => 'get-base-url-here',
+                        'merchantName'      => 'get-merchant-name',
+                        'email'             => 'get-merchant-email',
+                        'isStaging'         => true,
+                    ],
+                );
 
-                 Endpoint could
-                 - Create merchant (Merchant ID)
-                 - Create SSM access token (Instant Access Token)
-                 - Setup stores
-                 - Returns back to this function: MerchantID and access token
-                 returns
+                /* 
+                 $response returns:
                  {
                     appId: string,
                     accessToken: string
                  }
-
-                 - Commit appId + accessToken to M2 config
                 */
+
+                // TODO: Commit appId and accessToken to M2 config
             } catch (Exception $e) {
                 echo 'Error : ' . $e->getMessage();
             }
