@@ -203,21 +203,25 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                 $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData(); 
                 $consumer = $this->oAuthService->loadConsumer($instantIntegration["consumer_id"]);
 
+                $baseUrl = $this->storeManagerInterface->getStore()->getBaseUrl();
+
                 // Call new Instant Endpoint
                 $response = $this->doRequest->execute(
-                    'someUrl',
+                    'https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate',
                     [
                         'consumerKey'       => $consumer->getKey(),
                         'consumerSecret'    => $consumer->getSecret(),
                         'accessToken'       => $token->getToken(),
                         'accessTokenSecret' => $token->getSecret(),
                         'platform'          => 'MAGENTO',
-                        'baseUrl'           => $this->storeManagerInterface->getStore()->getBaseUrl(),
+                        'baseUrl'           => $baseUrl,
                         'merchantName'      => 'Magento Test Merchant',
                         'email'             => 'test@example.com',
                         'isStaging'         => true,
                     ],
                 );
+
+                \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('message', $response);
 
                 /* 
                  $response returns:
