@@ -21,6 +21,7 @@ use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\Oauth\TokenFactory;
 use Magento\Integration\Model\OauthService;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 use Instant\Checkout\Service\DoRequest;
 
@@ -62,7 +63,7 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
     private $storeManagerInterface;
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -82,11 +83,8 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
         IntegrationFactory $integrationFactory,
         DoRequest $doRequest,
         StoreManagerInterface $storeManagerInterface,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Framework\App\State $state
+        LoggerInterface $logger
     ) {
-        $state->setAreaCode(\Magento\Framework\App\Area::AREA_FRONTEND);
-
         $this->tokenFactory = $tokenFactory;
         $this->authorizationService = $authorizationService;
         $this->oAuthService = $oAuthService;

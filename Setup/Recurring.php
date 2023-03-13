@@ -12,6 +12,7 @@ use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\IntegrationFactory;
 use Magento\Integration\Model\OauthService;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\State;
 
 class Recurring implements InstallSchemaInterface
 {
@@ -31,7 +32,10 @@ class Recurring implements InstallSchemaInterface
         IntegrationFactory $integrationFactory,
         OauthService $oAuthService,
         StoreManagerInterface $storeManagerInterface,
+        State $state
     ) {
+        $state->setAreaCode(\Magento\Framework\App\Area::AREA_FRONTEND);
+
         $this->logger = $logger;
         $this->doRequest = $doRequest;
         $this->token = $token;
@@ -43,35 +47,37 @@ class Recurring implements InstallSchemaInterface
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
-
-
-        $this->logger->debug("==== LOGGING FROM RECURRING SCHEMA =====");
         $this->runAdditionalSetup($this->token);
-
         $setup->endSetup();
     }
 
     private function runAdditionalSetup(Token $token)
     {
+        $this->logger->debug("==== LOGGING FROM RECURRING SCHEMA =====");
+
         $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
         $consumer = $this->oAuthService->loadConsumer($instantIntegration["consumer_id"]);
 
         $baseUrl = $this->storeManagerInterface->getStore()->getBaseUrl();
 
+        $postData = [
+            'consumerKey'       => $consumer->getKey(),
+            'consumerSecret'    => $consumer->getSecret(),
+            'accessToken'       => $token->getToken(),
+            'accessTokenSecret' => $token->getSecret(),
+            'platform'          => 'MAGENTO',
+            'baseUrl'           => $baseUrl,
+            'merchantName'      => 'Magento Test Merchant',
+            'email'             => 'test@example.com',
+            'isStaging'         => true,
+        ];
+
+        $this->logger->debug('==== POST DATA:', $postData);
+
         // Call new Instant Endpoint
         $response = $this->doRequest->execute(
             'https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate',
-            [
-                'consumerKey'       => $consumer->getKey(),
-                'consumerSecret'    => $consumer->getSecret(),
-                'accessToken'       => $token->getToken(),
-                'accessTokenSecret' => $token->getSecret(),
-                'platform'          => 'MAGENTO',
-                'baseUrl'           => $baseUrl,
-                'merchantName'      => 'Magento Test Merchant',
-                'email'             => 'test@example.com',
-                'isStaging'         => true,
-            ],
+            $postData
         );
 
         $this->logger->debug('===== RESPONSE:', (array) $response);
