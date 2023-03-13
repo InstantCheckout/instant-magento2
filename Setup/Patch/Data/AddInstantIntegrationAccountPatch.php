@@ -20,10 +20,6 @@ use Magento\Integration\Model\IntegrationFactory;
 use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\Oauth\TokenFactory;
 use Magento\Integration\Model\OauthService;
-use Magento\Store\Model\StoreManagerInterface;
-use Psr\Log\LoggerInterface;
-
-use Instant\Checkout\Service\DoRequest;
 
 class AddInstantIntegrationAccountPatch implements DataPatchInterface
 {
@@ -53,45 +49,23 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
     private $integrationFactory;
 
     /**
-     * @var DoRequest
-     */
-    private $doRequest;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManagerInterface;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * AddInstantIntegrationAccountPatch constructor. 
      * This is a data patch that adds the Instant Checkout integration.
      * @param Token $token
      * @param AuthorizationService $authorizationService
      * @param OauthService $oAuthService
      * @param IntegrationFactory $integrationFactory
-     * @param DoRequest $doRequest
      */
     public function __construct(
         TokenFactory $tokenFactory,
         AuthorizationService $authorizationService,
         OauthService $oAuthService,
         IntegrationFactory $integrationFactory,
-        DoRequest $doRequest,
-        StoreManagerInterface $storeManagerInterface,
-        LoggerInterface $logger
     ) {
         $this->tokenFactory = $tokenFactory;
         $this->authorizationService = $authorizationService;
         $this->oAuthService = $oAuthService;
         $this->integrationFactory = $integrationFactory;
-        $this->doRequest = $doRequest;
-        $this->storeManagerInterface = $storeManagerInterface;
-        $this->logger = $logger;
     }
 
     /**
@@ -111,8 +85,6 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
      */
     public function apply()
     {
-        $this->logger->debug('========== LOGGING IN INSTANT PATCH =============');
-
         $integrationExists = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
 
         if (empty($integrationExists)) {
@@ -208,55 +180,10 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                 $token->createVerifierToken($consumerId);
                 $token->setType('access');
                 $token->save();
-
-               // try {
-               //     $this->logger->debug('===== RUNNING SETUP FUNCTION');
-               //     $this->runAdditionalSetup($token);
-               // } catch (\Exception $e) {
-               //     $this->logger->debug('---> Setup Error:', (array) $e);
-               // }
             } catch (Exception $e) {
                 echo 'Error : ' . $e->getMessage();
             }
         }
-    }
-
-    private function runAdditionalSetup(Token $token)
-    {
-        $this->logger->debug('===== RUNNING ADDITIONAL SETUP FUNCTION =====');
-
-        $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
-        $consumer = $this->oAuthService->loadConsumer($instantIntegration["consumer_id"]);
-
-        $baseUrl = $this->storeManagerInterface->getStore()->getBaseUrl();
-
-        // Call new Instant Endpoint
-        $response = $this->doRequest->execute(
-            'https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate',
-            [
-                'consumerKey'       => $consumer->getKey(),
-                'consumerSecret'    => $consumer->getSecret(),
-                'accessToken'       => $token->getToken(),
-                'accessTokenSecret' => $token->getSecret(),
-                'platform'          => 'MAGENTO',
-                'baseUrl'           => $baseUrl,
-                'merchantName'      => 'Magento Test Merchant',
-                'email'             => 'test@example.com',
-                'isStaging'         => true,
-            ],
-        );
-
-        $this->logger->debug('===== RESPONSE:', (array) $response);
-
-        /* 
-                 $response returns:
-                 {
-                    appId: string,
-                    accessToken: string
-                 }
-                */
-
-        // TODO: Commit appId and accessToken to M2 config
     }
 
     /**
