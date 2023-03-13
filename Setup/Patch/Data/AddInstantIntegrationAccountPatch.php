@@ -211,12 +211,12 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                 $token->setType('access');
                 $token->save();
 
-                try {
-                    $this->logger->debug('===== RUNNING SETUP FUNCTION');
-                    $this->runAdditionalSetup($token);
-                } catch (\Exception $e) {
-                    $this->logger->debug('---> Setup Error:', (array) $e);
-                }
+               // try {
+               //     $this->logger->debug('===== RUNNING SETUP FUNCTION');
+               //     $this->runAdditionalSetup($token);
+               // } catch (\Exception $e) {
+               //     $this->logger->debug('---> Setup Error:', (array) $e);
+               // }
             } catch (Exception $e) {
                 echo 'Error : ' . $e->getMessage();
             }
