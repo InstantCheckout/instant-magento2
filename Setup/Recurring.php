@@ -17,18 +17,18 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\State;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\Config\Storage\WriterInterface;
-use Magento\TestFramework\Store\StoreManager;
 
 class Recurring implements InstallSchemaInterface
 {
     const INTEGRATION_NAME = 'Instant Checkout';
+    const PLATFORM = 'MAGENTO';
 
     private $logger;
     private $doRequest;
     private $token;
     private $integrationFactory;
     private $oAuthService;
-    private $storeManagerInterface;
+    private $storeManager;
     private $configWriter;
 
     public function __construct(
@@ -37,10 +37,11 @@ class Recurring implements InstallSchemaInterface
         Token $token,
         IntegrationFactory $integrationFactory,
         OauthService $oAuthService,
-        StoreManagerInterface $storeManagerInterface,
-        State $state,
-        WriterInterface $configWriter
+        StoreManagerInterface $storeManager,
+        WriterInterface $configWriter,
+        State $state
     ) {
+        // TODO: Fix this issue (Area code not set).
         $state->setAreaCode(Area::AREA_FRONTEND);
 
         $this->logger = $logger;
@@ -48,35 +49,35 @@ class Recurring implements InstallSchemaInterface
         $this->token = $token;
         $this->integrationFactory = $integrationFactory;
         $this->oAuthService = $oAuthService;
-        $this->storeManagerInterface = $storeManagerInterface;
+        $this->storeManager = $storeManager;
         $this->configWriter = $configWriter;
     }
 
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
-        $this->runAdditionalSetup($this->token);
+        $this->addInstantAppIdAndAccessTokenToConfig();
         $setup->endSetup();
     }
 
-    private function runAdditionalSetup(Token $token)
+    private function addInstantAppIdAndAccessTokenToConfig()
     {
         $this->logger->debug("==== LOGGING FROM RECURRING SCHEMA =====");
 
         $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
         $consumer = $this->oAuthService->loadConsumer($instantIntegration["consumer_id"]);
         $oAuthToken = $this->token->loadByConsumerIdAndUserType($consumer->getId(), 1);
-        $baseUrl = $this->storeManagerInterface->getStore()->getBaseUrl();
+        $baseUrl = $this->storeManager->getStore()->getBaseUrl();
 
         $postData = [
             'consumerKey'       => $consumer->getKey(),
             'consumerSecret'    => $consumer->getSecret(),
             'accessToken'       => $oAuthToken->getToken(),
             'accessTokenSecret' => $oAuthToken->getSecret(),
-            'platform'          => 'MAGENTO',
+            'platform'          => static::PLATFORM,
             'baseUrl'           => $baseUrl,
-            'merchantName'      => 'Magento 123123',
-            'email'             => 'test@example.com',
+            'merchantName'      => $this->storeManager->getStore()->getId(),
+            'email'             => 'test2@example.com',
             'isStaging'         => true,
         ];
 
@@ -95,7 +96,14 @@ class Recurring implements InstallSchemaInterface
 
         $this->logger->debug('===== RESPONSE:', (array) $response);
 
-        $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH . '_test', $response['merchantId']);
-        $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH . '_test', $response['accessToken']);
+        try {
+            $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH . '_test', $response['merchantId']);
+            $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH . '_test', $response['accessToken']);
+        } catch (\Exception $e) {
+            $this->logger->critical(
+                'Instant: Unable to set App ID and Access Token from Recurring function. POST request may be failing.',
+                (array) $e
+            );
+        }
     }
 }

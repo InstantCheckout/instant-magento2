@@ -60,7 +60,7 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
         TokenFactory $tokenFactory,
         AuthorizationService $authorizationService,
         OauthService $oAuthService,
-        IntegrationFactory $integrationFactory,
+        IntegrationFactory $integrationFactory
     ) {
         $this->tokenFactory = $tokenFactory;
         $this->authorizationService = $authorizationService;
