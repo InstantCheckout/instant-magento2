@@ -62,6 +62,11 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
     private $storeManagerInterface;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * AddInstantIntegrationAccountPatch constructor. 
      * This is a data patch that adds the Instant Checkout integration.
      * @param Token $token
@@ -76,14 +81,19 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
         OauthService $oAuthService,
         IntegrationFactory $integrationFactory,
         DoRequest $doRequest,
-        StoreManagerInterface $storeManagerInterface
+        StoreManagerInterface $storeManagerInterface,
+        \Psr\Log\LoggerInterface $logger,
+        \Magento\Framework\App\State $state
     ) {
+        $state->setAreaCode(\Magento\Framework\App\Area::AREA_FRONTEND);
+
         $this->tokenFactory = $tokenFactory;
         $this->authorizationService = $authorizationService;
         $this->oAuthService = $oAuthService;
         $this->integrationFactory = $integrationFactory;
         $this->doRequest = $doRequest;
         $this->storeManagerInterface = $storeManagerInterface;
+        $this->logger = $logger;
     }
 
     /**
@@ -103,6 +113,8 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
      */
     public function apply()
     {
+        $this->logger->debug('========== LOGGING IN INSTANT PATCH =============');
+
         $integrationExists = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
 
         if (empty($integrationExists)) {
@@ -113,6 +125,7 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                 'endpoint' => '',
                 'setup_type' => '0'
             );
+
             try {
                 // Create integration 
                 $integration = $this->integrationFactory->create()->setData($integrationData);
@@ -196,34 +209,48 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                 $token = $this->tokenFactory->create();
                 $token->createVerifierToken($consumerId);
                 $token->setType('access');
-        		$token->save();
+                $token->save();
 
-                // =========
+                try {
+                    $this->logger->debug('===== RUNNING SETUP FUNCTION');
+                    $this->runAdditionalSetup($token);
+                } catch (\Exception $e) {
+                    $this->logger->debug('---> Setup Error:', (array) $e);
+                }
+            } catch (Exception $e) {
+                echo 'Error : ' . $e->getMessage();
+            }
+        }
+    }
 
-                $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData(); 
-                $consumer = $this->oAuthService->loadConsumer($instantIntegration["consumer_id"]);
+    private function runAdditionalSetup(Token $token)
+    {
+        $this->logger->debug('===== RUNNING ADDITIONAL SETUP FUNCTION =====');
 
-                $baseUrl = $this->storeManagerInterface->getStore()->getBaseUrl();
+        $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
+        $consumer = $this->oAuthService->loadConsumer($instantIntegration["consumer_id"]);
 
-                // Call new Instant Endpoint
-                $response = $this->doRequest->execute(
-                    'https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate',
-                    [
-                        'consumerKey'       => $consumer->getKey(),
-                        'consumerSecret'    => $consumer->getSecret(),
-                        'accessToken'       => $token->getToken(),
-                        'accessTokenSecret' => $token->getSecret(),
-                        'platform'          => 'MAGENTO',
-                        'baseUrl'           => $baseUrl,
-                        'merchantName'      => 'Magento Test Merchant',
-                        'email'             => 'test@example.com',
-                        'isStaging'         => true,
-                    ],
-                );
+        $baseUrl = $this->storeManagerInterface->getStore()->getBaseUrl();
 
-                \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug('message', $response);
+        // Call new Instant Endpoint
+        $response = $this->doRequest->execute(
+            'https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate',
+            [
+                'consumerKey'       => $consumer->getKey(),
+                'consumerSecret'    => $consumer->getSecret(),
+                'accessToken'       => $token->getToken(),
+                'accessTokenSecret' => $token->getSecret(),
+                'platform'          => 'MAGENTO',
+                'baseUrl'           => $baseUrl,
+                'merchantName'      => 'Magento Test Merchant',
+                'email'             => 'test@example.com',
+                'isStaging'         => true,
+            ],
+        );
 
-                /* 
+        $this->logger->debug('===== RESPONSE:', (array) $response);
+
+        /* 
                  $response returns:
                  {
                     appId: string,
@@ -231,11 +258,7 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                  }
                 */
 
-                // TODO: Commit appId and accessToken to M2 config
-            } catch (Exception $e) {
-                echo 'Error : ' . $e->getMessage();
-            }
-        }
+        // TODO: Commit appId and accessToken to M2 config
     }
 
     /**
