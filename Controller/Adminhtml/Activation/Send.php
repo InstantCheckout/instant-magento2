@@ -24,6 +24,7 @@ use Magento\Integration\Model\OauthService;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Instant\Checkout\Helper\InstantHelper;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -73,7 +74,12 @@ class Send extends Action
      * @var LoggerInterface
      */
     protected $logger;
-    
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
 
     /**
      * Send constructor.
@@ -95,7 +101,8 @@ class Send extends Action
         ResultJsonFactory $resultJsonFactory,
         StoreManagerInterface $storeManagerInterface,
         WriterInterface $configWriter,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->logger = $logger;
         $this->integrationFactory = $integrationFactory;
@@ -105,27 +112,28 @@ class Send extends Action
         $this->storeManagerInterface = $storeManagerInterface;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->configWriter = $configWriter;
+        $this->scopeConfig = $scopeConfig;
 
         parent::__construct($context);
     }
 
-    public function execute() {
-        // $this->getAppIdAndTokenFromBackend();
+    public function execute()
+    {
+        $this->getAppIdAndTokenFromBackend();
     }
 
-    private function getStoreEmails() {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $scopeConfig = $objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface');
-        $email = $scopeConfig->getValue('trans_email/ident_support/email',\Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-
-        $this->logger->debug("=== Email is:", $email);
+    // TODO: Return an array for all stores?
+    private function getStoreEmail(): string
+    {
+        return $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
-    private function getAppIdAndTokenFromBackend() {
+    private function getAppIdAndTokenFromBackend()
+    {
         $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
         $consumer = $this->oauthService->loadConsumer($instantIntegration["consumer_id"]);
         $token = $this->oauthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
-        $baseUrl = $this->storeManagerInterface->getStore()->getBaseUrl();
+        $store = $this->storeManagerInterface->getStore();
 
         $postData = [
             'consumerKey'       => $consumer->getKey(),
@@ -133,9 +141,9 @@ class Send extends Action
             'accessToken'       => $token->getToken(),
             'accessTokenSecret' => $token->getSecret(),
             'platform'          => 'MAGENTO',
-            'baseUrl'           => $baseUrl,
-            'merchantName'      => $this->storeManagerInterface->getStore()->getId(),
-            'email'             => 'test15@example.com',
+            'baseUrl'           => $store->getBaseUrl(),
+            'merchantName'      => $store->getId(),
+            'email'             => $this->getStoreEmail(),
             'isStaging'         => true,
         ];
 
