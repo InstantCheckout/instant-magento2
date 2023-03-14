@@ -17,15 +17,14 @@ namespace Instant\Checkout\Controller\Adminhtml\Activation;
 use Instant\Checkout\Service\DoRequest;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory as ResultJsonFactory;
-use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Oauth\Exception;
 use Magento\Integration\Model\IntegrationFactory;
 use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\OauthService;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
+use Instant\Checkout\Helper\InstantHelper;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Send
@@ -34,34 +33,47 @@ use Magento\Store\Model\StoreManagerInterface;
 class Send extends Action
 {
     const INTEGRATION_NAME = 'Instant Checkout';
+
     /**
      * @var IntegrationFactory
      */
     protected $integrationFactory;
+
     /**
      * @var Token
      */
     protected $oauthToken;
+
     /**
      * @var OauthService
      */
     protected $oauthService;
+
     /**
      * @var DoRequest
      */
     protected $doRequest;
-    /**
-     * @var Logger
-     */
-    protected $logger;
+
     /**
      * @var StoreManagerInterface
      */
     protected $storeManagerInterface;
+
     /**
      * @var ResultJsonFactory
      */
     protected $resultJsonFactory;
+
+    /**
+     * @var WriterInterface
+     */
+    protected $configWriter;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+    
 
     /**
      * Send constructor.
@@ -72,7 +84,7 @@ class Send extends Action
      * @param DoRequest $request
      * @param ResultJsonFactory $resultJsonFactory
      * @param StoreManagerInterface $storeManagerInterface
-     * @SuppressWarnings(PHPMD.LongVariable)
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -81,63 +93,77 @@ class Send extends Action
         OauthService $oauthService,
         DoRequest $doRequest,
         ResultJsonFactory $resultJsonFactory,
-        StoreManagerInterface $storeManagerInterface
+        StoreManagerInterface $storeManagerInterface,
+        WriterInterface $configWriter,
+        LoggerInterface $logger
     ) {
+        $this->logger = $logger;
         $this->integrationFactory = $integrationFactory;
         $this->oauthToken = $oauthToken;
         $this->oauthService = $oauthService;
         $this->doRequest = $doRequest;
         $this->storeManagerInterface = $storeManagerInterface;
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->configWriter = $configWriter;
+
         parent::__construct($context);
     }
 
-    /**
-     * @return ResponseInterface|ResultInterface|void
-     * @throws LocalizedException
-     * @throws Exception
-     */
-    public function execute()
-    {
-        // Load Instant Checkout integration
+    public function execute() {
+        // $this->getAppIdAndTokenFromBackend();
+    }
+
+    private function getStoreEmails() {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $scopeConfig = $objectManager->create('\Magento\Framework\App\Config\ScopeConfigInterface');
+        $email = $scopeConfig->getValue('trans_email/ident_support/email',\Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
+        $this->logger->debug("=== Email is:", $email);
+    }
+
+    private function getAppIdAndTokenFromBackend() {
         $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
-
-        // Load consumer and access token 
         $consumer = $this->oauthService->loadConsumer($instantIntegration["consumer_id"]);
-        $oauthToken = $this->oauthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
+        $token = $this->oauthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
+        $baseUrl = $this->storeManagerInterface->getStore()->getBaseUrl();
 
-        $consumerKey = $consumer->getKey();
-        $consumerSecret = $consumer->getSecret();
-
-        $accessToken = $oauthToken->getToken();
-        $accessTokenSecret = $oauthToken->getSecret();
-
-        // Construct payload
-        $payload = [
-            'baseUrl' => $this->storeManagerInterface->getStore()->getBaseUrl(),
-            'consumerKey' => $consumerKey,
-            'consumerSecret' => $consumerSecret,
-            'accessToken' => $accessToken,
-            'accessTokenSecret' => $accessTokenSecret,
+        $postData = [
+            'consumerKey'       => $consumer->getKey(),
+            'consumerSecret'    => $consumer->getSecret(),
+            'accessToken'       => $token->getToken(),
+            'accessTokenSecret' => $token->getSecret(),
+            'platform'          => 'MAGENTO',
+            'baseUrl'           => $baseUrl,
+            'merchantName'      => $this->storeManagerInterface->getStore()->getId(),
+            'email'             => 'test15@example.com',
+            'isStaging'         => true,
         ];
 
-        $valid = 0;
-        $responseText = 'failure';
+        $response = $this->doRequest->execute(
+            'admin/extension/activate',
+            $postData,
+            'POST',
+            -1,
+            0,
+            true,
+            true,
+            'https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate',
+        );
 
-        $response = $this->doRequest->execute('admin/integration/magento', $payload);
+        try {
+            $responseJson = json_decode($response['result'], true);
 
-        if ($response['status'] === 200) {
-            $valid = 1;
-            $responseText = 'success';
+            if (empty($responseJson['merchantId']) || empty($responseJson['accessToken'])) {
+                throw new \Exception('No merchantId or accessToken in response. Unable to set config.');
+            }
+
+            $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH, $responseJson['merchantId']);
+            $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH, $responseJson['accessToken']);
+
+            $this->logger->info('Instant: MerchantID (' . $responseJson['merchantId'] . ') and AccessToken (' . $responseJson['accessToken']  . ') set successfully in core config.');
+        } catch (\Exception $e) {
+            $this->logger->critical('Instant - Unable to set App ID and Access Token. POST request may be failing.');
+            $this->logger->critical($e->__toString());
         }
-
-        $resultJson = $this->resultJsonFactory->create();
-        $data = [
-            'valid' => $valid,
-            'responseText' => $responseText
-        ];
-
-        $resultJson->setData($data);
-        return $resultJson;
     }
 }

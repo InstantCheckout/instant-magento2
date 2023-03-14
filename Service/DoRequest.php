@@ -107,7 +107,9 @@ class DoRequest
         $idempotencyKey = -1,
         $requestLogId = 0,
         $enableRetry = true,
-        $enableIdempotency = true
+        $enableIdempotency = true,
+        $customUrl = null
+
     ) {
         try {
             $requestBody = json_encode($body);
@@ -133,7 +135,7 @@ class DoRequest
             $curl->setTimeout(30);
 
             $baseApiUrl = $this->instantHelper->getInstantApiUrl();
-            $requestUri = $baseApiUrl . $endpoint;
+            $requestUri = $customUrl ?? $baseApiUrl . $endpoint;
 
             $this->logInfo('Sending ' . $requestMethod . ' request to ' . $requestUri);
             $this->logInfo('Idempotency Key ' . $idempotencyKey);
