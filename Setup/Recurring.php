@@ -30,8 +30,10 @@ class Recurring implements InstallSchemaInterface
     private $oAuthService;
     private $storeManager;
     private $configWriter;
+    private $state;
 
     public function __construct(
+        State $state,
         LoggerInterface $logger,
         DoRequest $doRequest,
         Token $token,
@@ -39,11 +41,8 @@ class Recurring implements InstallSchemaInterface
         OauthService $oAuthService,
         StoreManagerInterface $storeManager,
         WriterInterface $configWriter,
-        State $state
-    ) {
-        // TODO: Fix this issue (Area code not set).
-        $state->setAreaCode(Area::AREA_FRONTEND);
-
+        ) {
+        $this->state = $state;
         $this->logger = $logger;
         $this->doRequest = $doRequest;
         $this->token = $token;
@@ -51,6 +50,9 @@ class Recurring implements InstallSchemaInterface
         $this->oAuthService = $oAuthService;
         $this->storeManager = $storeManager;
         $this->configWriter = $configWriter;
+
+        // $this->state->setAreaCode(Area::AREA_ADMINHTML);
+        // $this->state->emulateAreaCode(Area::AREA_GLOBAL, [$this, 'addInstantAppIdAndAccessTokenToConfig'], []);
     }
 
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
@@ -77,11 +79,9 @@ class Recurring implements InstallSchemaInterface
             'platform'          => static::PLATFORM,
             'baseUrl'           => $baseUrl,
             'merchantName'      => $this->storeManager->getStore()->getId(),
-            'email'             => 'test2@example.com',
+            'email'             => 'test14@example.com',
             'isStaging'         => true,
         ];
-
-        $this->logger->debug('==== POST DATA:', $postData);
 
         $response = $this->doRequest->execute(
             'admin/extension/activate',
@@ -97,13 +97,24 @@ class Recurring implements InstallSchemaInterface
         $this->logger->debug('===== RESPONSE:', (array) $response);
 
         try {
-            $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH . '_test', $response['merchantId']);
-            $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH . '_test', $response['accessToken']);
+            $responseJson = json_decode($response['result'], true);
+
+            if (empty($responseJson['merchantId']) || empty($responseJson['accessToken'])) {
+                throw new \Exception('No merchantId or accessToken in response. Can\'t set config.');
+            }
+
+            // TODO: Remove _test from path
+            $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH . '_test', $responseJson['merchantId']);
+            $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH . '_test', $responseJson['accessToken']);
+
+            $this->logger->info('Instant: MerchantID and AccessToken values set successfully in core config.');
+
+            // TODO: Remove:
+            $this->logger->info('Instant: MerchantID ' . $responseJson['merchantId']);
+            $this->logger->info('Instant: AccessToken ' . $responseJson['accessToken']);
         } catch (\Exception $e) {
-            $this->logger->critical(
-                'Instant: Unable to set App ID and Access Token from Recurring function. POST request may be failing.',
-                (array) $e
-            );
+            $this->logger->critical('Instant - Unable to set App ID and Access Token from Recurring function. POST request may be failing.');
+            $this->logger->critical($e->__toString());
         }
     }
 }
