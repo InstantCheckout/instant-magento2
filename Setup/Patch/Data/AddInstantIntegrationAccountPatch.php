@@ -17,9 +17,9 @@ use Magento\Framework\Oauth\Exception;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Integration\Model\AuthorizationService;
 use Magento\Integration\Model\IntegrationFactory;
-use Magento\Integration\Model\Oauth\Token;
-use Magento\Integration\Model\Oauth\TokenFactory;
+use Magento\Integration\Model\Oauth\TokenFactory as Token;
 use Magento\Integration\Model\OauthService;
+use Magento\Store\Model\StoreManagerInterface;
 
 class AddInstantIntegrationAccountPatch implements DataPatchInterface
 {
@@ -29,7 +29,7 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
     const ALIASES = [];
 
     /**
-     * @var TokenFactory
+     * @var Token
      */
     private $tokenFactory;
 
@@ -51,18 +51,22 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
     /**
      * AddInstantIntegrationAccountPatch constructor. 
      * This is a data patch that adds the Instant Checkout integration.
+     * @param StoreManagerInterface $storeManager
      * @param Token $token
      * @param AuthorizationService $authorizationService
      * @param OauthService $oAuthService
      * @param IntegrationFactory $integrationFactory
+     * @param Logger $logger
      */
     public function __construct(
-        TokenFactory $tokenFactory,
+        StoreManagerInterface $storeManager,
+        Token $token,
         AuthorizationService $authorizationService,
         OauthService $oAuthService,
         IntegrationFactory $integrationFactory
     ) {
-        $this->tokenFactory = $tokenFactory;
+        $this->tokenFactory = $token;
+        $this->storeManager = $storeManager;
         $this->authorizationService = $authorizationService;
         $this->oAuthService = $oAuthService;
         $this->integrationFactory = $integrationFactory;
@@ -95,7 +99,6 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                 'endpoint' => '',
                 'setup_type' => '0'
             );
-
             try {
                 // Create integration 
                 $integration = $this->integrationFactory->create()->setData($integrationData);
@@ -170,7 +173,6 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
                     'Magento_Backend::stores_attributes',
                     'Magento_Catalog::attributes_attributes',
                 ];
-
                 // Grant all permissions
                 $authorizeService = $this->authorizationService;
                 $authorizeService->grantPermissions($integrationId, $permissions);
