@@ -9,14 +9,14 @@ use Magento\Framework\Setup\ModuleContextInterface;
 
 use Psr\Log\LoggerInterface;
 use Instant\Checkout\Service\DoRequest;
+use Magento\Framework\App\Area;
 use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\IntegrationFactory;
 use Magento\Integration\Model\OauthService;
 use Magento\Store\Model\StoreManagerInterface;
 
-use Magento\Framework\App\State;
-use Magento\Framework\App\Area;
 use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\TestFramework\App\State;
 
 class Recurring implements InstallSchemaInterface
 {
@@ -30,10 +30,10 @@ class Recurring implements InstallSchemaInterface
     private $oAuthService;
     private $storeManager;
     private $configWriter;
+
     private $state;
 
     public function __construct(
-        State $state,
         LoggerInterface $logger,
         DoRequest $doRequest,
         Token $token,
@@ -41,8 +41,8 @@ class Recurring implements InstallSchemaInterface
         OauthService $oAuthService,
         StoreManagerInterface $storeManager,
         WriterInterface $configWriter,
-        ) {
-        $this->state = $state;
+        State $state
+    ) {
         $this->logger = $logger;
         $this->doRequest = $doRequest;
         $this->token = $token;
@@ -50,9 +50,9 @@ class Recurring implements InstallSchemaInterface
         $this->oAuthService = $oAuthService;
         $this->storeManager = $storeManager;
         $this->configWriter = $configWriter;
+        $this->state = $state;
 
-        // $this->state->setAreaCode(Area::AREA_ADMINHTML);
-        // $this->state->emulateAreaCode(Area::AREA_GLOBAL, [$this, 'addInstantAppIdAndAccessTokenToConfig'], []);
+        $this->state->setAreaCode(Area::AREA_GLOBAL);
     }
 
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
@@ -104,8 +104,8 @@ class Recurring implements InstallSchemaInterface
             }
 
             // TODO: Remove _test from path
-            $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH . '_test', $responseJson['merchantId']);
-            $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH . '_test', $responseJson['accessToken']);
+            $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH, $responseJson['merchantId']);
+            $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH, $responseJson['accessToken']);
 
             $this->logger->info('Instant: MerchantID and AccessToken values set successfully in core config.');
 
