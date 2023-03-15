@@ -61,11 +61,6 @@ class Send extends Action
     protected $storeManagerInterface;
 
     /**
-     * @var ResultJsonFactory
-     */
-    protected $resultJsonFactory;
-
-    /**
      * @var WriterInterface
      */
     protected $configWriter;
@@ -98,7 +93,6 @@ class Send extends Action
         Token $oauthToken,
         OauthService $oauthService,
         DoRequest $doRequest,
-        ResultJsonFactory $resultJsonFactory,
         StoreManagerInterface $storeManagerInterface,
         WriterInterface $configWriter,
         LoggerInterface $logger,
@@ -110,7 +104,6 @@ class Send extends Action
         $this->oauthService = $oauthService;
         $this->doRequest = $doRequest;
         $this->storeManagerInterface = $storeManagerInterface;
-        $this->resultJsonFactory = $resultJsonFactory;
         $this->configWriter = $configWriter;
         $this->scopeConfig = $scopeConfig;
 
@@ -119,7 +112,7 @@ class Send extends Action
 
     public function execute()
     {
-        $this->getAppIdAndTokenFromBackend();
+         $this->getAppIdAndTokenFromBackend();
     }
 
     // TODO: Return an array for all stores?
@@ -128,12 +121,22 @@ class Send extends Action
         return $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
+    private function getStoreName(): string
+    {
+        $storeName = $this->scopeConfig->getValue('general/store_information/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
+        if (empty($storeName)) {
+           $storeName = $this->storeManagerInterface->getStore()->getName(); 
+        }
+
+        return $storeName;
+    }
+
     private function getAppIdAndTokenFromBackend()
     {
         $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
         $consumer = $this->oauthService->loadConsumer($instantIntegration["consumer_id"]);
         $token = $this->oauthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
-        $store = $this->storeManagerInterface->getStore();
 
         $postData = [
             'consumerKey'       => $consumer->getKey(),
@@ -141,8 +144,8 @@ class Send extends Action
             'accessToken'       => $token->getToken(),
             'accessTokenSecret' => $token->getSecret(),
             'platform'          => 'MAGENTO',
-            'baseUrl'           => $store->getBaseUrl(),
-            'merchantName'      => $store->getName(),
+            'baseUrl'           => $this->storeManagerInterface->getStore()->getBaseUrl(),
+            'merchantName'      => $this->getStoreName(),
             'email'             => $this->getStoreEmail(),
             'isStaging'         => true,
         ];
