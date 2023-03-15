@@ -147,19 +147,23 @@ class Send extends Action
             'isStaging'         => true,
         ];
 
-        $response = $this->doRequest->execute(
-            'admin/extension/activate',
-            $postData,
-            'POST',
-            -1,
-            0,
-            true,
-            true,
-            'https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate',
-        );
-
         try {
+            $response = $this->doRequest->execute(
+                'admin/extension/activate',
+                $postData,
+                'POST',
+                -1,
+                0,
+                true,
+                true,
+                'https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate',
+            );
+
             $responseJson = json_decode($response['result'], true);
+
+            if (array_key_exists('error', $responseJson)) {
+                throw new \Exception('Error in response: ' . $responseJson['message']);
+            }
 
             if (empty($responseJson['merchantId']) || empty($responseJson['accessToken'])) {
                 throw new \Exception('No merchantId or accessToken in response. Unable to set config.');
@@ -167,10 +171,9 @@ class Send extends Action
 
             $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH, $responseJson['merchantId']);
             $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH, $responseJson['accessToken']);
-
-            $this->logger->info('Instant: MerchantID (' . $responseJson['merchantId'] . ') and AccessToken (' . $responseJson['accessToken']  . ') set successfully in core config.');
+            $this->logger->info('Instant: Success! MerchantID (' . $responseJson['merchantId'] . ') and AccessToken (' . $responseJson['accessToken']  . ') were set in core config.');
         } catch (\Exception $e) {
-            $this->logger->critical('Instant - Unable to set App ID and Access Token. POST request may be failing.');
+            $this->logger->critical('Instant - Unable to set App ID and Access Token. Check the POST request for errors.');
             $this->logger->critical($e->__toString());
         }
     }
