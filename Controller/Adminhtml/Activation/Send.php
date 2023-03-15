@@ -128,16 +128,12 @@ class Send extends Action
         return $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
-    private function getStoreName(): string
-    {
-        return $this->scopeConfig->getValue('general/store_information/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-    }
-
     private function getAppIdAndTokenFromBackend()
     {
         $instantIntegration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
         $consumer = $this->oauthService->loadConsumer($instantIntegration["consumer_id"]);
         $token = $this->oauthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
+        $store = $this->storeManagerInterface->getStore();
 
         $postData = [
             'consumerKey'       => $consumer->getKey(),
@@ -145,8 +141,8 @@ class Send extends Action
             'accessToken'       => $token->getToken(),
             'accessTokenSecret' => $token->getSecret(),
             'platform'          => 'MAGENTO',
-            'baseUrl'           => $this->storeManagerInterface->getStore()->getBaseUrl(),
-            'merchantName'      => $this->getStoreName(),
+            'baseUrl'           => $store->getBaseUrl(),
+            'merchantName'      => $store->getName(),
             'email'             => $this->getStoreEmail(),
             'isStaging'         => true,
         ];
