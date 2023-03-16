@@ -14,8 +14,15 @@ declare(strict_types=1);
 
 namespace Instant\Checkout\Block\Adminhtml\System\Config\Activation;
 
+use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Psr\Log\LoggerInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Integration\Model\IntegrationFactory;
+use Magento\Integration\Model\Oauth\Token;
+use Magento\Integration\Model\OauthService;
 
 /**
  * Class Send
@@ -30,6 +37,31 @@ class Send extends Field
      * @var string
      */
     protected $_template = 'system/config/activation/send.phtml';
+
+    public $logger;
+    public $scopeConfig;
+    public $storeManager;
+    public $integrationFactory;
+    public $oAuthService;
+    public $oAuthToken;
+
+    public function __construct(
+        Context $context,
+        LoggerInterface $logger,
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager,
+        IntegrationFactory $integrationFactory,
+        Token $oAuthToken,
+        OauthService $oAuthService
+    ) {
+        $this->logger = $logger;
+        $this->scopeConfig = $scopeConfig;
+        $this->storeManager = $storeManager;
+        $this->integrationFactory = $integrationFactory;
+        $this->oAuthToken = $oAuthToken;
+        $this->oAuthService = $oAuthService;
+        parent::__construct($context);
+    }
 
     /**
      * Unset scope
@@ -54,6 +86,7 @@ class Send extends Field
     protected function _getElementHtml(AbstractElement $element): string
     {
         $originalData = $element->getOriginalData();
+
         $this->addData([
             'button_label' => $originalData['button_label'],
             'button_url' => $this->getUrl($originalData['button_url'], ['_current' => true]),
@@ -68,6 +101,44 @@ class Send extends Field
      */
     public function getAjaxUrl()
     {
-        return $this->getUrl('instant/activation/send', ['_current' => true]);
+        return $this->getUrl('https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate');
+    }
+
+    public function getPostParams()
+    {
+        $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
+        $consumer = $this->oAuthService->loadConsumer($instantIntegration["consumer_id"]);
+        $token = $this->oAuthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
+
+        $postData = [
+            'consumerKey'       => $consumer->getKey(),
+            'consumerSecret'    => $consumer->getSecret(),
+            'accessToken'       => $token->getToken(),
+            'accessTokenSecret' => $token->getSecret(),
+            'platform'          => 'MAGENTO',
+            'baseUrl'           => $this->storeManager->getStore()->getBaseUrl(),
+            'merchantName'      => $this->getStoreName(),
+            'email'             => $this->getStoreEmail(),
+            'isStaging'         => true,
+        ];
+
+        return json_encode($postData);
+    }
+
+    // TODO: Return an array for all stores?
+    private function getStoreEmail(): string
+    {
+        return $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+
+    private function getStoreName(): string
+    {
+        $storeName = $this->scopeConfig->getValue('general/store_information/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
+        if (empty($storeName)) {
+            $storeName = $this->storeManager->getStore()->getName();
+        }
+
+        return $storeName;
     }
 }

@@ -19,10 +19,26 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
 <script>
     require(['prototype'], function() {
         function activateSend() {
-            var activationMessage = $('activation_result');
+            const params = <?= $block->getPostParams() ?>;
+            const activationMessage = $('activation_result');
+
             new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
-                parameters: '',
+                parameters: params,
+                method: 'POST',
                 onSuccess: function(response) {
+                    console.log("Response is", response);
+
+                    new Ajax.Request('/V1/instant/set_app_id_and_access_token', {
+                        parameters: {
+                            'appId': 'some app id',
+                            'accessToken': 'testing123',
+                        },
+                        method: 'POST',
+                        onSuccess: function(response) {
+                            console.log("Post request sent! Response is:", response);
+                        }
+                    });
+
                     var result = '<?= $block->escapeJs($block->escapeHtml(__('Error during Activation.'))) ?>';
                     try {
                         if (response.responseText.isJSON()) {

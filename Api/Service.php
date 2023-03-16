@@ -10,6 +10,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Psr\Log\LoggerInterface;
 
 class Service implements ServiceInterface
 {
@@ -50,6 +51,9 @@ class Service implements ServiceInterface
      */
     private $order;
 
+    // TODO: REmove:
+    private $logger;
+
     /**
      * Service constructor.
      *
@@ -69,7 +73,8 @@ class Service implements ServiceInterface
         Registry $registry,
         QuoteFactory $quoteFactory,
         OrderRepositoryInterface $orderRepository,
-        Order $order
+        Order $order,
+        LoggerInterface $logger
     ) {
         $this->checkoutHelper = $checkoutHelper;
         $this->checkoutSession = $checkoutSession;
@@ -78,6 +83,7 @@ class Service implements ServiceInterface
         $this->quoteFactory = $quoteFactory;
         $this->orderRepository = $orderRepository;
         $this->order = $order;
+        $this->logger = $logger;
     }
 
     public function deleteLastRealOrder()
@@ -135,5 +141,16 @@ class Service implements ServiceInterface
         }
 
         return false;
+    }
+
+    /**
+     * Update the App ID and Access Token when the activate button is clicked.
+     *
+     * @api
+     * @return string Redirect Url
+     */
+    public function set_app_id_and_access_token(array $appIdAndAccessToken)
+    {
+        $this->logger->debug("==== Found App ID and Access Token: ===", $appIdAndAccessToken);
     }
 }

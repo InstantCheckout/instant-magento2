@@ -7,6 +7,7 @@
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">
                             <resource id="Instant_Checkout::config" title="Instant Pay" sortOrder="50" />
+                            <resource id="Instant_Checkout::set_app_id_and_access_token" title="Set App ID and Access Token" sortOrder="50" />
                         </resource>
                     </resource>
                 </resource>

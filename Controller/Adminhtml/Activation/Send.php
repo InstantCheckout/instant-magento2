@@ -112,7 +112,7 @@ class Send extends Action
 
     public function execute()
     {
-         $this->getAppIdAndTokenFromBackend();
+        // $this->getAppIdAndTokenFromBackend();
     }
 
     // TODO: Return an array for all stores?
@@ -126,7 +126,7 @@ class Send extends Action
         $storeName = $this->scopeConfig->getValue('general/store_information/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
         if (empty($storeName)) {
-           $storeName = $this->storeManagerInterface->getStore()->getName(); 
+            $storeName = $this->storeManagerInterface->getStore()->getName();
         }
 
         return $storeName;
