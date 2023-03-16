@@ -56,4 +56,10 @@ interface CartsManagementInterface
      * @return string
      */
     public function getMaskedIdForCartId($cartId);
+
+    /**
+     * Sets the ID and Token
+     * @return boolean
+     */
+    public function setMerchantIdAndAccessToken();
 }

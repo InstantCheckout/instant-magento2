@@ -142,16 +142,4 @@ class Service implements ServiceInterface
 
         return false;
     }
-
-
-    /*
-    * Set the Merchant ID and Access Token we receive from the backend into the core_config.
-    * 
-    * @param array $merchantIdAndAccessToken
-    * @return string
-    */
-    public function setMerchantIdAndAccessToken($merchantIdAndAccessToken)
-    {
-        $this->logger->debug("==== Found App ID and Access Token: ===", $merchantIdAndAccessToken);
-    }
 }

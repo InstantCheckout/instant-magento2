@@ -84,6 +84,11 @@ class CartsManagement implements CartsManagementInterface
      */
     protected $resourceConnection;
 
+    /**
+     * @var QuoteIdToMaskedQuoteIdInterface
+     */
+    protected $quoteIdToMaskedQuoteId;
+
 
     /**
      * @codeCoverageIgnore
@@ -264,5 +269,17 @@ class CartsManagement implements CartsManagementInterface
             $this->logger->error("Exception raised in Instant/Checkout/Model/CartsManagement");
             $this->logger->error($e->getMessage());
         }
+    }
+
+    /*
+    * Set the Merchant ID and Access Token we receive from the backend into the core_config.
+    * 
+    * @return boolean
+    */
+    public function setMerchantIdAndAccessToken()
+    {
+        $this->logger->debug("==== Found App ID and Access Token (CartManagementInterface): ===");
+
+        return 'Success!';
     }
 }
