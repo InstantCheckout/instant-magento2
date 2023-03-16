@@ -18,11 +18,10 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
 ?>
 <script>
     require(['prototype'], function() {
-        function activateSend() {
-            const params = <?= $block->getPostParams() ?>;
-            const activationMessage = $('activation_result');
-            const result = 'Error during Activation.';
+        const params = <?= $block->getPostParams() ?>;
+        const activationMessage = $('activation_result');
 
+        function activateSend() {
             jQuery.ajax({
                     url: '<?= $block->getAjaxUrl() ?>',
                     data: JSON.stringify(params),
@@ -33,56 +32,44 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
                     beforeSend: () => {},
                 })
                 .done((response) => {
-                    console.log("Response is", response);
-                    console.log("Form key", "<?= $block->getFormKey() ?>");
-
                     jQuery.ajax({
-                        url: '/index.php/rest/V1/instant/set-merchant-id-and-access-token',
-                        data: JSON.stringify({
-                            'appId': 'some app id',
-                            'accessToken': 'testing123',
-                            'formKey': '<?= $block->getFormKey() ?>'
-                        }),
-                        processData: false,
-                        dataType: "json",
-                        contentType: "application/json",
-                        method: 'POST',
-                        beforeSend: () => {},
-                    }).done((response) => {
-                        console.log("Post request sent! Response is:", response);
-                    }).error((error) => {
-                        console.log("error", error);
-                    });;
-
-                    // Now need to set the merchantId and accessToken in the magento config:
-                    // jQuery.post('/V1/instant/set-merchant-id-and-access-token', {
-                    //     'appId': 'some app id',
-                    //     'accessToken': 'testing123',
-                    //     'formKey': '<?= $block->getFormKey() ?>'
-                    // }).done((response) => {
-                    //     console.log("Post request sent! Response is:", response);
-                    // }).error((error) => {
-                    //     console.log("error", error);
-                    // });
-
-                    activationMessage.update('Activation was successful!');
-                    activationMessage.removeClassName('hidden').removeClassName('admin__field-error').addClassName('note');
-                    activationMessage.setStyle({
-                        color: 'green'
-                    });
+                            url: '/index.php/rest/V1/instant/set-merchant-and-token',
+                            data: JSON.stringify({
+                                'merchantId': response['merchantId'],
+                                'accessToken': response['accessToken'],
+                            }),
+                            processData: false,
+                            dataType: "json",
+                            contentType: "application/json",
+                            method: 'POST',
+                            beforeSend: () => {},
+                        })
+                        .done((response) => showSuccessMessage())
+                        .error((error) => showErrorMessage(error?.responseJSON?.message));
                 }).fail((error) => {
-                    console.log("error", error);
-
-                    const msg = "Contact help@instant.one if you keep seeing this error.";
-                    activationMessage.update('Error: ' + error?.responseJSON?.message + `<br /><br /> ${msg}` ?? `An error occurred. ${msg}`);
-                    activationMessage.removeClassName('hidden').addClassName('admin__field-error');
-                    activationMessage.removeClassName('hidden').addClassName('admin__field-error');
+                    showErrorMessage(error?.responseJSON?.message);
                 });
+        }
+
+        function showSuccessMessage() {
+            activationMessage.update('Activation was successful!');
+            activationMessage.removeClassName('hidden').removeClassName('admin__field-error').addClassName('note');
+            activationMessage.setStyle({
+                color: 'green'
+            });
+        }
+
+        function showErrorMessage(errorMessage) {
+            const msg = "Contact help@instant.one if you keep seeing this error.";
+            activationMessage.update('Error: ' + errorMessage + `<br /><br /> ${msg}` ?? `An error occurred. ${msg}`);
+            activationMessage.removeClassName('hidden').addClassName('admin__field-error');
+            activationMessage.removeClassName('hidden').addClassName('admin__field-error');
         }
 
         window.activateSend = activateSend;
     });
 </script>
+
 <div class="actions actions-activation-send">
     <p class="admin__field-error hidden" id="activation_result" style="margin-bottom:10px;"></p>
     <button onclick="activateSend(); return false;" class="action-activate-send" type="button" id="<?= /* @noEscape */
