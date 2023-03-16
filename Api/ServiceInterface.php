@@ -16,7 +16,8 @@ interface ServiceInterface
      * Update the App ID and Access Token when the activate button is clicked.
      *
      * @api
+     * @param array $merchantIdAndAccessToken
      * @return string Redirect Url
      */
-    public function set_app_id_and_access_token(array $appIdAndAccessToken);
+    public function setMerchantIdAndAccessToken($merchantIdAndAccessToken);
 }

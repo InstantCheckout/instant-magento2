@@ -21,43 +21,40 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
         function activateSend() {
             const params = <?= $block->getPostParams() ?>;
             const activationMessage = $('activation_result');
+            const result = 'Error during Activation.';
 
-            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
-                parameters: params,
+            jQuery.ajax({
+                url: '<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>',
+                data: JSON.stringify(params),
+                processData: false,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
                 method: 'POST',
-                onSuccess: function(response) {
-                    console.log("Response is", response);
+                beforeSend: () => {},
+            }).done((response) => {
+                console.log("Response is", response);
 
-                    new Ajax.Request('/V1/instant/set_app_id_and_access_token', {
-                        parameters: {
-                            'appId': 'some app id',
-                            'accessToken': 'testing123',
-                        },
-                        method: 'POST',
-                        onSuccess: function(response) {
-                            console.log("Post request sent! Response is:", response);
-                        }
-                    });
+                jQuery.post('/V1/instant/set_app_id_and_access_token', {
+                    'appId': 'some app id',
+                    'accessToken': 'testing123',
+                }).done((response) => {
+                    console.log("Post request sent! Response is:", response);
+                }).error((error) => {
+                    console.log("error", error);
+                });
+                
+                activationMessage.update('Activation was successful!');
+                activationMessage.removeClassName('hidden').removeClassName('admin__field-error').addClassName('note');
+                activationMessage.setStyle({
+                    color: 'green'
+                });
+            }).fail((error) => {
+                console.log("error", error);
 
-                    var result = '<?= $block->escapeJs($block->escapeHtml(__('Error during Activation.'))) ?>';
-                    try {
-                        if (response.responseText.isJSON()) {
-                            response = response.responseText.evalJSON();
-                        }
-                        if (response.valid == 1) {
-                            activationMessage.removeClassName('hidden').removeClassName('admin__field-error').addClassName('note');
-                            activationMessage.setStyle({
-                                color: 'green'
-                            });
-                            result = 'Activation Success';
-                        } else {
-                            activationMessage.removeClassName('hidden').addClassName('admin__field-error');
-                        }
-                    } catch (e) {
-                        activationMessage.removeClassName('hidden').addClassName('admin__field-error');
-                    }
-                    activationMessage.update(result);
-                }
+                const msg = "Contact help@instant.one if you keep seeing this error.";
+                activationMessage.update('Error: ' + error?.responseJSON?.message + `<br /><br /> ${msg}` ?? `An error occurred. ${msg}`);
+                activationMessage.removeClassName('hidden').addClassName('admin__field-error');
+                activationMessage.removeClassName('hidden').addClassName('admin__field-error');
             });
         }
         window.activateSend = activateSend;

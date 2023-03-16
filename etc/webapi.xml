@@ -34,8 +34,8 @@
         </resources>
     </route>
 
-    <route url="/V1/instant/set_app_id_and_access_token" method="POST">
-        <service class="Instant\Checkout\Api\ServiceInterface" method="set_app_id_and_access_token" />
+    <route url="/V1/instant/set-access-token" method="POST">
+        <service class="Instant\Checkout\Api\ServiceInterface" method="setMerchantIdAndAccessToken" />
         <resources>
             <resource ref="anonymous" />
         </resources>

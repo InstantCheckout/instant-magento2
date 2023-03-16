@@ -143,14 +143,15 @@ class Service implements ServiceInterface
         return false;
     }
 
-    /**
-     * Update the App ID and Access Token when the activate button is clicked.
-     *
-     * @api
-     * @return string Redirect Url
-     */
-    public function set_app_id_and_access_token(array $appIdAndAccessToken)
+
+    /*
+    * Set the Merchant ID and Access Token we receive from the backend into the core_config.
+    * 
+    * @param array $merchantIdAndAccessToken
+    * @return string
+    */
+    public function setMerchantIdAndAccessToken($merchantIdAndAccessToken)
     {
-        $this->logger->debug("==== Found App ID and Access Token: ===", $appIdAndAccessToken);
+        $this->logger->debug("==== Found App ID and Access Token: ===", $merchantIdAndAccessToken);
     }
 }
