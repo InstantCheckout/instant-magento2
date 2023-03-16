@@ -107,6 +107,13 @@ class Send extends Field
     public function getPostParams()
     {
         $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
+
+        // Check if integration exists, create it if it doesn't.
+        // See file: AddInstantIntegrationAccountPatch.php
+
+        // Also check to see if Consumer Key, Secret, Access Token and Secret all exist.
+        // If they don't create a new integration.
+
         $consumer = $this->oAuthService->loadConsumer($instantIntegration["consumer_id"]);
         $token = $this->oAuthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
 

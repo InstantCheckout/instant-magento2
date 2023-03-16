@@ -59,7 +59,7 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
             });
         }
 
-        function showErrorMessage(errorMessage) {
+        function showErrorMessage(errorMessage = 'Something went wrong.') {
             const msg = "Contact help@instant.one if you keep seeing this error.";
             activationMessage.update('Error: ' + errorMessage + `<br /><br /> ${msg}` ?? `An error occurred. ${msg}`);
             activationMessage.removeClassName('hidden').addClassName('admin__field-error');

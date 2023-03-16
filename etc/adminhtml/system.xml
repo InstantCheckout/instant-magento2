@@ -35,10 +35,7 @@
                     <button_label>Activate</button_label>
                     <button_url>adminhtml/instant/activation/send</button_url>
                     <frontend_model>Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send</frontend_model>
-                    <comment>Important: Ensure config is correct and saved before activating
-                        Instant. Clicking this
-                        will send an access token to Instant, allowing Instant to make secure API
-                        calls to your store.
+                    <comment>Clicking this set an App ID and Access Token into your Magento config, allowing Instant to make secure API calls to your store.
                     </comment>
                 </field>
                 <field id="app_id" translate="label" type="text" sortOrder="90" showInDefault="1"
