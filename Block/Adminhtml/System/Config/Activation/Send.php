@@ -135,7 +135,6 @@ class Send extends Field
             'baseUrl'           => $this->storeManager->getStore()->getBaseUrl(),
             'merchantName'      => $this->getStoreName(),
             'email'             => $this->getStoreEmail(),
-            'isStaging'         => true,
         ];
 
         return json_encode($postData);

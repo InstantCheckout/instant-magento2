@@ -10,7 +10,7 @@ interface SetCoreConfigInterface
      * @api
      * @param string $merchantId
      * @param string $accessToken
-     * @return boolean
+     * @return string
      */
     public function setMerchantIdAndAccessToken($merchantId, $accessToken);
 }

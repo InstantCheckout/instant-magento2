@@ -43,19 +43,21 @@ class SetCoreConfig implements SetCoreConfigInterface
      * @api
      * @param string $merchantId
      * @param string $accessToken
-     * @return boolean
+     * @return string
      */
-    public function setMerchantIdAndAccessToken($merchantId, $accessToken): bool
+    public function setMerchantIdAndAccessToken($merchantId, $accessToken): string
     {
         try {
             $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH, $merchantId);
             $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH, $accessToken);
             $this->logger->info("Instant => Successfully wrote Merchant ID (" . $merchantId . ") and Access Token (" . $accessToken . ") to core config.");
-            return true;
+
+            return 'App Id and Access Token set successfully';
         } catch (\Exception $e) {
             $this->logger->error("Instant => ERROR - Failed to write Merchant ID (" . $merchantId . ") and Access Token (" . $accessToken . ") to core config.");
             $this->logger->error($e->__toString());
-            return false;
+
+            return 'Error - Unable to set App Id and Access Token.';
         }
     }
 }
