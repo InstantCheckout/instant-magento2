@@ -67,9 +67,9 @@ class AddInstantIntegrationAccountPatch implements DataPatchInterface
      */
     public function apply()
     {
-        $integrationExists = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
+        $integration = $this->integrationFactory->create()->load(static::INTEGRATION_NAME, 'name')->getData();
 
-        if (empty($integrationExists)) {
+        if (empty($integration)) {
             $this->integrationService->createInstantIntegration();
         }
     }

@@ -14,16 +14,17 @@ declare(strict_types=1);
 
 namespace Instant\Checkout\Block\Adminhtml\System\Config\Activation;
 
+use Instant\Checkout\Helper\InstantHelper;
 use Instant\Checkout\Service\InstantIntegrationService;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Integration\Model\IntegrationFactory;
 use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\OauthService;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class Send
@@ -39,7 +40,6 @@ class Send extends Field
      */
     protected $_template = 'system/config/activation/send.phtml';
 
-    private $logger;
     private $scopeConfig;
     private $storeManager;
     private $integrationFactory;
@@ -49,7 +49,6 @@ class Send extends Field
 
     public function __construct(
         Context $context,
-        LoggerInterface $logger,
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         IntegrationFactory $integrationFactory,
@@ -57,7 +56,6 @@ class Send extends Field
         OauthService $oAuthService,
         InstantIntegrationService $integrationService
     ) {
-        $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->integrationFactory = $integrationFactory;
@@ -124,10 +122,11 @@ class Send extends Field
         // Also check to see if Consumer Key, Secret, Access Token and Secret all exist.
         // If they don't create a new integration.
 
-        $consumer = $this->oAuthService->loadConsumer($instantIntegration["consumer_id"]);
+        $consumer = $this->oAuthService->loadConsumer($instantIntegration['consumer_id']);
         $token = $this->oAuthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
 
         $postData = [
+            'merchantId'        => $this->getMerchantId(),
             'consumerKey'       => $consumer->getKey(),
             'consumerSecret'    => $consumer->getSecret(),
             'accessToken'       => $token->getToken(),
@@ -142,15 +141,20 @@ class Send extends Field
         return json_encode($postData);
     }
 
+    private function getMerchantId()
+    {
+        return $this->scopeConfig->getValue(InstantHelper::INSTANT_APP_ID_PATH, ScopeInterface::SCOPE_STORE) ?? null;
+    }
+
     // TODO: Return an array for all stores?
     private function getStoreEmail(): string
     {
-        return $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->scopeConfig->getValue('trans_email/ident_support/email', ScopeInterface::SCOPE_STORE);
     }
 
     private function getStoreName(): string
     {
-        $storeName = $this->scopeConfig->getValue('general/store_information/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $storeName = $this->scopeConfig->getValue('general/store_information/name', ScopeInterface::SCOPE_STORE);
 
         if (empty($storeName)) {
             $storeName = $this->storeManager->getStore()->getName();

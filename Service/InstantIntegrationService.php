@@ -74,7 +74,7 @@ class InstantIntegrationService
             $token->createVerifierToken($consumerId);
             $token->setType('access');
             $token->save();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo 'Error : ' . $e->getMessage();
             $this->logger->error('Instant - Failed to create integration:', (array) $e);
         }
