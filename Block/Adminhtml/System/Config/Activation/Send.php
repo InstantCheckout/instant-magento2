@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Instant\Checkout\Block\Adminhtml\System\Config\Activation;
 
+use Instant\Checkout\Service\InstantIntegrationService;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
@@ -38,12 +39,13 @@ class Send extends Field
      */
     protected $_template = 'system/config/activation/send.phtml';
 
-    public $logger;
-    public $scopeConfig;
-    public $storeManager;
-    public $integrationFactory;
-    public $oAuthService;
-    public $oAuthToken;
+    private $logger;
+    private $scopeConfig;
+    private $storeManager;
+    private $integrationFactory;
+    private $oAuthService;
+    private $oAuthToken;
+    private $integrationService;
 
     public function __construct(
         Context $context,
@@ -52,7 +54,8 @@ class Send extends Field
         StoreManagerInterface $storeManager,
         IntegrationFactory $integrationFactory,
         Token $oAuthToken,
-        OauthService $oAuthService
+        OauthService $oAuthService,
+        InstantIntegrationService $integrationService
     ) {
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
@@ -60,6 +63,7 @@ class Send extends Field
         $this->integrationFactory = $integrationFactory;
         $this->oAuthToken = $oAuthToken;
         $this->oAuthService = $oAuthService;
+        $this->integrationService = $integrationService;
         parent::__construct($context);
     }
 
@@ -104,12 +108,18 @@ class Send extends Field
         return $this->getUrl('https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate');
     }
 
-    public function getPostParams()
+    /**
+     * Gets the params we need to send to the Instant backend to create a Merchant and its Stores.
+     * 
+     * @return string
+     */
+    public function getPostParams(): string
     {
         $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
 
-        // Check if integration exists, create it if it doesn't.
-        // See file: AddInstantIntegrationAccountPatch.php
+        if (empty($instantIntegration)) {
+            $this->integrationService->createInstantIntegration();
+        }
 
         // Also check to see if Consumer Key, Secret, Access Token and Secret all exist.
         // If they don't create a new integration.
