@@ -20,6 +20,11 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
     require(['prototype'], function() {
         const params = <?= $block->getPostParams() ?>;
         const activationMessage = $('activation_result');
+        const appIdInput = document.getElementById("instant_general_app_id");
+
+        if (appIdInput.value.length > 0) {
+            showExtensionIsActivateMessage();
+        }
 
         function activateSend() {
             jQuery.ajax({
@@ -37,6 +42,8 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
                     }
                 })
                 .done((response) => {
+                    appIdInput.value = response['merchantId'];
+
                     jQuery.ajax({
                             url: '/index.php/rest/V1/instant/set-app-id-and-token',
                             data: JSON.stringify({
@@ -57,6 +64,7 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
         }
 
         function showSuccessMessage() {
+            showExtensionIsActivateMessage();
             activationMessage.update('Activation was successful!');
             activationMessage.removeClassName('hidden').removeClassName('admin__field-error').addClassName('note');
             activationMessage.setStyle({
@@ -124,6 +132,15 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
             }
         }
 
+        function showExtensionIsActivateMessage() {
+            const messageElement = document.getElementById('activate-message');
+            messageElement.innerHTML = "Extension is active!";
+            messageElement.setStyle(`
+                margin-top: 12px;
+                color: green;
+            `);
+        }
+
         window.activateSend = activateSend;
     });
 </script>
@@ -134,4 +151,5 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
                                                                                                     $block->getHtmlId() ?>">
         <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
+    <p id="activate-message"></p>
 </div>

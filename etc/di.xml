@@ -14,6 +14,6 @@
     <preference for="Instant\Checkout\Api\ServiceInterface"
         type="Instant\Checkout\Api\Service" />
 
-        <preference for="Instant\Checkout\Api\SetCoreConfigInterface"
-        type="Instant\Checkout\Api\SetCoreConfig" />
+    <preference for="Instant\Checkout\Api\SetCoreConfigInterface"
+    type="Instant\Checkout\Api\SetCoreConfig" />
 </config>
