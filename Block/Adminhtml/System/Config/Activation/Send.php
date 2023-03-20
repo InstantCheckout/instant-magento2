@@ -25,6 +25,7 @@ use Magento\Integration\Model\IntegrationFactory;
 use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\OauthService;
 use Magento\Store\Model\ScopeInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Send
@@ -46,6 +47,8 @@ class Send extends Field
     private $oAuthService;
     private $oAuthToken;
     private $integrationService;
+    private $instantHelper;
+    private $logger;
 
     public function __construct(
         Context $context,
@@ -54,7 +57,9 @@ class Send extends Field
         IntegrationFactory $integrationFactory,
         Token $oAuthToken,
         OauthService $oAuthService,
-        InstantIntegrationService $integrationService
+        InstantIntegrationService $integrationService,
+        InstantHelper $instantHelper,
+        LoggerInterface $logger
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
@@ -62,6 +67,9 @@ class Send extends Field
         $this->oAuthToken = $oAuthToken;
         $this->oAuthService = $oAuthService;
         $this->integrationService = $integrationService;
+        $this->instantHelper = $instantHelper;
+        $this->logger = $logger;
+
         parent::__construct($context);
     }
 
@@ -99,11 +107,23 @@ class Send extends Field
     }
 
     /**
+     * Instant backend API endpoint to activate the Magento extension.
+     * 
      * @return string
      */
-    public function getAjaxUrl()
+    public function getActivateExtensionEndpointUrl(): string
     {
         return $this->getUrl('https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate');
+    }
+
+    /**
+     * Local Magento API endpoint that sets a App ID and Access Token into the core config.
+     * 
+     * @return string
+     */
+    public function getSetAppIdAndTokenUrl(): string
+    {
+        return $this->getUrl('/index.php/rest/V1/instant/set-app-id-and-token');
     }
 
     /**
@@ -113,20 +133,15 @@ class Send extends Field
      */
     public function getPostParams(): string
     {
+        $this->instantHelper->clearCache();
+        $this->checkIntegrationExists();
+
         $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
-
-        if (empty($instantIntegration)) {
-            $this->integrationService->createInstantIntegration();
-        }
-
-        // Also check to see if Consumer Key, Secret, Access Token and Secret all exist.
-        // If they don't create a new integration.
-
         $consumer = $this->oAuthService->loadConsumer($instantIntegration['consumer_id']);
         $token = $this->oAuthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
+        $merchantId = $this->getMerchantId();
 
         $postData = [
-            'merchantId'        => $this->getMerchantId(),
             'consumerKey'       => $consumer->getKey(),
             'consumerSecret'    => $consumer->getSecret(),
             'accessToken'       => $token->getToken(),
@@ -137,17 +152,40 @@ class Send extends Field
             'email'             => $this->getStoreEmail(),
         ];
 
+        if (!empty($merchantId)) {
+            $postData['merchantId'] = $merchantId;
+        }
+
         return json_encode($postData);
+    }
+
+    private function checkIntegrationExists() {
+        $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
+
+        if (empty($instantIntegration)) {
+            $this->integrationService->createInstantIntegration();
+        }
+
+        $consumer = $this->oAuthService->loadConsumer($instantIntegration['consumer_id']);
+        $token = $this->oAuthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
+
+        if (empty($consumer->getKey()) || empty($consumer->getSecret()) || empty($token->getToken()) || empty($token->getSecret())) {
+            $this->integrationService->createInstantIntegration();
+        }
     }
 
     private function getMerchantId()
     {
-        return $this->scopeConfig->getValue(InstantHelper::INSTANT_APP_ID_PATH, ScopeInterface::SCOPE_STORE) ?? null;
+        $merchantId = $this->instantHelper->getUncachedCoreConfigValue('instant/general/app_id');
+
+        $this->logger->debug('Merchant ID:' . $merchantId);
+
+        return $merchantId;
     }
 
-    // TODO: Return an array for all stores?
     private function getStoreEmail(): string
     {
+        // TODO: Return an array for all stores?
         return $this->scopeConfig->getValue('trans_email/ident_support/email', ScopeInterface::SCOPE_STORE);
     }
 

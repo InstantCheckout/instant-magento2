@@ -29,12 +29,19 @@ class SetCoreConfig implements SetCoreConfigInterface
      */
     private $logger;
 
+    /**
+     * @var InstantHelper
+     */
+    private $instantHelper;
+
     public function __construct(
         WriterInterface $configWriter,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        InstantHelper $instantHelper
     ) {
         $this->logger = $logger;
         $this->configWriter = $configWriter;
+        $this->instantHelper = $instantHelper;
     }
 
     /**
@@ -51,6 +58,8 @@ class SetCoreConfig implements SetCoreConfigInterface
             $this->configWriter->save(InstantHelper::INSTANT_APP_ID_PATH, $merchantId);
             $this->configWriter->save(InstantHelper::ACCESS_TOKEN_PATH, $accessToken);
             $this->logger->info("Instant => Successfully wrote Merchant ID (" . $merchantId . ") and Access Token (" . $accessToken . ") to core config.");
+
+            $this->instantHelper->clearCache();
 
             return 'App Id and Access Token set successfully';
         } catch (\Exception $e) {

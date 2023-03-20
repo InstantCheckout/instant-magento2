@@ -23,7 +23,7 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
 
         function activateSend() {
             jQuery.ajax({
-                    url: '<?= $block->getAjaxUrl() ?>',
+                    url: '<?= $block->getActivateExtensionEndpointUrl() ?>',
                     data: JSON.stringify(params),
                     processData: false,
                     dataType: "json",
@@ -38,7 +38,7 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
                 })
                 .done((response) => {
                     jQuery.ajax({
-                            url: '/index.php/rest/V1/instant/set-merchant-and-token',
+                            url: '/index.php/rest/V1/instant/set-app-id-and-token',
                             data: JSON.stringify({
                                 'merchantId': response['merchantId'],
                                 'accessToken': response['accessToken'],
