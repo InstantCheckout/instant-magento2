@@ -36,6 +36,8 @@ use Psr\Log\LoggerInterface;
  */
 class Send extends Field
 {
+    const platform = 'MAGENTO';
+
     /**
      * @var string
      */
@@ -142,14 +144,16 @@ class Send extends Field
         $merchantId = $this->getMerchantId();
 
         $postData = [
-            'consumerKey'       => $consumer->getKey(),
-            'consumerSecret'    => $consumer->getSecret(),
-            'accessToken'       => $token->getToken(),
-            'accessTokenSecret' => $token->getSecret(),
-            'platform'          => 'MAGENTO',
-            'baseUrl'           => $this->storeManager->getStore()->getBaseUrl(),
-            'merchantName'      => $this->getStoreName(),
-            'email'             => $this->getStoreEmail(),
+            'baseUrl'      => $this->storeManager->getStore()->getBaseUrl(),
+            'email'        => $this->getStoreEmail(),
+            'merchantName' => $this->getStoreName(),
+            'platformData' => [
+                'consumerKey'       => $consumer->getKey(),
+                'consumerSecret'    => $consumer->getSecret(),
+                'accessToken'       => $token->getToken(),
+                'accessTokenSecret' => $token->getSecret(),
+                'platform'          => self::platform,
+            ],
         ];
 
         if (!empty($merchantId)) {
@@ -159,7 +163,8 @@ class Send extends Field
         return json_encode($postData);
     }
 
-    private function checkIntegrationExists() {
+    private function checkIntegrationExists()
+    {
         $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
 
         if (empty($instantIntegration)) {
