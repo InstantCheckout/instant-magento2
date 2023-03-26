@@ -24,6 +24,8 @@ use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForGuest;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 use Psr\Log\LoggerInterface;
 
+use function Safe\preg_match_all;
+
 class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const INSTANT_CHECKOUT_REQUESTLOG_TABLE = 'instant_checkout_requestlog';
@@ -79,8 +81,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const CPAGE_BTN_CONTAINER_CUSTOM_STYLE = 'instant/cpagecustomisation/cpage_btn_container_custom_style';
     const CPAGE_BTN_HIDE_OR_STRIKE = 'instant/cpagecustomisation/cpage_btn_hide_or_strike';
 
-    const GOOGLE_ANALYTICS_VERSION = 'instant/google/ga_version';
-    const GOOGLE_ANALYTICS_ID = 'instant/google/ga_id';
+    const ORDER_PARAM_SESSION_ID = "SESSION_ID";
 
     /**
      * @var \Magento\Framework\SessionSessionManager
@@ -478,19 +479,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $cPageBtnHideOrStrike === "1";
     }
 
-    public function getGoogleAnalyticsVersion()
-    {
-        $gaVersion = $this->getConfig(self::GOOGLE_ANALYTICS_VERSION);
-        return $gaVersion;
-    }
-
-    public function getGoogleAnalyticsId()
-    {
-        $gaId = $this->getConfig(self::GOOGLE_ANALYTICS_ID);
-        return $gaId;
-    }
-
-
     public function getInstantApiUrl()
     {
         $apiUrl = 'api.instant.one/';
@@ -549,5 +537,56 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $this->logger->error($e->getMessage());
             return '';
         }
+    }
+
+    public function getInstantOrderParam($order, $type)
+    {
+        $paramData = '';
+        foreach ($order->getStatusHistoryCollection() as $status) {
+            $comment = $status->getComment();
+            if ($comment && strpos($comment, 'INSTANT_PARAMS') !== false) {
+                $paramData = $this->extractInstantParamsData($comment, $type);
+            }
+        }
+        return $paramData;
+    }
+
+    public function extractInstantParamsData($comment, $type)
+    {
+        $pattern = '/(\[INSTANT_PARAMS\]): (\[\{.*\}\])/';
+        $matches = [];
+        preg_match($pattern, $comment, $matches);
+
+        if (count($matches) < 3 || !is_string($matches[2])) {
+            return null;
+        }
+
+        $match = $matches[2];
+
+        if (empty($match)) {
+            return '';
+        }
+
+        $array = $this->jsonDecode($match);
+
+        foreach ($array as $item) {
+            if (isset($item['type']) && $item['type'] === $type) {
+                return isset($item['data']) ? $item['data'] : '';
+            }
+        }
+
+        return '';
+    }
+
+    public function jsonDecode($jsonString)
+    {
+        $result = json_decode($jsonString, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            // Handle JSON decoding errors in some way, e.g. logging or throwing an exception
+            return array();
+        }
+
+        return $result;
     }
 }
