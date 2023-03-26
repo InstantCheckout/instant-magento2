@@ -551,7 +551,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $paramData;
     }
 
-    public function extractInstantParamsData($comment, $type)
+    private function extractInstantParamsData($comment, $type)
     {
         $pattern = '/(\[INSTANT_PARAMS\]): (\[\{.*\}\])/';
         $matches = [];
@@ -578,7 +578,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return '';
     }
 
-    public function jsonDecode($jsonString)
+    private function jsonDecode($jsonString)
     {
         $result = json_decode($jsonString, true);
 
