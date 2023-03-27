@@ -37,6 +37,9 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
                     beforeSend: () => {
                         showSpinner();
                     },
+                    error: () => {
+                        hideSpinner();
+                    },
                     complete: () => {
                         hideSpinner();
                     }
