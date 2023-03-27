@@ -144,14 +144,16 @@ class Send extends Field
         $merchantId = $this->getUncachedMerchantId();
 
         $postData = [
-            'consumerKey'       => $consumer->getKey(),
-            'consumerSecret'    => $consumer->getSecret(),
-            'accessToken'       => $token->getToken(),
-            'accessTokenSecret' => $token->getSecret(),
-            'platform'          => 'MAGENTO',
-            'baseUrl'           => $this->storeManager->getStore()->getBaseUrl(),
             'merchantName'      => $this->getStoreName(),
             'email'             => $this->getStoreEmail(),
+            'platformData'      => [
+                'baseUrl'           => $this->storeManager->getStore()->getBaseUrl(),
+                'platform'          => 'MAGENTO',
+                'consumerKey'       => $consumer->getKey(),
+                'consumerSecret'    => $consumer->getSecret(),
+                'accessToken'       => $token->getToken(),
+                'accessTokenSecret' => $token->getSecret(),
+            ],
         ];
 
         if (!empty($merchantId)) {
