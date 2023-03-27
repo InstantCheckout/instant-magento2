@@ -153,7 +153,7 @@ class GetConfig extends Action
             'bottomLayerFontSize' =>  $this->instantHelper->getStbBottomLayerFontSize(),
             'fontWeight' => $this->instantHelper->getStbFontWeight(),
         ];
-        
+
         $data['mcBtnCustomStyle'] = $this->instantHelper->getMcBtnCustomStyle();
         $data['mcBtnContainerCustomStyle'] = $this->instantHelper->getMcBtnContainerCustomStyle();
         $data['mcBtnHideOrStrike'] = $this->instantHelper->getMcBtnShouldHideOrStrike();
@@ -166,10 +166,9 @@ class GetConfig extends Action
         $data['cpageBtnContainerCustomStyle'] = $this->instantHelper->getCpageBtnContainerCustomStyle();
         $data['cpageBtnHideOrStrike'] = $this->instantHelper->getCpageBtnShouldHideOrStrike();
 
-        $data['gaVersion'] = $this->instantHelper->getGoogleAnalyticsVersion();
-        $data['gaId'] = $this->instantHelper->getGoogleAnalyticsId();
         $data['version'] = "1.9.03";
         $data['platform'] = "M2";
+        $data['sessionId'] = session_id();
 
         if ($this->customerSession->isLoggedIn()) {
             $customer = $this->customerRepository->getById($this->customerSession->getId());
