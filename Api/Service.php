@@ -10,7 +10,6 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Psr\Log\LoggerInterface;
 
 class Service implements ServiceInterface
 {
