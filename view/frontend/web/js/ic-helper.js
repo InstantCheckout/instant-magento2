@@ -24,7 +24,34 @@ define([
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    window.Instant = data;
+                    window.Instant = {
+                        appId: data.appId,
+                        enableMinicartBtn: data.enableMinicartBtn,
+                        cartId: data.cartId,
+                        enableSandbox: data.enableSandbox,
+                        storeCode: data.storeCode,
+                        mcBtnWidth: data.mcBtnWidth,
+                        cpageBtnWidth: data.cpageBtnWidth,
+                        shouldResizeCartIndexBtn: data.shouldResizeCartIndexBtn,
+                        shouldResizePdpBtn: data.shouldResizePdpBtn,
+                        disabledForCustomerGroup: data.disabledForCustomerGroup,
+                        currentCurrencyCode: data.currentCurrencyCode,
+                        baseCurrencyCode: data.baseCurrencyCode,
+                        swipeToBuy: data.swipeToBuy,
+                        mcBtnCustomStyle: data.mcBtnCustomStyle,
+                        mcBtnContainerCustomStyle: data.mcBtnContainerCustomStyle,
+                        mcBtnHideOrStrike: data.mcBtnHideOrStrike,
+                        cindexBtnCustomStyle: data.cindexBtnCustomStyle,
+                        cindexBtnContainerCustomStyle: data.cindexBtnContainerCustomStyle,
+                        cindexBtnHideOrStrike: data.cindexBtnHideOrStrike,
+                        cpageBtnCustomStyle: data.cpageBtnCustomStyle,
+                        cpageBtnContainerCustomStyle: data.cpageBtnContainerCustomStyle,
+                        cpageBtnHideOrStrike: data.cpageBtnHideOrStrike,
+                        customer: data.customer,
+                        address: data.address,
+                    };
+
+                    window.InstantM2.sessionId = data.sessionId;
 
                     $(document).trigger('instant-config-loaded');
                     if (typeof callback === 'function') {
@@ -180,21 +207,8 @@ define([
         },
 
         shouldEnableInstantBtn: function () {
-            let cartContainsBlacklistedSku = false;
             const areBaseAndCurrentCurrenciesEqual = window.Instant.baseCurrencyCode === window.Instant.currentCurrencyCode;
-
-            const cartData = this.getCustomerCartData();
-            if (cartData && cartData.items) {
-                cartData.items.forEach(item => {
-                    window.Instant.disabledForSkusContaining.forEach(x => {
-                        if (x && item.product_sku.indexOf(x) !== -1) {
-                            cartContainsBlacklistedSku = true;
-                        }
-                    })
-                })
-            }
-
-            return !cartContainsBlacklistedSku && areBaseAndCurrentCurrenciesEqual && !window.Instant.disabledForCustomerGroup;
+            return areBaseAndCurrentCurrenciesEqual && !window.Instant.disabledForCustomerGroup;
         },
 
         refreshInstantButtons: function () {

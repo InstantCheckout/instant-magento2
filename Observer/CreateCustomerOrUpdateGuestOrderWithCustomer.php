@@ -26,6 +26,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Model\AccountManagement;
 use Magento\Sales\Api\OrderCustomerManagementInterface;
+use Instant\Checkout\Helper\InstantHelper;
 
 /**
  * Class CreateCustomerOrUpdateGuestOrderWithCustomer
@@ -72,6 +73,11 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
     protected $orderCustomerService;
 
     /**
+     * @var InstantHelper
+     */
+    private $instantHelper;
+
+    /**
      * CreateCustomerOrUpdateGuestOrderWithCustomer constructor.
      * @param PurchasedFactory $purchasedFactory
      * @param OrderRepositoryInterface $orderRepository
@@ -93,7 +99,8 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
         CustomerFactory $customerFactory,
         StoreManagerInterface $storeManager,
         OrderCustomerManagementInterface $orderCustomerService,
-        OrderStatusHistoryRepositoryInterface $orderStatusRepository
+        OrderStatusHistoryRepositoryInterface $orderStatusRepository,
+        InstantHelper $instantHelper
     ) {
         $this->purchasedFactory = $purchasedFactory;
         $this->orderRepository = $orderRepository;
@@ -105,6 +112,7 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
         $this->storeManager = $storeManager;
         $this->orderCustomerService = $orderCustomerService;
         $this->orderStatusRepository = $orderStatusRepository;
+        $this->instantHelper = $instantHelper;
     }
 
     public function addCommentToOrder(Order $order, string $comment)
@@ -155,16 +163,17 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
 
                 // Check whether we should create an account and/or subscribe existing or new account to newsletter
                 try {
+                    $createCustomer = $this->instantHelper->getInstantOrderParam($order, 'CREATE_CUSTOMER');
+                    if ($createCustomer === 1) {
+                        $shouldCreateCustomerIfNotExists = true;
+                        $this->logInfo($order, "Detected that we should create customer if not exists.");
+                    }
+
                     foreach ($order->getStatusHistoryCollection() as $status) {
                         if ($status->getComment()) {
                             if (strpos($status->getComment(), 'SUBSCRIBE_TO_NEWSLETTER') !== false) {
                                 $shouldSubscribeCustomerToNewsletter =  true;
                                 $this->logInfo($order, "Detected that we should subscribe new/existing customer to newsletter.");
-                            }
-
-                            if (strpos($status->getComment(), 'CREATE_WEBSITE_USER') !== false) {
-                                $shouldCreateCustomerIfNotExists = true;
-                                $this->logInfo($order, "Detected that we should create customer if not exists.");
                             }
                         }
                     }

@@ -128,7 +128,6 @@ class GetConfig extends Action
         $data['appId'] = $this->instantHelper->getInstantAppId();
         $data['cartId'] = $this->instantHelper->getSessionCartId();
         $data['enableSandbox'] = $this->instantHelper->getSandboxEnabledConfig();
-        $data['disabledForSkusContaining'] = $this->instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $this->storeManager->getStore()->getCode();
         $data['mcBtnWidth'] = $this->instantHelper->getMcBtnWidth();
         $data['cpageBtnWidth'] = $this->instantHelper->getCPageBtnWidth();
@@ -165,9 +164,6 @@ class GetConfig extends Action
         $data['cpageBtnCustomStyle'] = $this->instantHelper->getCpageBtnCustomStyle();
         $data['cpageBtnContainerCustomStyle'] = $this->instantHelper->getCpageBtnContainerCustomStyle();
         $data['cpageBtnHideOrStrike'] = $this->instantHelper->getCpageBtnShouldHideOrStrike();
-
-        $data['version'] = "1.9.03";
-        $data['platform'] = "M2";
         $data['sessionId'] = session_id();
 
         if ($this->customerSession->isLoggedIn()) {
