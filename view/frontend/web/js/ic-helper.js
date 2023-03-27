@@ -51,7 +51,13 @@ define([
                         address: data.address,
                     };
 
-                    window.InstantM2.sessionId = data.sessionId;
+                    if (!window.InstantM2) {
+                        window.InstantM2.sessionId = data.sessionId;
+                    } else {
+                        window.InstantM2 = {
+                            sessionId: data.sessionId
+                        }
+                    }
 
                     $(document).trigger('instant-config-loaded');
                     if (typeof callback === 'function') {
