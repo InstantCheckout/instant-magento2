@@ -147,14 +147,6 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
     {
         /** @var Order $order */
         $order = $observer->getEvent()->getInvoice()->getOrder();
-
-        $this->logInfo($order, "Session ID:");
-        $this->logInfo($order, $this->instantHelper->getInstantOrderParam($order, 'SESSION_ID'));
-
-
-        $this->logInfo($order, "Create Website User:");
-        $this->logInfo($order, $this->instantHelper->getInstantOrderParam($order, 'CREATE_CUSTOMER'));
-
         $this->logInfo($order, "In CreateCustomerOrUpdateGuestOrderWithCustomer");
 
         $incrementId = $order->getIncrementId();
@@ -172,7 +164,7 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                 // Check whether we should create an account and/or subscribe existing or new account to newsletter
                 try {
                     $createCustomer = $this->instantHelper->getInstantOrderParam($order, 'CREATE_CUSTOMER');
-                    if ($createCustomer === 1) {s
+                    if ($createCustomer === 1) {
                         $shouldCreateCustomerIfNotExists = true;
                         $this->logInfo($order, "Detected that we should create customer if not exists.");
                     }
