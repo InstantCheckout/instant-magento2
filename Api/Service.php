@@ -51,9 +51,6 @@ class Service implements ServiceInterface
      */
     private $order;
 
-    // TODO: REmove:
-    private $logger;
-
     /**
      * Service constructor.
      *
@@ -73,8 +70,7 @@ class Service implements ServiceInterface
         Registry $registry,
         QuoteFactory $quoteFactory,
         OrderRepositoryInterface $orderRepository,
-        Order $order,
-        LoggerInterface $logger
+        Order $order
     ) {
         $this->checkoutHelper = $checkoutHelper;
         $this->checkoutSession = $checkoutSession;
@@ -83,7 +79,6 @@ class Service implements ServiceInterface
         $this->quoteFactory = $quoteFactory;
         $this->orderRepository = $orderRepository;
         $this->order = $order;
-        $this->logger = $logger;
     }
 
     public function deleteLastRealOrder()
