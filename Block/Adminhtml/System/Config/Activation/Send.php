@@ -25,7 +25,6 @@ use Magento\Integration\Model\IntegrationFactory;
 use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\OauthService;
 use Magento\Store\Model\ScopeInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Class Send
@@ -48,7 +47,6 @@ class Send extends Field
     private $oAuthToken;
     private $integrationService;
     private $instantHelper;
-    private $logger;
 
     public function __construct(
         Context $context,
@@ -58,8 +56,7 @@ class Send extends Field
         Token $oAuthToken,
         OauthService $oAuthService,
         InstantIntegrationService $integrationService,
-        InstantHelper $instantHelper,
-        LoggerInterface $logger
+        InstantHelper $instantHelper
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
@@ -68,7 +65,6 @@ class Send extends Field
         $this->oAuthService = $oAuthService;
         $this->integrationService = $integrationService;
         $this->instantHelper = $instantHelper;
-        $this->logger = $logger;
 
         parent::__construct($context);
     }
@@ -113,7 +109,14 @@ class Send extends Field
      */
     public function getActivateExtensionEndpointUrl(): string
     {
-        return $this->getUrl('https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate');
+        $url = $this->instantHelper->getInstantApiUrl();
+
+        // TODO: Remove this when deploying to production.
+        if (true) {
+            return $this->getUrl('https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate');
+        }
+
+        return $url . 'admin/extension/activate';
     }
 
     /**
@@ -133,13 +136,12 @@ class Send extends Field
      */
     public function getPostParams(): string
     {
-        $this->instantHelper->clearCache();
         $this->checkIntegrationExists();
 
         $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
         $consumer = $this->oAuthService->loadConsumer($instantIntegration['consumer_id']);
         $token = $this->oAuthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
-        $merchantId = $this->getMerchantId();
+        $merchantId = $this->getUncachedMerchantId();
 
         $postData = [
             'consumerKey'       => $consumer->getKey(),
@@ -159,7 +161,8 @@ class Send extends Field
         return json_encode($postData);
     }
 
-    private function checkIntegrationExists() {
+    private function checkIntegrationExists()
+    {
         $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
 
         if (empty($instantIntegration)) {
@@ -174,13 +177,9 @@ class Send extends Field
         }
     }
 
-    private function getMerchantId()
+    private function getUncachedMerchantId()
     {
-        $merchantId = $this->instantHelper->getUncachedCoreConfigValue('instant/general/app_id');
-
-        $this->logger->debug('Merchant ID:' . $merchantId);
-
-        return $merchantId;
+        return $this->instantHelper->getUncachedCoreConfigValue('instant/general/app_id');
     }
 
     private function getStoreEmail(): string
