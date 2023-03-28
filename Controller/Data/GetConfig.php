@@ -128,7 +128,6 @@ class GetConfig extends Action
         $data['appId'] = $this->instantHelper->getInstantAppId();
         $data['cartId'] = $this->instantHelper->getSessionCartId();
         $data['enableSandbox'] = $this->instantHelper->getSandboxEnabledConfig();
-        $data['disabledForSkusContaining'] = $this->instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $this->storeManager->getStore()->getCode();
         $data['mcBtnWidth'] = $this->instantHelper->getMcBtnWidth();
         $data['cpageBtnWidth'] = $this->instantHelper->getCPageBtnWidth();
@@ -153,7 +152,7 @@ class GetConfig extends Action
             'bottomLayerFontSize' =>  $this->instantHelper->getStbBottomLayerFontSize(),
             'fontWeight' => $this->instantHelper->getStbFontWeight(),
         ];
-        
+
         $data['mcBtnCustomStyle'] = $this->instantHelper->getMcBtnCustomStyle();
         $data['mcBtnContainerCustomStyle'] = $this->instantHelper->getMcBtnContainerCustomStyle();
         $data['mcBtnHideOrStrike'] = $this->instantHelper->getMcBtnShouldHideOrStrike();
@@ -165,11 +164,7 @@ class GetConfig extends Action
         $data['cpageBtnCustomStyle'] = $this->instantHelper->getCpageBtnCustomStyle();
         $data['cpageBtnContainerCustomStyle'] = $this->instantHelper->getCpageBtnContainerCustomStyle();
         $data['cpageBtnHideOrStrike'] = $this->instantHelper->getCpageBtnShouldHideOrStrike();
-
-        $data['gaVersion'] = $this->instantHelper->getGoogleAnalyticsVersion();
-        $data['gaId'] = $this->instantHelper->getGoogleAnalyticsId();
-        $data['version'] = "1.9.03";
-        $data['platform'] = "M2";
+        $data['sessionId'] = session_id();
 
         if ($this->customerSession->isLoggedIn()) {
             $customer = $this->customerRepository->getById($this->customerSession->getId());

@@ -301,21 +301,6 @@
                     <comment>Defaults to no.</comment>
                 </field>
             </group>
-            <group id="google" translate="label" type="text" sortOrder="10" showInDefault="1"
-                showInWebsite="1" showInStore="1">
-                <label>Google API</label>
-                <field id="ga_version" translate="label" type="text" sortOrder="90"
-                    showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Google Analytics Version</label>
-                    <comment>3 for UA, 4 for GA4</comment>
-                </field>
-                <field id="ga_id" translate="label" type="text" sortOrder="90" showInDefault="1"
-                    showInWebsite="1" showInStore="1">
-                    <label>Measurement ID or Tracking ID</label>
-                    <comment>If GA3/UA, then tracking ID e.g. UA-000000-2 should be specified. If
-                        GA4, measurement ID e.g. G-XXXXXXX should be specified.</comment>
-                </field>
-            </group>
         </section>
     </system>
 </config>
