@@ -109,14 +109,7 @@ class Send extends Field
      */
     public function getActivateExtensionEndpointUrl(): string
     {
-        $url = $this->instantHelper->getInstantApiUrl();
-
-        // TODO: Remove this when deploying to production.
-        if (true) {
-            return $this->getUrl('https://gqqe5b9w1m.execute-api.ap-southeast-2.amazonaws.com/pr725/admin/extension/activate');
-        }
-
-        return $url . 'admin/extension/activate';
+        return $this->instantHelper->getInstantApiUrl() . 'admin/extension/activate';
     }
 
     /**
