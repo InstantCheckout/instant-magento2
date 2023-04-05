@@ -166,7 +166,7 @@ class GetConfig extends Action
         $data['cpageBtnHideOrStrike'] = $this->instantHelper->getCpageBtnShouldHideOrStrike();
 
         $sessionId = session_id();
-        if (empty($sessionId)) {
+        if (!empty($sessionId)) {
             $data['sessionId'] = session_id();
         }
 
