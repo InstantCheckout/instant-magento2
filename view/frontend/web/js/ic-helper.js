@@ -51,13 +51,12 @@ define([
                         address: data.address,
                     };
 
-                    if (!window.InstantM2) {
-                        window.InstantM2.sessionId = data.sessionId;
-                    } else {
-                        window.InstantM2 = {
-                            sessionId: data.sessionId
+                    const setSessionIdInterval = setInterval(() => {
+                        if (window.InstantM2) {
+                            window.InstantM2.sessionId = data.sessionId;
+                            clearInterval(setSessionIdInterval);
                         }
-                    }
+                    }, 100)
 
                     $(document).trigger('instant-config-loaded');
                     if (typeof callback === 'function') {
