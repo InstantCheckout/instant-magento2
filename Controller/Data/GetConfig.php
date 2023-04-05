@@ -164,7 +164,11 @@ class GetConfig extends Action
         $data['cpageBtnCustomStyle'] = $this->instantHelper->getCpageBtnCustomStyle();
         $data['cpageBtnContainerCustomStyle'] = $this->instantHelper->getCpageBtnContainerCustomStyle();
         $data['cpageBtnHideOrStrike'] = $this->instantHelper->getCpageBtnShouldHideOrStrike();
-        $data['sessionId'] = session_id();
+
+        $sessionId = session_id();
+        if (!empty($sessionId)) {
+            $data['sessionId'] = session_id();
+        }
 
         if ($this->customerSession->isLoggedIn()) {
             $customer = $this->customerRepository->getById($this->customerSession->getId());
