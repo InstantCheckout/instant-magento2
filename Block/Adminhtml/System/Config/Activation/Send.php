@@ -14,8 +14,17 @@ declare(strict_types=1);
 
 namespace Instant\Checkout\Block\Adminhtml\System\Config\Activation;
 
+use Instant\Checkout\Helper\InstantHelper;
+use Instant\Checkout\Service\InstantIntegrationService;
+use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Integration\Model\IntegrationFactory;
+use Magento\Integration\Model\Oauth\Token;
+use Magento\Integration\Model\OauthService;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class Send
@@ -30,6 +39,35 @@ class Send extends Field
      * @var string
      */
     protected $_template = 'system/config/activation/send.phtml';
+
+    private $scopeConfig;
+    private $storeManager;
+    private $integrationFactory;
+    private $oAuthService;
+    private $oAuthToken;
+    private $integrationService;
+    private $instantHelper;
+
+    public function __construct(
+        Context $context,
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager,
+        IntegrationFactory $integrationFactory,
+        Token $oAuthToken,
+        OauthService $oAuthService,
+        InstantIntegrationService $integrationService,
+        InstantHelper $instantHelper
+    ) {
+        $this->scopeConfig = $scopeConfig;
+        $this->storeManager = $storeManager;
+        $this->integrationFactory = $integrationFactory;
+        $this->oAuthToken = $oAuthToken;
+        $this->oAuthService = $oAuthService;
+        $this->integrationService = $integrationService;
+        $this->instantHelper = $instantHelper;
+
+        parent::__construct($context);
+    }
 
     /**
      * Unset scope
@@ -54,6 +92,7 @@ class Send extends Field
     protected function _getElementHtml(AbstractElement $element): string
     {
         $originalData = $element->getOriginalData();
+
         $this->addData([
             'button_label' => $originalData['button_label'],
             'button_url' => $this->getUrl($originalData['button_url'], ['_current' => true]),
@@ -64,10 +103,94 @@ class Send extends Field
     }
 
     /**
+     * Instant backend API endpoint to activate the Magento extension.
+     * 
      * @return string
      */
-    public function getAjaxUrl()
+    public function getActivateExtensionEndpointUrl(): string
     {
-        return $this->getUrl('instant/activation/send', ['_current' => true]);
+        return $this->instantHelper->getInstantApiUrl() . 'admin/extension/activate';
+    }
+
+    /**
+     * Local Magento API endpoint that sets a App ID and Access Token into the core config.
+     * 
+     * @return string
+     */
+    public function getSetAppIdAndTokenUrl(): string
+    {
+        return $this->getUrl('/index.php/rest/V1/instant/set-app-id-and-token');
+    }
+
+    /**
+     * Gets the params we need to send to the Instant backend to create a Merchant and its Stores.
+     * 
+     * @return string
+     */
+    public function getPostParams(): string
+    {
+        $this->checkIntegrationExists();
+
+        $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
+        $consumer = $this->oAuthService->loadConsumer($instantIntegration['consumer_id']);
+        $token = $this->oAuthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
+        $merchantId = $this->getUncachedMerchantId();
+
+        $postData = [
+            'merchantName'      => $this->getStoreName(),
+            'email'             => $this->getStoreEmail(),
+            'platformData'      => [
+                'baseUrl'           => $this->storeManager->getStore()->getBaseUrl(),
+                'platform'          => 'MAGENTO',
+                'consumerKey'       => $consumer->getKey(),
+                'consumerSecret'    => $consumer->getSecret(),
+                'accessToken'       => $token->getToken(),
+                'accessTokenSecret' => $token->getSecret(),
+            ],
+        ];
+
+        if (!empty($merchantId)) {
+            $postData['merchantId'] = $merchantId;
+        }
+
+        return json_encode($postData);
+    }
+
+    private function checkIntegrationExists()
+    {
+        $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
+
+        if (empty($instantIntegration)) {
+            $this->integrationService->createInstantIntegration();
+        }
+
+        $consumer = $this->oAuthService->loadConsumer($instantIntegration['consumer_id']);
+        $token = $this->oAuthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
+
+        if (empty($consumer->getKey()) || empty($consumer->getSecret()) || empty($token->getToken()) || empty($token->getSecret())) {
+            $this->integrationService->createInstantIntegration();
+        }
+    }
+
+    private function getUncachedMerchantId()
+    {
+        return $this->instantHelper->getUncachedCoreConfigValue('instant/general/app_id');
+    }
+
+    private function getStoreEmail(): string
+    {
+        // TODO: Return an array for all stores?
+        return $this->scopeConfig->getValue('trans_email/ident_support/email', ScopeInterface::SCOPE_STORE);
+    }
+
+    private function getStoreName(): string
+    {
+        $storeName = $this->scopeConfig->getValue('general/store_information/name', ScopeInterface::SCOPE_STORE);
+
+        if (empty($storeName)) {
+            $storeName = $this->storeManager->getStore()->getName();
+        }
+
+        return $storeName;
     }
 }

@@ -30,35 +30,28 @@
             <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1"
                 showInWebsite="1" showInStore="1">
                 <label>Application Config</label>
+                <field id="activate_button" translate="label comment" sortOrder="80"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
+                    <button_label>Activate</button_label>
+                    <button_url>adminhtml/instant/activation/send</button_url>
+                    <frontend_model>Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send</frontend_model>
+                    <comment>Clicking this set an App ID and Access Token into your Magento config, allowing Instant to make secure API calls to your store.
+                    </comment>
+                </field>
+
                 <field id="app_id" translate="label" type="text" sortOrder="90" showInDefault="1"
                     showInWebsite="1" showInStore="1">
                     <label>Instant App ID</label>
-                    <comment>Enter the Application ID provided by Instant</comment>
+                    <comment>The Application ID provided by Instant. If this field is empty you need to activate your extension.</comment>
+                    <frontend_model>Instant\Checkout\Block\Adminhtml\Config\DisableFormField</frontend_model>
                 </field>
-                <field id="api_access_token" translate="label" type="text" sortOrder="100"
-                    showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Instant Access Token</label>
-                    <comment>Enter the Access Token provided by Instant (This is used to
-                        authenticate your API calls to Instant. IMPORTANT: This is private, do not
-                        make publicly available)</comment>
-                </field>
+
                 <field id="enable_sandbox" translate="label" type="select" sortOrder="110"
                     showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Is in Sandbox/Staging Environment</label>
                     <comment>Defaults to Yes. CRITICAL: Set to No if in LIVE/PRODUCTION environment.
                         Set to Yes if this site is a SANDBOX/STAGING environment. </comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="activate_button" translate="label comment" sortOrder="120"
-                    showInDefault="1" showInWebsite="1" showInStore="1">
-                    <button_label>Activate</button_label>
-                    <button_url>adminhtml/instant/activation/send</button_url>
-                    <frontend_model>Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send</frontend_model>
-                    <comment>Important: Ensure config is correct and saved before activating
-                        Instant. Clicking this
-                        will send an access token to Instant, allowing Instant to make secure API
-                        calls to your store.
-                    </comment>
                 </field>
                 <field id="disabled_for_skus_containing" translate="label" type="text"
                     sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">

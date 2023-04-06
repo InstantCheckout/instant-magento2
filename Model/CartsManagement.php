@@ -84,6 +84,11 @@ class CartsManagement implements CartsManagementInterface
      */
     protected $resourceConnection;
 
+    /**
+     * @var QuoteIdToMaskedQuoteIdInterface
+     */
+    protected $quoteIdToMaskedQuoteId;
+
 
     /**
      * @codeCoverageIgnore

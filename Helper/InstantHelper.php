@@ -22,7 +22,9 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForCustomer;
 use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForGuest;
 use Magento\Quote\Model\QuoteIdMaskFactory;
+use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\App\Cache\Manager;
 
 use function Safe\preg_match_all;
 
@@ -89,6 +91,11 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     private $sessionManager;
 
     /**
+     * @var Session
+     */
+    protected $customerSession;
+
+    /**
      * @var StoreManagerInterface
      */
     protected $storeManager;
@@ -119,6 +126,16 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     private $quoteIdMaskFactory;
 
     /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+
+    /**
+     * @var Manager
+     */
+    private $cacheManager;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -138,7 +155,9 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         LoggerInterface $logger,
         CreateEmptyCartForCustomer $createEmptyCartForCustomer,
         CreateEmptyCartForGuest $createEmptyCartForGuest,
-        QuoteIdMaskFactory $quoteIdMaskFactory
+        QuoteIdMaskFactory $quoteIdMaskFactory,
+        CollectionFactory $collectionFactory,
+        Manager $cacheManager
     ) {
         $this->customerSession = $customerSession;
         $this->sessionManager = $sessionManager;
@@ -148,7 +167,9 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->createEmptyCartForCustomer = $createEmptyCartForCustomer;
         $this->createEmptyCartForGuest = $createEmptyCartForGuest;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
+        $this->collectionFactory = $collectionFactory;
         $this->logger = $logger;
+        $this->cacheManager = $cacheManager;
 
         return parent::__construct($context);
     }
@@ -531,6 +552,20 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $this->logger->error($e->getMessage());
             return '';
         }
+    }
+
+    public function getUncachedCoreConfigValue($pathFieldValue)
+    {
+        $collection = $this->collectionFactory->create();
+        $configValue = $collection->addFieldToFilter('path', ['eq' => $pathFieldValue])->getFirstItem()->getValue();
+
+        return $configValue ?? "";
+    }
+
+    public function clearCache()
+    {
+        $this->cacheManager->flush($this->cacheManager->getAvailableTypes());
+        $this->logger->info('Cache was cleared!');
     }
 
     public function getInstantOrderParam($order, $type)
