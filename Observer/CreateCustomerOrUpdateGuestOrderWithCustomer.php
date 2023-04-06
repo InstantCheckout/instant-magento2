@@ -164,6 +164,10 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                 // Check whether we should create an account and/or subscribe existing or new account to newsletter
                 try {
                     $createCustomer = $this->instantHelper->getInstantOrderParam($order, 'CREATE_CUSTOMER');
+                    \Magento\Framework\App\ObjectManager::getInstance()
+                        ->get(\Psr\Log\LoggerInterface::class)->debug('createCustomer');
+                    \Magento\Framework\App\ObjectManager::getInstance()
+                        ->get(\Psr\Log\LoggerInterface::class)->debug($createCustomer);
                     if ($createCustomer === 1) {
                         $shouldCreateCustomerIfNotExists = true;
                         $this->logInfo($order, "Detected that we should create customer if not exists.");
@@ -185,15 +189,28 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                 if ($order->getCustomerIsGuest()) {
                     $this->logInfo($order, "Attempting to get customer with email: " . $order->getCustomerEmail());
                     try {
+                        \Magento\Framework\App\ObjectManager::getInstance()
+                            ->get(\Psr\Log\LoggerInterface::class)->debug('Inside try statement of customer');
                         $customer = $this->customerRepository->get($order->getCustomerEmail());
                     } catch (Exception $e) {
+                        \Magento\Framework\App\ObjectManager::getInstance()
+                            ->get(\Psr\Log\LoggerInterface::class)->debug($e->getMessage());
+                        \Magento\Framework\App\ObjectManager::getInstance()
+                            ->get(\Psr\Log\LoggerInterface::class)->debug('Inside exception');
                         // do nothing. Customer with order email does not exist.
                     }
 
                     if ($customer) {
+                        \Magento\Framework\App\ObjectManager::getInstance()
+                            ->get(\Psr\Log\LoggerInterface::class)->debug('Inside customer');
                         $this->logInfo($order, "Order is guest order and customer exists.");
                         $this->addCommentToOrder($order, sprintf('Customer with email ' . $order->getCustomerEmail() . ' exists. Assigning order to this customer.'));
                     } else if ($shouldCreateCustomerIfNotExists) {
+                        \Magento\Framework\App\ObjectManager::getInstance()
+                            ->get(\Psr\Log\LoggerInterface::class)->debug('Inside else if: shouldCreateCustomerIfNotExists');
+                        \Magento\Framework\App\ObjectManager::getInstance()
+                            ->get(\Psr\Log\LoggerInterface::class)->debug($shouldCreateCustomerIfNotExists);
+
                         $this->logInfo($order, "Customer with email: " . $order->getCustomerEmail() . " does not exist.");
                         $this->addCommentToOrder($order, sprintf('Creating account for customer with email: ' . $order->getCustomerEmail()));
                         $customer = $this->orderCustomerService->create($orderId);
