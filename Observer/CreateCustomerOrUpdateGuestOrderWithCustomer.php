@@ -164,7 +164,7 @@ class CreateCustomerOrUpdateGuestOrderWithCustomer implements ObserverInterface
                 // Check whether we should create an account and/or subscribe existing or new account to newsletter
                 try {
                     $createCustomer = $this->instantHelper->getInstantOrderParam($order, 'CREATE_CUSTOMER');
-                    if ($createCustomer === 1) {
+                    if ($createCustomer == 1) {
                         $shouldCreateCustomerIfNotExists = true;
                         $this->logInfo($order, "Detected that we should create customer if not exists.");
                     }
