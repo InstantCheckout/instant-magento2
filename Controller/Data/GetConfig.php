@@ -128,6 +128,7 @@ class GetConfig extends Action
         $data['appId'] = $this->instantHelper->getInstantAppId();
         $data['cartId'] = $this->instantHelper->getSessionCartId();
         $data['enableSandbox'] = $this->instantHelper->getSandboxEnabledConfig();
+        $data['disabledForSkusContaining'] = $this->instantHelper->getDisabledForSkusContaining();
         $data['storeCode'] = $this->storeManager->getStore()->getCode();
         $data['mcBtnWidth'] = $this->instantHelper->getMcBtnWidth();
         $data['cpageBtnWidth'] = $this->instantHelper->getCPageBtnWidth();

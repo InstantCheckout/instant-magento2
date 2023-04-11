@@ -254,6 +254,12 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $sandboxEnabled === "1";
     }
 
+    public function getDisabledForSkusContaining()
+    {
+        $disableForSkusContaining = $this->getConfig(self::DISABLED_FOR_SKUS_CONTAINING);
+        return explode(',', $disableForSkusContaining ?? '');
+    }
+
     public function getDisabledForCustomerGroup()
     {
         $disabledForCustomerGroupIdsConfig = $this->getConfig(self::DISABLED_FOR_CUSTOMER_GROUP_IDS);

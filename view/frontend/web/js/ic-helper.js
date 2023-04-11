@@ -38,6 +38,7 @@ define([
                         currentCurrencyCode: data.currentCurrencyCode,
                         baseCurrencyCode: data.baseCurrencyCode,
                         swipeToBuy: data.swipeToBuy,
+                        disabledForSkusContaining: data.disabledForSkusContaining,
                         mcBtnCustomStyle: data.mcBtnCustomStyle,
                         mcBtnContainerCustomStyle: data.mcBtnContainerCustomStyle,
                         mcBtnHideOrStrike: data.mcBtnHideOrStrike,
@@ -214,8 +215,21 @@ define([
         },
 
         shouldEnableInstantBtn: function () {
+            let cartContainsBlacklistedSku = false;
             const areBaseAndCurrentCurrenciesEqual = window.Instant.baseCurrencyCode === window.Instant.currentCurrencyCode;
-            return areBaseAndCurrentCurrenciesEqual && !window.Instant.disabledForCustomerGroup;
+
+            const cartData = this.getCustomerCartData();
+            if (cartData && cartData.items) {
+                cartData.items.forEach(item => {
+                    window.Instant.disabledForSkusContaining.forEach(x => {
+                        if (x && item.product_sku.indexOf(x) !== -1) {
+                            cartContainsBlacklistedSku = true;
+                        }
+                    })
+                })
+            }
+
+            return !cartContainsBlacklistedSku && areBaseAndCurrentCurrenciesEqual && !window.Instant.disabledForCustomerGroup;
         },
 
         refreshInstantButtons: function () {
