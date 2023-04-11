@@ -56,8 +56,19 @@ class PdpBlock extends \Magento\Framework\View\Element\Template
     {
         $catalogPageBtnEnabled = $this->instantHelper->getInstantBtnCatalogPageEnabled();
         $disabledForCustomerGroup = $this->instantHelper->getDisabledForCustomerGroup();
+        $disabledSkus = $this->instantHelper->getDisabledForSkusContaining();
+        $productSku = $this->getProduct()->getSku();
 
-        if ($catalogPageBtnEnabled && !$disabledForCustomerGroup) {
+        $isProductDisabled = false;
+
+        foreach ($disabledSkus as $disabledSku) {
+            if (!empty($disabledSku) && strpos($productSku, $disabledSku) !== false) {
+                $isProductDisabled = true;
+                break;
+            }
+        }
+
+        if ($catalogPageBtnEnabled && !$disabledForCustomerGroup && !$isProductDisabled) {
             return parent::_toHtml();
         }
 

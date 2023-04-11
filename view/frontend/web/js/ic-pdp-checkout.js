@@ -37,6 +37,17 @@ define([
 
     return function (config, element) {
         $(pdpBtnContainerSelector).css('display', 'flex');
+
+        $(document).on('instant-config-loaded', function () {
+            let skuIsDisabled = false;
+            window.Instant.disabledForSkusContaining.forEach(x => {
+                if (x && config.sku.indexOf(x) !== -1) {
+                    skuIsDisabled = true;
+                }
+            })
+            $(pdpBtnContainerSelector).css('display', skuIsDisabled ? 'none' : 'flex');
+        });
+
         // If we should reposition OR strike, or should reposition pdp below atc, then move the OR strike before button
         if (config.pdpShouldRepositionOrStrikeAboveBtn || config.shouldPositionPdpBelowAtc) {
             $(pdpBtnOrStrike).insertBefore(pdpBtnSelector);
