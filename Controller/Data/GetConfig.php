@@ -196,6 +196,20 @@ class GetConfig extends Action
         }
 
         $result->setData($data);
+
+
+        $customer = $this->customerRepository->getById(85607);
+
+        if ($customer->getCustomAttribute('mobile_number')) {
+            $attributeValue = $customer->getCustomAttribute('mobile_number')->getValue();
+            \Magento\Framework\App\ObjectManager::getInstance()
+                ->get(\Psr\Log\LoggerInterface::class)->debug('CUSTOMER MOBILE PHONE');
+            \Magento\Framework\App\ObjectManager::getInstance()
+                ->get(\Psr\Log\LoggerInterface::class)->debug($attributeValue);
+        } else {
+            throw new Exception("NO MOBILE NUMBER");
+        }
+
         return $result;
     }
 }

@@ -43,7 +43,6 @@
                     showInWebsite="1" showInStore="1">
                     <label>Instant App ID</label>
                     <comment>The Application ID provided by Instant. If this field is empty you need to activate your extension.</comment>
-                    <frontend_model>Instant\Checkout\Block\Adminhtml\Config\DisableFormField</frontend_model>
                 </field>
 
                 <field id="enable_sandbox" translate="label" type="select" sortOrder="110"
@@ -70,6 +69,12 @@
                     <comment>Defaults to empty. Enter a comma delimited list. Any customer group
                         contained in this comma delimited list, will have Instant disabled (e.g. 1,2
                         will ensure Instant is disabled for all customers in groups with ID 1 or 2.)</comment>
+                </field>
+                <field id="auto_convert_guest_to_customer" translate="label" type="select" sortOrder="140"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Automatically create a website account for customers who check out using Instant who do not have an existing website account</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Defaults to false.</comment>
                 </field>
                 <field id="enable_catalog" translate="label" type="select" sortOrder="140"
                     showInDefault="1" showInWebsite="1" showInStore="1">
