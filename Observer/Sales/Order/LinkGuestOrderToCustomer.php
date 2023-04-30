@@ -39,7 +39,7 @@ class LinkGuestOrderToCustomer implements ObserverInterface
         CollectionFactory $factory,
         InstantHelper $instantHelper,
         OrderCustomerManagementInterface $orderCustomerService,
-        AddressFactory $addressFactory,
+        AddressFactory $addressFactory
     ) {
         $this->factory = $factory;
         $this->instantHelper = $instantHelper;
