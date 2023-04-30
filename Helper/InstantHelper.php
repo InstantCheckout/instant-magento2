@@ -25,6 +25,8 @@ use Magento\Quote\Model\QuoteIdMaskFactory;
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Cache\Manager;
+use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
+use Magento\Sales\Model\Order;
 
 use function Safe\preg_match_all;
 
@@ -37,6 +39,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const ENABLE_INSTANT_SANDBOX_MODE_PATH = 'instant/general/enable_sandbox';
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
     const DISABLED_FOR_CUSTOMER_GROUP_IDS = 'instant/general/disabled_for_customer_group_ids';
+    const AUTO_CONVERT_GUEST_TO_CUSTOMER = 'instant/general/auto_convert_guest_to_customer';
 
     const ENABLE_INSTANT_CATALOG_PAGE_PATH = 'instant/general/enable_catalog';
     const ENABLE_INSTANT_MINICART_BTN_PATH = 'instant/general/enable_minicart';
@@ -141,6 +144,11 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     private $logger;
 
     /**
+     * @var OrderStatusHistoryRepositoryInterface
+     */
+    protected $orderStatusRepository;
+
+    /**
      * Constructor.
      * @param Context $context
      * @param Session $customerSession
@@ -157,7 +165,8 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         CreateEmptyCartForGuest $createEmptyCartForGuest,
         QuoteIdMaskFactory $quoteIdMaskFactory,
         CollectionFactory $collectionFactory,
-        Manager $cacheManager
+        Manager $cacheManager,
+        OrderStatusHistoryRepositoryInterface $orderStatusRepository
     ) {
         $this->customerSession = $customerSession;
         $this->sessionManager = $sessionManager;
@@ -170,6 +179,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->collectionFactory = $collectionFactory;
         $this->logger = $logger;
         $this->cacheManager = $cacheManager;
+        $this->orderStatusRepository = $orderStatusRepository;
 
         return parent::__construct($context);
     }
@@ -191,6 +201,26 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    public function addCommentToOrder(Order $order, string $comment)
+    {
+        $commentToAdd = '[INSTANT] (Order ID: ' . $order->getId() . '): ' . sprintf($comment);
+        $statusComment = NULL;
+
+        try {
+            $statusComment = $order->addCommentToStatusHistory($commentToAdd);
+            $this->orderStatusRepository->save($statusComment);
+            $this->logInfo($comment);
+        } catch (Exception $e) {
+            $order->addStatusHistoryComment($commentToAdd);
+            $order->save();
+        }
+    }
+
+    public function logInfo(string $log)
+    {
+        $this->logger->info($log);
     }
 
     public function getConfig($config)
@@ -222,6 +252,12 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $instantAccessToken = $this->getConfig(self::ACCESS_TOKEN_PATH);
         return $instantAccessToken;
+    }
+
+    public function getShouldAutoConvertGuestToCustomer()
+    {
+        $shouldConvert = $this->getConfig(self::AUTO_CONVERT_GUEST_TO_CUSTOMER);
+        return $shouldConvert === "1";
     }
 
     public function getInstantMinicartBtnEnabled()

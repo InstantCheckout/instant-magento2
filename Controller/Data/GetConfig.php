@@ -196,6 +196,7 @@ class GetConfig extends Action
         }
 
         $result->setData($data);
+
         return $result;
     }
 }

@@ -8,7 +8,8 @@
     <event name="sales_order_invoice_pay">
         <observer name="set_tx_on_invoice_pay"
             instance="Instant\Checkout\Observer\SetTransactionOnInvoicePaid" />
-        <observer name="guest_to_customer"
-            instance="Instant\Checkout\Observer\CreateCustomerOrUpdateGuestOrderWithCustomer" />
+    </event>
+    <event name="sales_order_place_after">
+        <observer name="link_guest_order_to_customer" instance="Instant\Checkout\Observer\Sales\Order\LinkGuestOrderToCustomer"/>
     </event>
 </config>
