@@ -40,6 +40,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const DISABLED_FOR_SKUS_CONTAINING = 'instant/general/disabled_for_skus_containing';
     const DISABLED_FOR_CUSTOMER_GROUP_IDS = 'instant/general/disabled_for_customer_group_ids';
     const AUTO_CONVERT_GUEST_TO_CUSTOMER = 'instant/general/auto_convert_guest_to_customer';
+    const ENABLE_MULTICURRENCY_ON_SINGLE_STORE = 'instant/general/enable_multicurrency_on_single_store';
 
     const ENABLE_INSTANT_CATALOG_PAGE_PATH = 'instant/general/enable_catalog';
     const ENABLE_INSTANT_MINICART_BTN_PATH = 'instant/general/enable_minicart';
@@ -276,6 +277,12 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $checkoutSummaryEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_SUMMARY);
         return $checkoutSummaryEnabled === "1";
+    }
+
+    public function getEnableMulticurrencyOnSingleStore()
+    {
+        $enableMultiCurrencyOnSingleStore = $this->getConfig(self::ENABLE_MULTICURRENCY_ON_SINGLE_STORE);
+        return $enableMultiCurrencyOnSingleStore === "1";
     }
 
     public function getInstantBtnCatalogPageEnabled()

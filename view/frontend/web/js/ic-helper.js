@@ -49,6 +49,7 @@ define([
                         cpageBtnContainerCustomStyle: data.cpageBtnContainerCustomStyle,
                         cpageBtnHideOrStrike: data.cpageBtnHideOrStrike,
                         customer: data.customer,
+                        enableMulticurrencyOnSingleStore: data.enableMulticurrencyOnSingleStore,
                         address: data.address,
                     };
 
@@ -216,7 +217,8 @@ define([
 
         shouldEnableInstantBtn: function () {
             let cartContainsBlacklistedSku = false;
-            const areBaseAndCurrentCurrenciesEqual = window.Instant.baseCurrencyCode === window.Instant.currentCurrencyCode;
+
+            const currencyEnabled = ((window.Instant.enableMulticurrencyOnSingleStore && (window.Instant.baseCurrencyCode !== window.Instant.currentCurrencyCode)) || (window.Instant.baseCurrencyCode === window.Instant.currentCurrencyCode));
 
             const cartData = this.getCustomerCartData();
             if (cartData && cartData.items) {
@@ -229,7 +231,7 @@ define([
                 })
             }
 
-            return !cartContainsBlacklistedSku && areBaseAndCurrentCurrenciesEqual && !window.Instant.disabledForCustomerGroup;
+            return !cartContainsBlacklistedSku && currencyEnabled && !window.Instant.disabledForCustomerGroup;
         },
 
         refreshInstantButtons: function () {

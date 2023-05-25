@@ -2,7 +2,7 @@ define([
     'jquery',
     'underscore',
     'Instant_Checkout/js/ic-helper'
-], function ($, _) {
+], function ($, _, checkoutHelper) {
     "use strict";
 
     const pdpBtnSelector = "#ic-pdp-btn";
@@ -39,13 +39,8 @@ define([
         $(pdpBtnContainerSelector).css('display', 'flex');
 
         $(document).on('instant-config-loaded', function () {
-            let skuIsDisabled = false;
-            window.Instant.disabledForSkusContaining.forEach(x => {
-                if (x && config.sku.indexOf(x) !== -1) {
-                    skuIsDisabled = true;
-                }
-            })
-            $(pdpBtnContainerSelector).css('display', skuIsDisabled ? 'none' : 'flex');
+            const shouldEnableInstantBtn = checkoutHelper.shouldEnableInstantBtn();
+            $(pdpBtnContainerSelector).css('display', !shouldEnableInstantBtn ? 'none' : 'flex');
         });
 
         // If we should reposition OR strike, or should reposition pdp below atc, then move the OR strike before button

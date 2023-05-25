@@ -44,6 +44,7 @@
                 <enable_minicart>0</enable_minicart>
                 <enable_checkout_summary>0</enable_checkout_summary>
                 <auto_convert_guest_to_customer>0</auto_convert_guest_to_customer>
+                <enable_multicurrency_on_single_store>0</enable_multicurrency_on_single_store>
                 <enable_checkout_page>0</enable_checkout_page>
                 <enable_sandbox>1</enable_sandbox>
                 <cpage_btn_width>60</cpage_btn_width>

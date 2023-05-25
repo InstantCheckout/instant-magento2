@@ -137,6 +137,7 @@ class GetConfig extends Action
         $data['disabledForCustomerGroup'] = $this->instantHelper->getDisabledForCustomerGroup();
         $data['currentCurrencyCode'] = $this->instantHelper->getCurrentCurrencyCode();
         $data['baseCurrencyCode'] = $this->instantHelper->getBaseCurrencyCode();
+        $data['enableMulticurrencyOnSingleStore'] = $this->instantHelper->getEnableMulticurrencyOnSingleStore();
 
         $data['swipeToBuy'] = [
             'enabled' => $this->instantHelper->getStbEnabled(),

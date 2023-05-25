@@ -35,14 +35,16 @@
                     <button_label>Activate</button_label>
                     <button_url>adminhtml/instant/activation/send</button_url>
                     <frontend_model>Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send</frontend_model>
-                    <comment>Clicking this set an App ID and Access Token into your Magento config, allowing Instant to make secure API calls to your store.
+                    <comment>Clicking this set an App ID and Access Token into your Magento config,
+                        allowing Instant to make secure API calls to your store.
                     </comment>
                 </field>
 
                 <field id="app_id" translate="label" type="text" sortOrder="90" showInDefault="1"
                     showInWebsite="1" showInStore="1">
                     <label>Instant App ID</label>
-                    <comment>The Application ID provided by Instant. If this field is empty you need to activate your extension.</comment>
+                    <comment>The Application ID provided by Instant. If this field is empty you need
+                        to activate your extension.</comment>
                 </field>
 
                 <field id="enable_sandbox" translate="label" type="select" sortOrder="110"
@@ -70,11 +72,24 @@
                         contained in this comma delimited list, will have Instant disabled (e.g. 1,2
                         will ensure Instant is disabled for all customers in groups with ID 1 or 2.)</comment>
                 </field>
-                <field id="auto_convert_guest_to_customer" translate="label" type="select" sortOrder="140"
+                <field id="auto_convert_guest_to_customer" translate="label" type="select"
+                    sortOrder="140"
                     showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Automatically create a website account for customers who check out using Instant who do not have an existing website account</label>
+                    <label>Automatically create a website account for customers who check out using
+                        Instant who do not have an existing website account</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Defaults to false.</comment>
+                </field>
+                <field id="enable_multicurrency_on_single_store" translate="label" type="select"
+                    sortOrder="140"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enables support for multiple currencies on a single store view. (e.g. AUD
+                        on a USD store view)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Please note that this
+                        must be enabled if multiple currencies need to be supported on a single
+                        store view. For setups where a single store views supports a single
+                        currency, this can remain disabled.</comment>
                 </field>
                 <field id="enable_catalog" translate="label" type="select" sortOrder="140"
                     showInDefault="1" showInWebsite="1" showInStore="1">

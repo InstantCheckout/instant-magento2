@@ -5,7 +5,8 @@ define([
     "use strict";
 
     return function (config) {
-        if (config.baseCurrencyCode !== config.currentCurrencyCode) {
+        const currencyEnabled = ((window.Instant.enableMulticurrencyOnSingleStore && (window.Instant.baseCurrencyCode !== window.Instant.currentCurrencyCode)) || (window.Instant.baseCurrencyCode === window.Instant.currentCurrencyCode));
+        if (!currencyEnabled) {
             return;
         }
 
