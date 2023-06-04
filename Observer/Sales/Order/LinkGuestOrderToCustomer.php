@@ -119,13 +119,23 @@ class LinkGuestOrderToCustomer implements ObserverInterface
         }
 
         if ($customer) {
-            $this->instantHelper->addCommentToOrder($order, 'Assigning customer ' . $customer->getId() .  ' to order.');
+            $this->instantHelper->addCommentToOrder($order, 'Assigning customer ' . $customer->getId() . ' to order.');
             /** @var Customer $customer */
             $order->setCustomerId($customer->getId());
             $order->setCustomerIsGuest(0);
             $order->setCustomerGroupId($customer->getGroupId());
             $order->save();
             $this->instantHelper->addCommentToOrder($order, 'Customer assigned to order.');
+
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            try {
+                $subscriptionManager = $objectManager->create('Magento\Newsletter\Model\SubscriptionManager');
+                $this->instantHelper->addCommentToOrder($order, 'Subscribing customer to newsletter');
+                $subscriptionManager->subscribeCustomer((int) $customer->getId(), (int) $order->getStore()->getId());
+            } catch (Exception $e) {
+                $this->instantHelper->logInfo("[INSTANT::Instant/Checkout/Observer/Sales/Order/LinkGuestOrderToCustomer] Exception raised.");
+                $this->instantHelper->logInfo($e->getMessage());
+            }
         }
     }
 }
