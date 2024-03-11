@@ -4,23 +4,11 @@
 <?php /** @var \Magento\Catalog\Block\Product\View $block */ ?>
 <?php $helper = $this->helper(\Instant\Checkout\Helper\InstantHelper::class); ?>
 <!-- INSTANT BUTTON START -->
-<div id="ic-cindex-btn-container" class="ic-btn-container">
-    <div class='ic-css-reset'>
-        <div id="ic-cindex-btn-wrapper" class="ic-btn-wrapper">
-            <button disabled id="ic-cindex-btn" type="button" title="Instant Checkout" class="ic-btn" data-instant="true" data-mage-init='
-                    {
-                        "Instant_Checkout/js/ic-cindex-checkout": {
-                            "shouldResizeCartIndexBtn": "<?= $block->escapeHtml($helper->getShouldResizeCartIndexBtn()) ?>",
-                            "baseCurrencyCode": "<?= $block->escapeHtml($helper->getBaseCurrencyCode()) ?>",
-                            "currentCurrencyCode": "<?= $block->escapeHtml($helper->getCurrentCurrencyCode()) ?>"
-                        }            
-                    }
-                    '>
-                Instant Checkout
-            </button>
-            <div id="ic-cindex-btn-strike" class="ic-btn-strike">
-                <span>or</span>
-            </div>
+<div id="ic-cindex-btn-container" class="ic-btn-container" style="display: none">
+    <div id="ic-cindex-btn-wrapper" class="ic-btn-wrapper">
+        <button id="ic-cindex-btn" type="button" data-instant="true"></button>
+        <div id="ic-cindex-btn-strike" class="ic-btn-strike">
+            <span>or</span>
         </div>
     </div>
 </div>

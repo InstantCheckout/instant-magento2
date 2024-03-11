@@ -1,0 +1,19 @@
+<?php
+?>
+
+<?php /** @var \Magento\Catalog\Block\Product\View $block */ ?>
+<?php $instantHelper = $this->helper(\Instant\Checkout\Helper\InstantHelper::class); ?>
+
+<script>
+    <?php
+    $data = $instantHelper->getInstantConfig();
+    ?>
+
+    // Initialize window.Instant if it's not already defined
+    if (typeof window.Instant === 'undefined') {
+        window.Instant = {};
+    }
+
+    // Assign data to window.Instant
+    window.Instant = Object.assign(window.Instant, <?= json_encode($data) ?>);
+</script>

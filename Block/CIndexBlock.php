@@ -36,13 +36,6 @@ class CIndexBlock extends \Magento\Framework\View\Element\Template
 
     public function _toHtml()
     {
-        $checkoutSummaryEnabled = $this->instantHelper->getInstantBtnCheckoutSummaryEnabled();
-        $disabledForCustomerGroup = $this->instantHelper->getDisabledForCustomerGroup();
-
-        if ($checkoutSummaryEnabled && !$disabledForCustomerGroup) {
-            return parent::_toHtml();
-        }
-
-        return '';
+        return parent::_toHtml();
     }
 }

@@ -13,22 +13,23 @@
 namespace Instant\Checkout\Helper;
 
 use Exception;
-use Magento\Framework\App\Helper\Context;
-use Magento\Customer\Model\Session;
-use Magento\Framework\Session\SessionManager;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\App\ResourceConnection;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory;
+use Magento\Customer\Api\AddressRepositoryInterface;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Model\Session;
+use Magento\Framework\App\Cache\Manager;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Session\SessionManager;
+use Magento\Quote\Model\QuoteIdMaskFactory;
 use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForCustomer;
 use Magento\QuoteGraphQl\Model\Cart\CreateEmptyCartForGuest;
-use Magento\Quote\Model\QuoteIdMaskFactory;
-use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory;
-use Psr\Log\LoggerInterface;
-use Magento\Framework\App\Cache\Manager;
 use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 use Magento\Sales\Model\Order;
-
-use function Safe\preg_match_all;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -49,10 +50,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const RETRY_FAILURES_COUNT = 'instant/general/retry_failures_count';
 
     const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
-    const SHOULD_RESIZE_CART_INDEX_BTN = 'instant/visual/should_resize_cart_index_btn';
-
-    const CPAGE_BTN_WIDTH = 'instant/visual/cpage_btn_width';
-
     const PDP_SHOULD_RESIZE_PDP_BTN = 'instant/pdpcustomisation/should_resize_pdp_btn';
     const PDP_REPOSITION_OR_STRIKE_ABOVE_BTN = 'instant/pdpcustomisation/pdp_reposition_or_strike_above_btn';
     const PDP_BTN_CUSTOM_STYLE = 'instant/pdpcustomisation/pdp_btn_custom_style';
@@ -61,20 +58,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const PDP_BTN_REPOSITION_WITHIN_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_within_div';
     const PDP_SHOULD_POSITION_PDP_BELOW_ATC = 'instant/pdpcustomisation/should_position_pdp_below_atc';
 
-    const STB_ENABLED = 'instant/stb_visual_customisation/stb_enabled';
-    const STB_HEIGHT = 'instant/stb_visual_customisation/stb_height';
-    const STB_BORDER_RADIUS = 'instant/stb_visual_customisation/stb_border_radius';
-    const STB_BOTTOM_LAYER_BORDER_COLOUR = 'instant/stb_visual_customisation/stb_bottom_layer_border_colour';
-    const STB_BOTTOM_LAYER_BACKGROUND_COLOUR = 'instant/stb_visual_customisation/stb_bottom_layer_background_colour';
-    const STB_TOP_LAYER_BACKGROUND_COLOUR = 'instant/stb_visual_customisation/stb_top_layer_background_colour';
-    const STB_TOP_LAYER_TEXT_COLOUR = 'instant/stb_visual_customisation/stb_top_layer_text_colour';
-    const STB_BOTTOM_LAYER_TEXT_COLOUR = 'instant/stb_visual_customisation/stb_bottom_layer_text_colour';
-    const STB_THUMB_BACKGROUND_COLOUR = 'instant/stb_visual_customisation/stb_thumb_background_colour';
-    const STB_FONT_FAMILY = 'instant/stb_visual_customisation/stb_font_family';
-    const STB_TOP_LAYER_FONT_SIZE = 'instant/stb_visual_customisation/stb_top_layer_font_size';
-    const STB_BOTTOM_LAYER_FONT_SIZE = 'instant/stb_visual_customisation/stb_bottom_layer_font_size';
-    const STB_FONT_WEIGHT = 'instant/stb_visual_customisation/stb_font_weight';
-
     const MC_BTN_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_custom_style';
     const MC_BTN_CONTAINER_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_container_custom_style';
     const MC_BTN_HIDE_OR_STRIKE = 'instant/mccustomisation/mc_btn_hide_or_strike';
@@ -82,17 +65,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const CINDEX_BTN_CUSTOM_STYLE = 'instant/cindexcustomisation/cindex_btn_custom_style';
     const CINDEX_BTN_CONTAINER_CUSTOM_STYLE = 'instant/cindexcustomisation/cindex_btn_container_custom_style';
     const CINDEX_BTN_HIDE_OR_STRIKE = 'instant/cindexcustomisation/cindex_btn_hide_or_strike';
-
-    const CPAGE_BTN_CUSTOM_STYLE = 'instant/cpagecustomisation/cpage_btn_custom_style';
-    const CPAGE_BTN_CONTAINER_CUSTOM_STYLE = 'instant/cpagecustomisation/cpage_btn_container_custom_style';
-    const CPAGE_BTN_HIDE_OR_STRIKE = 'instant/cpagecustomisation/cpage_btn_hide_or_strike';
-
-    const ORDER_PARAM_SESSION_ID = "SESSION_ID";
-
-    /**
-     * @var \Magento\Framework\SessionSessionManager
-     */
-    private $sessionManager;
 
     /**
      * @var Session
@@ -135,11 +107,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     private $collectionFactory;
 
     /**
-     * @var Manager
-     */
-    private $cacheManager;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -148,6 +115,21 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @var OrderStatusHistoryRepositoryInterface
      */
     protected $orderStatusRepository;
+
+    /**
+     * @var JsonFactory
+     */
+    protected $jsonResultFactory;
+
+    /**
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
+     * @var AddressRepositoryInterface
+     */
+    private $addressRepository;
 
     /**
      * Constructor.
@@ -167,7 +149,9 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         QuoteIdMaskFactory $quoteIdMaskFactory,
         CollectionFactory $collectionFactory,
         Manager $cacheManager,
-        OrderStatusHistoryRepositoryInterface $orderStatusRepository
+        OrderStatusHistoryRepositoryInterface $orderStatusRepository,
+        JsonFactory $jsonResultFactory,
+        AddressRepositoryInterface $addressRepository
     ) {
         $this->customerSession = $customerSession;
         $this->sessionManager = $sessionManager;
@@ -181,6 +165,8 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->logger = $logger;
         $this->cacheManager = $cacheManager;
         $this->orderStatusRepository = $orderStatusRepository;
+        $this->jsonResultFactory = $jsonResultFactory;
+        $this->addressRepository = $addressRepository;
 
         return parent::__construct($context);
     }
@@ -193,7 +179,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function doesInstantRequestLogTableExist()
     {
         try {
-            $connection  = $this->resourceConnection->getConnection();
+            $connection = $this->resourceConnection->getConnection();
             $tableName = $connection->getTableName(self::INSTANT_CHECKOUT_REQUESTLOG_TABLE);
 
             $isTableExist = $connection->isTableExists($tableName);
@@ -224,329 +210,39 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->logger->info($log);
     }
 
-    public function getConfig($config)
+    public function getConfigField($key)
     {
-        return $this->scopeConfig->getValue(
-            $config,
+        $field = $this->scopeConfig->getValue(
+            $key,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
-    }
 
-    public function getSessionId()
-    {
-        return $this->sessionManager->getSessionId();
-    }
+        if ($field === "0" || $field === "1") {
+            return $field === "1";
+        }
 
-    public function getRetryFailuresCount()
-    {
-        $retryFailuresCount = $this->getConfig(self::RETRY_FAILURES_COUNT);
-        return $retryFailuresCount;
-    }
-
-    public function getInstantAppId()
-    {
-        $instantAppId = $this->getConfig(self::INSTANT_APP_ID_PATH);
-        return $instantAppId;
-    }
-
-    public function getInstantApiAccessToken()
-    {
-        $instantAccessToken = $this->getConfig(self::ACCESS_TOKEN_PATH);
-        return $instantAccessToken;
-    }
-
-    public function getShouldAutoConvertGuestToCustomer()
-    {
-        $shouldConvert = $this->getConfig(self::AUTO_CONVERT_GUEST_TO_CUSTOMER);
-        return $shouldConvert === "1";
-    }
-
-    public function getInstantMinicartBtnEnabled()
-    {
-        $minicartBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_MINICART_BTN_PATH);
-        return $minicartBtnEnabled === "1";
-    }
-
-    public function getInstantBtnCheckoutPageEnabled()
-    {
-        $checkoutPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH);
-        return $checkoutPageBtnEnabled === "1";
-    }
-
-    public function getInstantBtnCheckoutSummaryEnabled()
-    {
-        $checkoutSummaryEnabled = $this->getConfig(self::ENABLE_INSTANT_CHECKOUT_SUMMARY);
-        return $checkoutSummaryEnabled === "1";
-    }
-
-    public function getEnableMulticurrencyOnSingleStore()
-    {
-        $enableMultiCurrencyOnSingleStore = $this->getConfig(self::ENABLE_MULTICURRENCY_ON_SINGLE_STORE);
-        return $enableMultiCurrencyOnSingleStore === "1";
-    }
-
-    public function getInstantBtnCatalogPageEnabled()
-    {
-        $catalogPageBtnEnabled = $this->getConfig(self::ENABLE_INSTANT_CATALOG_PAGE_PATH);
-        return $catalogPageBtnEnabled === "1";
-    }
-
-    public function getSandboxEnabledConfig()
-    {
-        $sandboxEnabled = $this->getConfig(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
-        return $sandboxEnabled === "1";
-    }
-
-    public function getDisabledForSkusContaining()
-    {
-        $disableForSkusContaining = $this->getConfig(self::DISABLED_FOR_SKUS_CONTAINING);
-        return explode(',', $disableForSkusContaining ?? '');
+        return $field;
     }
 
     public function getDisabledForCustomerGroup()
     {
-        $disabledForCustomerGroupIdsConfig = $this->getConfig(self::DISABLED_FOR_CUSTOMER_GROUP_IDS);
+        $disabledForCustomerGroupIdsConfig = $this->getConfigField(self::DISABLED_FOR_CUSTOMER_GROUP_IDS);
 
         $disabledCustomerGroupIds = explode(',', $disabledForCustomerGroupIdsConfig ?? '');
-        $customerGroupId = $this->getCustomerGroupId();
+
+        $customerGroupId = -1;
+        if ($this->customerSession->isLoggedIn()) {
+            $customerGroupId = $this->customerSession->getCustomer()->getGroupId();
+        }
 
         return in_array($customerGroupId, $disabledCustomerGroupIds);
     }
 
-    public function getCustomerGroupId()
-    {
-        if ($this->customerSession->isLoggedIn()) {
-            return $this->customerSession->getCustomer()->getGroupId();
-        }
-
-        return -1;
-    }
-
-    public function getCustomerId()
-    {
-        if ($this->customerSession->isLoggedIn()) {
-            return $this->customerSession->getCustomerData()->getId();
-        }
-
-        return -1;
-    }
-
-    public function getMcBtnWidth()
-    {
-        return $this->getConfig(self::MC_BTN_WIDTH);
-    }
-
-    public function getShouldResizeCartIndexBtn()
-    {
-        $shouldResize = $this->getConfig(self::SHOULD_RESIZE_CART_INDEX_BTN);
-        return $shouldResize === '1';
-    }
-
-    public function getCPageBtnWidth()
-    {
-        return $this->getConfig(self::CPAGE_BTN_WIDTH);
-    }
-
-    public function getShouldResizePdpBtn()
-    {
-        $shouldResize = $this->getConfig(self::PDP_SHOULD_RESIZE_PDP_BTN);
-        return $shouldResize === "1";
-    }
-
-    public function getCurrentCurrencyCode()
-    {
-        return $this->storeManager->getStore()->getCurrentCurrencyCode();
-    }
-
-    public function getStoreId()
-    {
-        return $this->storeManager->getStore()->getId();
-    }
-
-    public function getStoreCode()
-    {
-        return $this->storeManager->getStore()->getCode();
-    }
-
-    public function getBaseCurrencyCode()
-    {
-        return $this->storeManager->getStore()->getBaseCurrencyCode();
-    }
-
-    public function getShouldPositionPdpBelowAtc()
-    {
-        $shouldPosition = $this->getConfig(self::PDP_SHOULD_POSITION_PDP_BELOW_ATC);
-        return $shouldPosition === "1";
-    }
-
-    public function getShouldRepositionOrStrikeAbovePdpBtn()
-    {
-        $shouldRepositionOrStrikeAbovePdpBtn = $this->getConfig(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN);
-        return $shouldRepositionOrStrikeAbovePdpBtn === "1";
-    }
-
-    public function getPdpBtnCustomStyle()
-    {
-        $pdpBtnCustomStyle = $this->getConfig(self::PDP_BTN_CUSTOM_STYLE);
-        return $pdpBtnCustomStyle;
-    }
-
-    public function getPdpBtnContainerCustomStyle()
-    {
-        $pdpBtnContainerCustomStyle = $this->getConfig(self::PDP_BTN_CONTAINER_CUSTOM_STYLE);
-        return $pdpBtnContainerCustomStyle;
-    }
-
-    public function getPdpBtnRepositionDiv()
-    {
-        $pdpBtnRepositionDiv = $this->getConfig(self::PDP_BTN_REPOSITION_DIV);
-        return $pdpBtnRepositionDiv;
-    }
-
-    public function getPdpBtnRepositionWithinDiv()
-    {
-        $pdpBtnRepositionWithinDiv = $this->getConfig(self::PDP_BTN_REPOSITION_WITHIN_DIV);
-        return $pdpBtnRepositionWithinDiv;
-    }
-
-
-    public function getStbEnabled()
-    {
-        $stbEnabled = $this->getConfig(self::STB_ENABLED);
-        return $stbEnabled === '1';
-    }
-
-    public function getStbHeight()
-    {
-        $stbHeight = $this->getConfig(self::STB_HEIGHT);
-        return $stbHeight;
-    }
-
-    public function getStbBorderRadius()
-    {
-        $stbBorderRadius = $this->getConfig(self::STB_BORDER_RADIUS);
-        return $stbBorderRadius;
-    }
-
-    public function getStbBottomLayerBorderColour()
-    {
-        $stbBottomLayerBorderColour = $this->getConfig(self::STB_BOTTOM_LAYER_BORDER_COLOUR);
-        return $stbBottomLayerBorderColour;
-    }
-
-    public function getStbBottomLayerBackgroundColour()
-    {
-        $stbBottomLayerBackgroundColour = $this->getConfig(self::STB_BOTTOM_LAYER_BACKGROUND_COLOUR);
-        return $stbBottomLayerBackgroundColour;
-    }
-
-    public function getStbTopLayerBackgroundColour()
-    {
-        $stbTopLayerBackgroundColour = $this->getConfig(self::STB_TOP_LAYER_BACKGROUND_COLOUR);
-        return $stbTopLayerBackgroundColour;
-    }
-
-    public function getStbTopLayerTextColour()
-    {
-        $stbTopLayerTextColour = $this->getConfig(self::STB_TOP_LAYER_TEXT_COLOUR);
-        return $stbTopLayerTextColour;
-    }
-
-    public function getStbBottomLayerTextColour()
-    {
-        $stbBottomLayerTextColour = $this->getConfig(self::STB_BOTTOM_LAYER_TEXT_COLOUR);
-        return $stbBottomLayerTextColour;
-    }
-
-    public function getStbThumbBackgroundColour()
-    {
-        $stbThumbBackgroundColour = $this->getConfig(self::STB_THUMB_BACKGROUND_COLOUR);
-        return $stbThumbBackgroundColour;
-    }
-
-    public function getStbFontFamily()
-    {
-        $stbFontFamily = $this->getConfig(self::STB_FONT_FAMILY);
-        return $stbFontFamily;
-    }
-
-    public function getStbFontWeight()
-    {
-        $stbFontWeight = $this->getConfig(self::STB_FONT_WEIGHT);
-        return $stbFontWeight;
-    }
-
-    public function getStbTopLayerFontSize()
-    {
-        $stbTopLayerFontSize = $this->getConfig(self::STB_TOP_LAYER_FONT_SIZE);
-        return $stbTopLayerFontSize;
-    }
-
-    public function getStbBottomLayerFontSize()
-    {
-        $stbBottomLayerFontSize = $this->getConfig(self::STB_BOTTOM_LAYER_FONT_SIZE);
-        return $stbBottomLayerFontSize;
-    }
-
-
-    public function getMcBtnCustomStyle()
-    {
-        $mcBtnCustomStyle = $this->getConfig(self::MC_BTN_CUSTOM_STYLE);
-        return $mcBtnCustomStyle;
-    }
-
-    public function getMcBtnContainerCustomStyle()
-    {
-        $mcBtnContainerCustomStyle = $this->getConfig(self::MC_BTN_CONTAINER_CUSTOM_STYLE);
-        return $mcBtnContainerCustomStyle;
-    }
-
-    public function getMcBtnShouldHideOrStrike()
-    {
-        $mcBtnContainerCustomStyle = $this->getConfig(self::MC_BTN_HIDE_OR_STRIKE);
-        return $mcBtnContainerCustomStyle === "1";
-    }
-
-    public function getCindexBtnCustomStyle()
-    {
-        $cIndexBtnCustomStyle = $this->getConfig(self::CINDEX_BTN_CUSTOM_STYLE);
-        return $cIndexBtnCustomStyle;
-    }
-
-    public function getCindexBtnContainerCustomStyle()
-    {
-        $cIndexBtnContainerCustomStyle = $this->getConfig(self::CINDEX_BTN_CONTAINER_CUSTOM_STYLE);
-        return $cIndexBtnContainerCustomStyle;
-    }
-
-    public function getCindexBtnShouldHideOrStrike()
-    {
-        $cIndexBtnHideOrStrike = $this->getConfig(self::CINDEX_BTN_HIDE_OR_STRIKE);
-        return $cIndexBtnHideOrStrike === "1";
-    }
-
-    public function getCpageBtnCustomStyle()
-    {
-        $cPageBtnCustomStyle = $this->getConfig(self::CPAGE_BTN_CUSTOM_STYLE);
-        return $cPageBtnCustomStyle;
-    }
-
-    public function getCpageBtnContainerCustomStyle()
-    {
-        $cPageBtnContainerCustomStyle = $this->getConfig(self::CPAGE_BTN_CONTAINER_CUSTOM_STYLE);
-        return $cPageBtnContainerCustomStyle;
-    }
-
-    public function getCpageBtnShouldHideOrStrike()
-    {
-        $cPageBtnHideOrStrike = $this->getConfig(self::CPAGE_BTN_HIDE_OR_STRIKE);
-        return $cPageBtnHideOrStrike === "1";
-    }
 
     public function getInstantApiUrl()
     {
         $apiUrl = 'api.instant.one/';
-        $isStaging = $this->getSandboxEnabledConfig();
+        $isStaging = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
 
         if ($isStaging) {
             $apiUrl = 'staging.' . $apiUrl;
@@ -555,7 +251,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return "https://" . $apiUrl;
     }
 
-    public function guid()
+    public function createGuid()
     {
         return sprintf(
             '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
@@ -570,19 +266,17 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
-    public function encodeURIComponent($str)
-    {
-        $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
-        return strtr(rawurlencode($str), $revert);
-    }
-
     public function getSessionCartId()
     {
         try {
             $cartId = $this->checkoutSession->getQuote()->getEntityId();
 
             if (empty($cartId)) {
-                $customerId = $this->getCustomerId();
+                $customerId = -1;
+                if ($this->customerSession->isLoggedIn()) {
+                    $customerId = $this->customerSession->getCustomerData()->getId();
+                }
+
                 $customerLoggedIn = $customerId && $customerId > -1;
 
                 $maskedQuoteId = $customerLoggedIn
@@ -611,11 +305,6 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $configValue ?? "";
     }
 
-    public function clearCache()
-    {
-        $this->cacheManager->flush($this->cacheManager->getAvailableTypes());
-        $this->logger->info('Cache was cleared!');
-    }
 
     public function getInstantOrderParam($order, $type)
     {
@@ -645,7 +334,11 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
             return '';
         }
 
-        $array = $this->jsonDecode($match);
+        $array = json_decode($match, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            // Handle JSON decoding errors in some way, e.g. logging or throwing an exception
+            $array = array();
+        }
 
         foreach ($array as $item) {
             if (isset($item['type']) && $item['type'] === $type) {
@@ -656,15 +349,78 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return '';
     }
 
-    private function jsonDecode($jsonString)
+    /**
+     * Execute function
+     */
+    public function getInstantConfig()
     {
-        $result = json_decode($jsonString, true);
+        $data = [];
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            // Handle JSON decoding errors in some way, e.g. logging or throwing an exception
-            return array();
+        /* General */
+        $data['appId'] = $this->getConfigField(self::INSTANT_APP_ID_PATH);
+        $data['storeCode'] = $this->storeManager->getStore()->getCode();
+
+        $data['cartId'] = $this->getSessionCartId();
+        $data['enableSandbox'] = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
+        $data['disabledForSkusContaining'] = explode(',', $this->getConfigField(self::DISABLED_FOR_SKUS_CONTAINING) ?? '');
+        $data['disabledForCustomerGroup'] = $this->getDisabledForCustomerGroup();
+
+        $data['currentCurrencyCode'] = $this->storeManager->getStore()->getCurrentCurrencyCode();
+        $data['baseCurrencyCode'] = $this->storeManager->getStore()->getBaseCurrencyCode();
+
+        $data['enablePdpBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CATALOG_PAGE_PATH);
+        $data['enableMinicartBtn'] = $this->getConfigField(self::ENABLE_INSTANT_MINICART_BTN_PATH);
+        $data['enableCindexBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_SUMMARY);
+        $data['enableCheckoutPage'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH);
+
+        $data['shouldResizePdpBtn'] = $this->getConfigField(self::PDP_SHOULD_RESIZE_PDP_BTN);
+        $data['shouldPositionPdpBelowAtc'] = $this->getConfigField(self::PDP_SHOULD_POSITION_PDP_BELOW_ATC);
+        $data['pdpBtnCustomStyle'] = $this->getConfigField(self::PDP_BTN_CUSTOM_STYLE);
+        $data['pdpBtnContainerCustomStyle'] = $this->getConfigField(self::PDP_BTN_CONTAINER_CUSTOM_STYLE);
+        $data['pdpBtnRepositionDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_DIV);
+        $data['pdpBtnRepositionWithinDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_WITHIN_DIV);
+        $data['pdpShouldRepositionOrStrikeAboveBtn'] = $this->getConfigField(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN);
+
+        $data['mcBtnWidth'] = $this->getConfigField(self::MC_BTN_WIDTH); // to deprecate
+        $data['mcBtnCustomStyle'] = $this->getConfigField(self::MC_BTN_CUSTOM_STYLE);
+        $data['mcBtnContainerCustomStyle'] = $this->getConfigField(self::MC_BTN_CONTAINER_CUSTOM_STYLE);
+        $data['mcBtnHideOrStrike'] = $this->getConfigField(self::MC_BTN_HIDE_OR_STRIKE);
+
+        $data['cindexBtnCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CUSTOM_STYLE);
+        $data['cindexBtnContainerCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CONTAINER_CUSTOM_STYLE);
+        $data['cindexBtnHideOrStrike'] = $this->getConfigField(self::CINDEX_BTN_HIDE_OR_STRIKE);
+
+        $data['enableMulticurrencyOnSingleStore'] = $this->getConfigField(self::ENABLE_MULTICURRENCY_ON_SINGLE_STORE);
+
+        $sessionId = session_id();
+        if (!empty($sessionId)) {
+            $data['sessionId'] = session_id();
         }
 
-        return $result;
+        if ($this->customerSession->isLoggedIn()) {
+            $customer = $this->customerRepository->getById($this->customerSession->getId());
+            $data['customer'] = [
+                'email' => $customer->getEmail(),
+                'firstName' => $customer->getFirstname(),
+                'lastName' => $customer->getLastname(),
+            ];
+
+            $shippingAddressId = $customer->getDefaultShipping();
+            if ($shippingAddressId) {
+                $shippingAddress = $this->addressRepository->getById($shippingAddressId);
+                $defaultShippingAddress = [
+                    "address1" => $shippingAddress->getStreet()[0],
+                    "address2" => count($shippingAddress->getStreet()) == 2 ? $shippingAddress->getStreet()[1] : '',
+                    "city" => $shippingAddress->getCity(),
+                    "regionCode" => $shippingAddress->getRegion()->getRegionCode(),
+                    "postCode" => $shippingAddress->getPostcode(),
+                    "countryCode" => $shippingAddress->getCountryId()
+                ];
+                $data['address'] = $defaultShippingAddress;
+                $data['customer']['phone'] = $shippingAddress->getTelephone();
+            }
+        }
+
+        return $data;
     }
 }
