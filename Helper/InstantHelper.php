@@ -17,7 +17,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Model\Session;
+use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Cache\Manager;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\ResourceConnection;
@@ -67,7 +67,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const CINDEX_BTN_HIDE_OR_STRIKE = 'instant/cindexcustomisation/cindex_btn_hide_or_strike';
 
     /**
-     * @var Session
+     * @var CheckoutSession
      */
     protected $customerSession;
 
@@ -133,12 +133,10 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Constructor.
-     * @param Context $context
-     * @param Session $customerSession
      * */
     public function __construct(
         Context $context,
-        Session $customerSession,
+        CustomerSession $customerSession,
         SessionManager $sessionManager,
         StoreManagerInterface $storeManager,
         ResourceConnection $resourceConnection,
@@ -210,14 +208,14 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->logger->info($log);
     }
 
-    public function getConfigField($key)
+    public function getConfigField($key, $isBooleanField)
     {
         $field = $this->scopeConfig->getValue(
             $key,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
 
-        if ($field === "0" || $field === "1") {
+        if ($isBooleanField && ($field === "0" || $field === "1")) {
             return $field === "1";
         }
 
@@ -242,7 +240,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getInstantApiUrl()
     {
         $apiUrl = 'api.instant.one/';
-        $isStaging = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
+        $isStaging = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH, true);
 
         if ($isStaging) {
             $apiUrl = 'staging.' . $apiUrl;
@@ -274,7 +272,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
             if (empty($cartId)) {
                 $customerId = -1;
                 if ($this->customerSession->isLoggedIn()) {
-                    $customerId = $this->customerSession->getCustomerData()->getId();
+                    $customerId = $this->customerSession->getId();
                 }
 
                 $customerLoggedIn = $customerId && $customerId > -1;
@@ -357,29 +355,29 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $data = [];
 
         /* General */
-        $data['appId'] = $this->getConfigField(self::INSTANT_APP_ID_PATH);
+        $data['appId'] = $this->getConfigField(self::INSTANT_APP_ID_PATH, false);
         $data['storeCode'] = $this->storeManager->getStore()->getCode();
 
         $data['cartId'] = $this->getSessionCartId();
-        $data['enableSandbox'] = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
-        $data['disabledForSkusContaining'] = explode(',', $this->getConfigField(self::DISABLED_FOR_SKUS_CONTAINING) ?? '');
+        $data['enableSandbox'] = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH, true);
+        $data['disabledForSkusContaining'] = explode(',', $this->getConfigField(self::DISABLED_FOR_SKUS_CONTAINING, false) ?? '');
         $data['disabledForCustomerGroup'] = $this->getDisabledForCustomerGroup();
 
         $data['currentCurrencyCode'] = $this->storeManager->getStore()->getCurrentCurrencyCode();
         $data['baseCurrencyCode'] = $this->storeManager->getStore()->getBaseCurrencyCode();
 
-        $data['enablePdpBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CATALOG_PAGE_PATH);
-        $data['enableMinicartBtn'] = $this->getConfigField(self::ENABLE_INSTANT_MINICART_BTN_PATH);
-        $data['enableCindexBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_SUMMARY);
-        $data['enableCheckoutPage'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH);
+        $data['enablePdpBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CATALOG_PAGE_PATH, true);
+        $data['enableMinicartBtn'] = $this->getConfigField(self::ENABLE_INSTANT_MINICART_BTN_PATH, true);
+        $data['enableCindexBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_SUMMARY, true);
+        $data['enableCheckoutPage'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH, true);
 
-        $data['shouldResizePdpBtn'] = $this->getConfigField(self::PDP_SHOULD_RESIZE_PDP_BTN);
-        $data['shouldPositionPdpBelowAtc'] = $this->getConfigField(self::PDP_SHOULD_POSITION_PDP_BELOW_ATC);
-        $data['pdpBtnCustomStyle'] = $this->getConfigField(self::PDP_BTN_CUSTOM_STYLE);
-        $data['pdpBtnContainerCustomStyle'] = $this->getConfigField(self::PDP_BTN_CONTAINER_CUSTOM_STYLE);
-        $data['pdpBtnRepositionDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_DIV);
-        $data['pdpBtnRepositionWithinDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_WITHIN_DIV);
-        $data['pdpShouldRepositionOrStrikeAboveBtn'] = $this->getConfigField(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN);
+        $data['shouldResizePdpBtn'] = $this->getConfigField(self::PDP_SHOULD_RESIZE_PDP_BTN, true);
+        $data['shouldPositionPdpBelowAtc'] = $this->getConfigField(self::PDP_SHOULD_POSITION_PDP_BELOW_ATC, true);
+        $data['pdpBtnCustomStyle'] = $this->getConfigField(self::PDP_BTN_CUSTOM_STYLE, false);
+        $data['pdpBtnContainerCustomStyle'] = $this->getConfigField(self::PDP_BTN_CONTAINER_CUSTOM_STYLE, false);
+        $data['pdpBtnRepositionDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_DIV, false);
+        $data['pdpBtnRepositionWithinDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_WITHIN_DIV, false);
+        $data['pdpShouldRepositionOrStrikeAboveBtn'] = $this->getConfigField(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN, true);
 
         $data['mcBtnWidth'] = $this->getConfigField(self::MC_BTN_WIDTH); // to deprecate
         $data['mcBtnCustomStyle'] = $this->getConfigField(self::MC_BTN_CUSTOM_STYLE);
@@ -398,7 +396,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         if ($this->customerSession->isLoggedIn()) {
-            $customer = $this->customerRepository->getById($this->customerSession->getId());
+            $customer = $this->customerRepository->getById($this->customerSession->getCustomerData()->getId());
             $data['customer'] = [
                 'email' => $customer->getEmail(),
                 'firstName' => $customer->getFirstname(),

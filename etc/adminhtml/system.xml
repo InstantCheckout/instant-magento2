@@ -35,8 +35,7 @@
                     <button_label>Activate</button_label>
                     <button_url>adminhtml/instant/activation/send</button_url>
                     <frontend_model>Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send</frontend_model>
-                    <comment>Clicking this will utilise your App ID and Access Token to activate the Instant extension.
-        </comment>
+                    <comment>** Important: Please save before clicking Activate ** Clicking this will utilise your App ID and Access Token to activate the Instant extension.</comment>
                 </field>
                 <field id="enable_catalog" translate="label" type="select"
                     showInDefault="1" showInWebsite="1" showInStore="1">
