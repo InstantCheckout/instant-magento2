@@ -2,60 +2,72 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <tab id="instant" translate="label" sortOrder="110" class="instant-tab">
+        <tab id="instant" translate="label" class="instant-tab">
             <label>Instant</label>
         </tab>
-        <section id="instant" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1"
+        <section id="instant" translate="label" showInDefault="1" showInWebsite="1"
             showInStore="1">
             <class>separator-top</class>
             <label>App Configuration</label>
             <tab>instant</tab>
             <resource>Instant_Checkout::config</resource>
-            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1"
+            <group id="general" translate="label" type="text" showInDefault="1"
                 showInWebsite="1" showInStore="1">
                 <label>Application Config</label>
-                <field id="activate_button" translate="label comment" sortOrder="80"
-                    showInDefault="1" showInWebsite="1" showInStore="1">
-                    <button_label>Activate</button_label>
-                    <button_url>adminhtml/instant/activation/send</button_url>
-                    <frontend_model>Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send</frontend_model>
-                    <comment>Clicking this set an App ID and Access Token into your Magento config,
-                        allowing Instant to make secure API calls to your store.
-                    </comment>
-                </field>
-                <field id="app_id" translate="label" type="text" sortOrder="90" showInDefault="1"
-                    showInWebsite="1" showInStore="1">
+                <field id="app_id" translate="label" type="text" showInDefault="1"
+                showInWebsite="1" showInStore="1">
                     <label>Instant App ID</label>
                     <comment>The Application ID provided by Instant.</comment>
                 </field>
-                <field id="api_access_token" translate="label" type="text" sortOrder="90" showInDefault="1"
-                    showInWebsite="1" showInStore="1">
+                <field id="api_access_token" translate="label" type="text" showInDefault="1"
+            showInWebsite="1" showInStore="1">
                     <label>Instant Access Token</label>
                     <comment>The Access Token provided by Instant.</comment>
                 </field>
-                <field id="enable_sandbox" translate="label" type="select" sortOrder="110"
-                    showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Is in Sandbox/Staging Environment</label>
-                    <comment>Defaults to Yes. CRITICAL: Set to No if in LIVE/PRODUCTION environment.
-                        Set to Yes if this site is a SANDBOX/STAGING environment. </comment>
+                <field id="enable_sandbox" translate="label" type="select"
+        showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Is in Staging Environment</label>
+                    <comment>Defaults to Yes. Set to Yes if this site is a staging environment. Set to No if in production environment.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="disabled_for_skus_containing" translate="label" type="text"
-                    sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Disable Instant for products where the SKU contains the following
-                        specified phrases (provide a comma delimited list)</label>
-                    <comment>Defaults to empty. Enter a comma delimited list. If a product's SKU
-                        contains any of phrases in this comma delimited list, then Instant will be
-                        disabled. (e.g. ABC,DEF will ensure Instant is disabled for all products
-                        where the SKU contains either ABC or DEF.) To enable Instant for all
-                        products, leave empty.</comment>
+                <field id="activate_button" translate="label comment" 
+        showInDefault="1" showInWebsite="1" showInStore="1">
+                    <button_label>Activate</button_label>
+                    <button_url>adminhtml/instant/activation/send</button_url>
+                    <frontend_model>Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send</frontend_model>
+                    <comment>Clicking this will utilise your App ID and Access Token to activate the Instant extension.
+        </comment>
                 </field>
-                <field id="disabled_for_customer_group_ids" translate="label" type="text"
-                    sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Disable Instant for specific customer groups (provide a comma delimited
-                        list of IDs)</label>
-                    <comment>Defaults to empty. Enter a comma delimited list. Any customer group
-                        contained in this comma delimited list, will have Instant disabled (e.g. 1,2
+                <field id="enable_catalog" translate="label" type="select"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable on PDP (Product Display Page)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_minicart" translate="label" type="select"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable on Minicart</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_checkout_summary" translate="label" type="select"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable on Cart Index Page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_checkout_page" translate="label" type="select"
+                    showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable on Checkout Page Payment Section</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="disabled_for_skus_containing" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable Instant for products where the SKU contains the following
+                        specified phrases</label>
+                    <comment>Enter a comma delimited list. If a product's SKU contains any of phrases in this comma delimited list, then Instant will be
+                        disabled. (e.g. ABC,DEF will ensure Instant is disabled for all products
+                        where the SKU contains either ABC or DEF.)</comment>
+                </field>
+                <field id="disabled_for_customer_group_ids" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable Instant for specific customer group IDs</label>
+                    <comment>Enter a comma delimited list. Any customer group ID provided will have Instant disabled. (e.g. 1,2
                         will ensure Instant is disabled for all customers in groups with ID 1 or 2.)</comment>
                 </field>
                 <field id="auto_convert_guest_to_customer" translate="label" type="select"
@@ -67,42 +79,21 @@
                     <comment>Defaults to false.</comment>
                 </field>
                 <field id="enable_multicurrency_on_single_store" translate="label" type="select"
-                    sortOrder="140"
                     showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enables support for multiple currencies on a single store view. (e.g. AUD
+                    <label>Enables support for multiple currencies on a single store view. (e.g. CAD
                         on a USD store view)</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Please note that this
                         must be enabled if multiple currencies need to be supported on a single
-                        store view. For setups where a single store views supports a single
+                        store view. For setups where a single store view supports a single
                         currency, this can remain disabled.</comment>
                 </field>
-                <field id="enable_catalog" translate="label" type="select" sortOrder="140"
-                    showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable on Product Catalog Page</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="enable_minicart" translate="label" type="select" sortOrder="150"
-                    showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable on Minicart</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="enable_checkout_summary" translate="label" type="select" sortOrder="160"
-                    showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable on Cart Summary Page</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="enable_checkout_page" translate="label" type="select" sortOrder="160"
-                    showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable on Checkout Page Payment Section</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="retry_failures_cron" translate="label" type="text" sortOrder="160"
+                <field id="retry_failures_cron" translate="label" type="text"
                     showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Retry failures cron schedule</label>
                     <comment>Schedule for resending failed requests such as refund order failures - default is */5 * * * *</comment>
                 </field>
-                <field id="retry_failures_count" translate="label" type="text" sortOrder="160"
+                <field id="retry_failures_count" translate="label" type="text"
                     showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Retry failure count</label>
                     <comment>Number of attempts to retry failed requests such as refund order failures to Instant. Default is 3</comment>
