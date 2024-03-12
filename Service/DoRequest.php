@@ -120,8 +120,8 @@ class DoRequest
             $headers = [
                 "Content-Type" => "application/json",
                 "User-Agent" => static::AGENT,
-                "X-Instant-App-Id" => $this->instantHelper->getConfigField($this->instantHelper::INSTANT_APP_ID_PATH),
-                "X-Instant-App-Auth" => $this->instantHelper->getConfigField($this->instantHelper::ACCESS_TOKEN_PATH),
+                "X-Instant-App-Id" => $this->instantHelper->getConfigField($this->instantHelper::INSTANT_APP_ID_PATH, false),
+                "X-Instant-App-Auth" => $this->instantHelper->getConfigField($this->instantHelper::ACCESS_TOKEN_PATH, false),
                 'Expect:' => '',
             ];
 

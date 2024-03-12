@@ -149,6 +149,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         Manager $cacheManager,
         OrderStatusHistoryRepositoryInterface $orderStatusRepository,
         JsonFactory $jsonResultFactory,
+        CustomerRepositoryInterface $customerRepository,
         AddressRepositoryInterface $addressRepository
     ) {
         $this->customerSession = $customerSession;
@@ -165,6 +166,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->orderStatusRepository = $orderStatusRepository;
         $this->jsonResultFactory = $jsonResultFactory;
         $this->addressRepository = $addressRepository;
+        $this->customerRepository = $customerRepository;
 
         return parent::__construct($context);
     }
@@ -222,16 +224,20 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $field;
     }
 
-    public function getDisabledForCustomerGroup()
+    public function getCustomerGroupId()
     {
-        $disabledForCustomerGroupIdsConfig = $this->getConfigField(self::DISABLED_FOR_CUSTOMER_GROUP_IDS);
-
-        $disabledCustomerGroupIds = explode(',', $disabledForCustomerGroupIdsConfig ?? '');
-
         $customerGroupId = -1;
         if ($this->customerSession->isLoggedIn()) {
             $customerGroupId = $this->customerSession->getCustomer()->getGroupId();
         }
+        return $customerGroupId;
+    }
+
+    public function getDisabledForCustomerGroup()
+    {
+        $disabledForCustomerGroupIdsConfig = $this->getConfigField(self::DISABLED_FOR_CUSTOMER_GROUP_IDS, false);
+        $disabledCustomerGroupIds = explode(',', $disabledForCustomerGroupIdsConfig ?? '');
+        $customerGroupId = $this->getCustomerGroupId();
 
         return in_array($customerGroupId, $disabledCustomerGroupIds);
     }
@@ -362,6 +368,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $data['enableSandbox'] = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH, true);
         $data['disabledForSkusContaining'] = explode(',', $this->getConfigField(self::DISABLED_FOR_SKUS_CONTAINING, false) ?? '');
         $data['disabledForCustomerGroup'] = $this->getDisabledForCustomerGroup();
+        $data['customerGroupId'] = $this->getCustomerGroupId();
 
         $data['currentCurrencyCode'] = $this->storeManager->getStore()->getCurrentCurrencyCode();
         $data['baseCurrencyCode'] = $this->storeManager->getStore()->getBaseCurrencyCode();
@@ -379,16 +386,16 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $data['pdpBtnRepositionWithinDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_WITHIN_DIV, false);
         $data['pdpShouldRepositionOrStrikeAboveBtn'] = $this->getConfigField(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN, true);
 
-        $data['mcBtnWidth'] = $this->getConfigField(self::MC_BTN_WIDTH); // to deprecate
-        $data['mcBtnCustomStyle'] = $this->getConfigField(self::MC_BTN_CUSTOM_STYLE);
-        $data['mcBtnContainerCustomStyle'] = $this->getConfigField(self::MC_BTN_CONTAINER_CUSTOM_STYLE);
-        $data['mcBtnHideOrStrike'] = $this->getConfigField(self::MC_BTN_HIDE_OR_STRIKE);
+        $data['mcBtnWidth'] = $this->getConfigField(self::MC_BTN_WIDTH, false);
+        $data['mcBtnCustomStyle'] = $this->getConfigField(self::MC_BTN_CUSTOM_STYLE, false);
+        $data['mcBtnContainerCustomStyle'] = $this->getConfigField(self::MC_BTN_CONTAINER_CUSTOM_STYLE, false);
+        $data['mcBtnHideOrStrike'] = $this->getConfigField(self::MC_BTN_HIDE_OR_STRIKE, true);
 
-        $data['cindexBtnCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CUSTOM_STYLE);
-        $data['cindexBtnContainerCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CONTAINER_CUSTOM_STYLE);
-        $data['cindexBtnHideOrStrike'] = $this->getConfigField(self::CINDEX_BTN_HIDE_OR_STRIKE);
+        $data['cindexBtnCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CUSTOM_STYLE, false);
+        $data['cindexBtnContainerCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CONTAINER_CUSTOM_STYLE, false);
+        $data['cindexBtnHideOrStrike'] = $this->getConfigField(self::CINDEX_BTN_HIDE_OR_STRIKE, true);
 
-        $data['enableMulticurrencyOnSingleStore'] = $this->getConfigField(self::ENABLE_MULTICURRENCY_ON_SINGLE_STORE);
+        $data['enableMulticurrencyOnSingleStore'] = $this->getConfigField(self::ENABLE_MULTICURRENCY_ON_SINGLE_STORE, true);
 
         $sessionId = session_id();
         if (!empty($sessionId)) {

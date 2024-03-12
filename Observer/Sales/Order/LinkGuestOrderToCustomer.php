@@ -110,7 +110,7 @@ class LinkGuestOrderToCustomer implements ObserverInterface
             $customer = false;
         }
 
-        $shouldConvertGuestToCustomer = $this->instantHelper->getConfigField($this->instantHelper::AUTO_CONVERT_GUEST_TO_CUSTOMER);
+        $shouldConvertGuestToCustomer = $this->instantHelper->getConfigField($this->instantHelper::AUTO_CONVERT_GUEST_TO_CUSTOMER, true);
         if ($shouldConvertGuestToCustomer && !$customer) {
             $this->instantHelper->addCommentToOrder($order, 'Customer for this order does not exist. Converting guest to customer.');
             $customer = $this->orderCustomerService->create($order->getId());
