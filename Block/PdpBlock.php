@@ -54,7 +54,7 @@ class PdpBlock extends \Magento\Framework\View\Element\Template
 
     public function _toHtml()
     {
-        $disabledSkus = explode(',', $this->getConfigField($this->instantHelper::DISABLED_FOR_SKUS_CONTAINING, false) ?? '');
+        $disabledSkus = explode(',', $this->getConfigField($this->instantHelper::DISABLED_FOR_SKUS_CONTAINING) ?? '');
         $productSku = $this->getProduct()->getSku();
 
         $isProductDisabled = false;

@@ -34,7 +34,6 @@ use Psr\Log\LoggerInterface;
 class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const INSTANT_CHECKOUT_REQUESTLOG_TABLE = 'instant_checkout_requestlog';
-
     const INSTANT_APP_ID_PATH = 'instant/general/app_id';
     const ACCESS_TOKEN_PATH = 'instant/general/api_access_token';
     const ENABLE_INSTANT_SANDBOX_MODE_PATH = 'instant/general/enable_sandbox';
@@ -42,13 +41,11 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const DISABLED_FOR_CUSTOMER_GROUP_IDS = 'instant/general/disabled_for_customer_group_ids';
     const AUTO_CONVERT_GUEST_TO_CUSTOMER = 'instant/general/auto_convert_guest_to_customer';
     const ENABLE_MULTICURRENCY_ON_SINGLE_STORE = 'instant/general/enable_multicurrency_on_single_store';
-
     const ENABLE_INSTANT_CATALOG_PAGE_PATH = 'instant/general/enable_catalog';
     const ENABLE_INSTANT_MINICART_BTN_PATH = 'instant/general/enable_minicart';
     const ENABLE_INSTANT_CHECKOUT_SUMMARY = 'instant/general/enable_checkout_summary';
     const ENABLE_INSTANT_CHECKOUT_PAGE_PATH = 'instant/general/enable_checkout_page';
     const RETRY_FAILURES_COUNT = 'instant/general/retry_failures_count';
-
     const MC_BTN_WIDTH = 'instant/visual/mc_btn_width';
     const PDP_SHOULD_RESIZE_PDP_BTN = 'instant/pdpcustomisation/should_resize_pdp_btn';
     const PDP_REPOSITION_OR_STRIKE_ABOVE_BTN = 'instant/pdpcustomisation/pdp_reposition_or_strike_above_btn';
@@ -57,16 +54,45 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const PDP_BTN_REPOSITION_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_div';
     const PDP_BTN_REPOSITION_WITHIN_DIV = 'instant/pdpcustomisation/pdp_btn_reposition_within_div';
     const PDP_SHOULD_POSITION_PDP_BELOW_ATC = 'instant/pdpcustomisation/should_position_pdp_below_atc';
-
     const MC_BTN_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_custom_style';
     const MC_BTN_CONTAINER_CUSTOM_STYLE = 'instant/mccustomisation/mc_btn_container_custom_style';
     const MC_BTN_HIDE_OR_STRIKE = 'instant/mccustomisation/mc_btn_hide_or_strike';
-
     const CINDEX_BTN_CUSTOM_STYLE = 'instant/cindexcustomisation/cindex_btn_custom_style';
     const CINDEX_BTN_CONTAINER_CUSTOM_STYLE = 'instant/cindexcustomisation/cindex_btn_container_custom_style';
     const CINDEX_SHOULD_RESIZE_BTN = 'instant/visual/should_resize_cart_index_btn';
-
     const CINDEX_BTN_HIDE_OR_STRIKE = 'instant/cindexcustomisation/cindex_btn_hide_or_strike';
+    const TEST_TEST_TEST = 'instant/cindexcustomisation/test';
+
+    const CONFIG_PATHS = [
+        self::INSTANT_APP_ID_PATH => ['type' => 'string'],
+        self::ACCESS_TOKEN_PATH => ['type' => 'string'],
+        self::ENABLE_INSTANT_SANDBOX_MODE_PATH => ['type' => 'boolean'],
+        self::DISABLED_FOR_SKUS_CONTAINING => ['type' => 'string'],
+        self::DISABLED_FOR_CUSTOMER_GROUP_IDS => ['type' => 'string'],
+        self::AUTO_CONVERT_GUEST_TO_CUSTOMER => ['type' => 'boolean'],
+        self::ENABLE_MULTICURRENCY_ON_SINGLE_STORE => ['type' => 'boolean'],
+        self::ENABLE_INSTANT_CATALOG_PAGE_PATH => ['type' => 'boolean'],
+        self::ENABLE_INSTANT_MINICART_BTN_PATH => ['type' => 'boolean'],
+        self::ENABLE_INSTANT_CHECKOUT_SUMMARY => ['type' => 'boolean'],
+        self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH => ['type' => 'boolean'],
+        self::RETRY_FAILURES_COUNT => ['type' => 'integer'],
+        self::MC_BTN_WIDTH => ['type' => 'string'],
+        self::PDP_SHOULD_RESIZE_PDP_BTN => ['type' => 'boolean'],
+        self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN => ['type' => 'boolean'],
+        self::PDP_BTN_CUSTOM_STYLE => ['type' => 'string'],
+        self::PDP_BTN_CONTAINER_CUSTOM_STYLE => ['type' => 'string'],
+        self::PDP_BTN_REPOSITION_DIV => ['type' => 'string'],
+        self::PDP_BTN_REPOSITION_WITHIN_DIV => ['type' => 'string'],
+        self::PDP_SHOULD_POSITION_PDP_BELOW_ATC => ['type' => 'boolean'],
+        self::MC_BTN_CUSTOM_STYLE => ['type' => 'string'],
+        self::MC_BTN_CONTAINER_CUSTOM_STYLE => ['type' => 'string'],
+        self::MC_BTN_HIDE_OR_STRIKE => ['type' => 'boolean'],
+        self::CINDEX_BTN_CUSTOM_STYLE => ['type' => 'string'],
+        self::CINDEX_BTN_CONTAINER_CUSTOM_STYLE => ['type' => 'string'],
+        self::CINDEX_SHOULD_RESIZE_BTN => ['type' => 'boolean'],
+        self::CINDEX_BTN_HIDE_OR_STRIKE => ['type' => 'boolean'],
+    ];
+
 
     /**
      * @var CheckoutSession
@@ -212,19 +238,27 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->logger->info($log);
     }
 
-    public function getConfigField($key, $isBooleanField)
+    public function getConfigField($key)
     {
-        $field = $this->scopeConfig->getValue(
+        // Retrieve the field type from the $configFields array.
+        $fieldType = isset($configFields[$key]) ? self::CONFIG_PATHS[$key]['type'] : 'string';
+
+        // Get the value from the configuration.
+        $fieldValue = $this->scopeConfig->getValue(
             $key,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
 
-        if ($isBooleanField && ($field === "0" || $field === "1")) {
-            return $field === "1";
+        // Convert the value based on the type.
+        if ($fieldType === 'boolean') {
+            // Explicitly check for '0' or '1' for boolean fields.
+            return $fieldValue === "1";
+        } else {
+            // For non-boolean fields, return the value as is.
+            return $fieldValue;
         }
-
-        return $field;
     }
+
 
     public function getCustomerGroupId()
     {
@@ -237,7 +271,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getDisabledForCustomerGroup()
     {
-        $disabledForCustomerGroupIdsConfig = $this->getConfigField(self::DISABLED_FOR_CUSTOMER_GROUP_IDS, false);
+        $disabledForCustomerGroupIdsConfig = $this->getConfigField(self::DISABLED_FOR_CUSTOMER_GROUP_IDS);
         $disabledCustomerGroupIds = explode(',', $disabledForCustomerGroupIdsConfig ?? '');
         $customerGroupId = $this->getCustomerGroupId();
 
@@ -248,7 +282,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getInstantApiUrl()
     {
         $apiUrl = 'api.instant.one/';
-        $isStaging = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH, true);
+        $isStaging = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
 
         if ($isStaging) {
             $apiUrl = 'staging.' . $apiUrl;
@@ -363,42 +397,44 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $data = [];
 
         /* General */
-        $data['appId'] = $this->getConfigField(self::INSTANT_APP_ID_PATH, false);
+        $data['appId'] = $this->getConfigField(self::INSTANT_APP_ID_PATH);
         $data['storeCode'] = $this->storeManager->getStore()->getCode();
 
         $data['cartId'] = $this->getSessionCartId();
-        $data['enableSandbox'] = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH, true);
-        $data['disabledForSkusContaining'] = explode(',', $this->getConfigField(self::DISABLED_FOR_SKUS_CONTAINING, false) ?? '');
+        $data['enableSandbox'] = $this->getConfigField(self::ENABLE_INSTANT_SANDBOX_MODE_PATH);
+        $data['disabledForSkusContaining'] = explode(',', $this->getConfigField(self::DISABLED_FOR_SKUS_CONTAINING) ?? '');
         $data['disabledForCustomerGroup'] = $this->getDisabledForCustomerGroup();
         $data['customerGroupId'] = $this->getCustomerGroupId();
 
         $data['currentCurrencyCode'] = $this->storeManager->getStore()->getCurrentCurrencyCode();
         $data['baseCurrencyCode'] = $this->storeManager->getStore()->getBaseCurrencyCode();
 
-        $data['enablePdpBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CATALOG_PAGE_PATH, true);
-        $data['enableMinicartBtn'] = $this->getConfigField(self::ENABLE_INSTANT_MINICART_BTN_PATH, true);
-        $data['enableCindexBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_SUMMARY, true);
-        $data['enableCheckoutPage'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH, true);
+        $data['enablePdpBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CATALOG_PAGE_PATH);
+        $data['enableMinicartBtn'] = $this->getConfigField(self::ENABLE_INSTANT_MINICART_BTN_PATH);
+        $data['enableCindexBtn'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_SUMMARY);
+        $data['enableCheckoutPage'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH);
 
-        $data['shouldResizePdpBtn'] = $this->getConfigField(self::PDP_SHOULD_RESIZE_PDP_BTN, true);
-        $data['shouldResizeCartIndexBtn'] = $this->getConfigField(self::CINDEX_SHOULD_RESIZE_BTN, true);
-        $data['shouldPositionPdpBelowAtc'] = $this->getConfigField(self::PDP_SHOULD_POSITION_PDP_BELOW_ATC, true);
-        $data['pdpBtnCustomStyle'] = $this->getConfigField(self::PDP_BTN_CUSTOM_STYLE, false);
-        $data['pdpBtnContainerCustomStyle'] = $this->getConfigField(self::PDP_BTN_CONTAINER_CUSTOM_STYLE, false);
-        $data['pdpBtnRepositionDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_DIV, false);
-        $data['pdpBtnRepositionWithinDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_WITHIN_DIV, false);
-        $data['pdpShouldRepositionOrStrikeAboveBtn'] = $this->getConfigField(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN, true);
+        $data['shouldResizePdpBtn'] = $this->getConfigField(self::PDP_SHOULD_RESIZE_PDP_BTN);
+        $data['shouldResizeCartIndexBtn'] = $this->getConfigField(self::CINDEX_SHOULD_RESIZE_BTN);
+        $data['shouldPositionPdpBelowAtc'] = $this->getConfigField(self::PDP_SHOULD_POSITION_PDP_BELOW_ATC);
+        $data['pdpBtnCustomStyle'] = $this->getConfigField(self::PDP_BTN_CUSTOM_STYLE);
+        $data['pdpBtnContainerCustomStyle'] = $this->getConfigField(self::PDP_BTN_CONTAINER_CUSTOM_STYLE);
+        $data['pdpBtnRepositionDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_DIV);
+        $data['pdpBtnRepositionWithinDiv'] = $this->getConfigField(self::PDP_BTN_REPOSITION_WITHIN_DIV);
+        $data['pdpShouldRepositionOrStrikeAboveBtn'] = $this->getConfigField(self::PDP_REPOSITION_OR_STRIKE_ABOVE_BTN);
 
-        $data['mcBtnWidth'] = $this->getConfigField(self::MC_BTN_WIDTH, false);
-        $data['mcBtnCustomStyle'] = $this->getConfigField(self::MC_BTN_CUSTOM_STYLE, false);
-        $data['mcBtnContainerCustomStyle'] = $this->getConfigField(self::MC_BTN_CONTAINER_CUSTOM_STYLE, false);
-        $data['mcBtnHideOrStrike'] = $this->getConfigField(self::MC_BTN_HIDE_OR_STRIKE, true);
+        $data['mcBtnWidth'] = $this->getConfigField(self::MC_BTN_WIDTH);
+        $data['mcBtnCustomStyle'] = $this->getConfigField(self::MC_BTN_CUSTOM_STYLE);
+        $data['mcBtnContainerCustomStyle'] = $this->getConfigField(self::MC_BTN_CONTAINER_CUSTOM_STYLE);
+        $data['mcBtnHideOrStrike'] = $this->getConfigField(self::MC_BTN_HIDE_OR_STRIKE);
 
-        $data['cindexBtnCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CUSTOM_STYLE, false);
-        $data['cindexBtnContainerCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CONTAINER_CUSTOM_STYLE, false);
-        $data['cindexBtnHideOrStrike'] = $this->getConfigField(self::CINDEX_BTN_HIDE_OR_STRIKE, true);
+        $data['cindexBtnCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CUSTOM_STYLE);
+        $data['cindexBtnContainerCustomStyle'] = $this->getConfigField(self::CINDEX_BTN_CONTAINER_CUSTOM_STYLE);
+        $data['cindexBtnHideOrStrike'] = $this->getConfigField(self::CINDEX_BTN_HIDE_OR_STRIKE);
 
-        $data['enableMulticurrencyOnSingleStore'] = $this->getConfigField(self::ENABLE_MULTICURRENCY_ON_SINGLE_STORE, true);
+        $data['enableMulticurrencyOnSingleStore'] = $this->getConfigField(self::ENABLE_MULTICURRENCY_ON_SINGLE_STORE);
+
+        $data['test_test'] = $this->getConfigField(self::TEST_TEST_TEST);
 
         $sessionId = session_id();
         if (!empty($sessionId)) {

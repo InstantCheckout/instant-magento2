@@ -67,7 +67,7 @@ class ResendFailedRequest
         if ($requestLogTableExists) {
             $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
             $searchCriteria = $searchCriteriaBuilder->addFilter('retry_required', 1)
-                ->addFilter('attempts', $this->instantHelper->getConfigField($this->instantHelper::RETRY_FAILURES_COUNT, false), 'lt')->create();
+                ->addFilter('attempts', $this->instantHelper->getConfigField($this->instantHelper::RETRY_FAILURES_COUNT), 'lt')->create();
             $items = $this->requestLogRepository->getList($searchCriteria)->getItems();
             foreach ($items as $item) {
                 $body = (array) json_decode($item->getBody());
