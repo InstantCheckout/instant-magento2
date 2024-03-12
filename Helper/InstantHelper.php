@@ -241,7 +241,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getConfigField($key)
     {
         // Retrieve the field type from the $configFields array.
-        $fieldType = isset($configFields[$key]) ? self::CONFIG_PATHS[$key]['type'] : 'string';
+        $fieldType = isset(self::CONFIG_PATHS[$key]) ? self::CONFIG_PATHS[$key]['type'] : 'string';
 
         // Get the value from the configuration.
         $fieldValue = $this->scopeConfig->getValue(

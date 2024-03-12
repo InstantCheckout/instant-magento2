@@ -29,17 +29,14 @@
                 <enable_catalog>0</enable_catalog>
                 <enable_minicart>0</enable_minicart>
                 <enable_checkout_summary>0</enable_checkout_summary>
+                <enable_checkout_page>0</enable_checkout_page>
                 <auto_convert_guest_to_customer>0</auto_convert_guest_to_customer>
                 <enable_multicurrency_on_single_store>0</enable_multicurrency_on_single_store>
-                <enable_checkout_page>0</enable_checkout_page>
                 <enable_sandbox>1</enable_sandbox>
-                <mc_btn_width>100</mc_btn_width>
-                <should_resize_pdp_btn>1</should_resize_pdp_btn>
-                <should_position_pdp_below_atc>1</should_position_pdp_below_atc>
-                <pdp_btn_custom_style></pdp_btn_custom_style>
                 <disabled_for_skus_containing></disabled_for_skus_containing>
                 <retry_failures_cron>*/5 * * * *</retry_failures_cron>
                 <retry_failures_count>3</retry_failures_count>
+                <auto_convert_guest_to_customer>0</auto_convert_guest_to_customer>
             </general>
         </instant>
     </default>
