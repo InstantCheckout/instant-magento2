@@ -64,6 +64,8 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     const CINDEX_BTN_CUSTOM_STYLE = 'instant/cindexcustomisation/cindex_btn_custom_style';
     const CINDEX_BTN_CONTAINER_CUSTOM_STYLE = 'instant/cindexcustomisation/cindex_btn_container_custom_style';
+    const CINDEX_SHOULD_RESIZE_BTN = 'instant/visual/should_resize_cart_index_btn';
+
     const CINDEX_BTN_HIDE_OR_STRIKE = 'instant/cindexcustomisation/cindex_btn_hide_or_strike';
 
     /**
@@ -379,6 +381,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $data['enableCheckoutPage'] = $this->getConfigField(self::ENABLE_INSTANT_CHECKOUT_PAGE_PATH, true);
 
         $data['shouldResizePdpBtn'] = $this->getConfigField(self::PDP_SHOULD_RESIZE_PDP_BTN, true);
+        $data['shouldResizeCartIndexBtn'] = $this->getConfigField(self::CINDEX_SHOULD_RESIZE_BTN, true);
         $data['shouldPositionPdpBelowAtc'] = $this->getConfigField(self::PDP_SHOULD_POSITION_PDP_BELOW_ATC, true);
         $data['pdpBtnCustomStyle'] = $this->getConfigField(self::PDP_BTN_CUSTOM_STYLE, false);
         $data['pdpBtnContainerCustomStyle'] = $this->getConfigField(self::PDP_BTN_CONTAINER_CUSTOM_STYLE, false);
