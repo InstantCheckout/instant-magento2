@@ -26,7 +26,6 @@ define(
             },
 
             isEnabled: function () {
-                console.log("@#@#@#@#")
                 return window.Instant.enableCheckoutPage;
             },
 

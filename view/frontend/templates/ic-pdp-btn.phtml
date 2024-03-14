@@ -1,19 +1,51 @@
-<?php
-?>
-
 <?php /** @var \Magento\Catalog\Block\Product\View $block */ ?>
-<?php $helper = $this->helper(\Instant\Checkout\Helper\InstantHelper::class); ?>
-
 <div id="ic-pdp-btn-container" class="ic-btn-container" style="display: none">
     <div id="ic-pdp-btn-wrapper" class="ic-btn-wrapper">
-        <button id="ic-pdp-btn"
+        <div id="ic-pdp-btn"
             data-instant-hascustomoptions="<?= $block->getProductHasCustomOptions() ? 'true' : 'false' ?>"
             data-instant-productsku="<?= $block->escapeHtmlAttr($block->getProduct()->getSku()) ?>"
             data-instant-producttype="<?= $block->escapeHtmlAttr($block->getProduct()->getTypeId()) ?>" type="button"
             title="Instant Checkout" data-instant="true">
-        </button>
-        <div id=" ic-pdp-btn-strike" class="ic-btn-strike">
+        </div>
+        <div id="ic-pdp-btn-strike" class="ic-btn-strike">
             <span>or</span>
         </div>
     </div>
 </div>
+
+<?php /** @var \Magento\Catalog\Block\Product\View $block */ ?>
+<div id="ic-pdp-btn-container" class="ic-btn-container" style="display: none">
+    <div id="ic-pdp-btn-wrapper" class="ic-btn-wrapper">
+        <div id="ic-pdp-btn"
+            data-instant-hascustomoptions="<?= $block->getProductHasCustomOptions() ? 'true' : 'false' ?>"
+            data-instant-productsku="<?= $block->escapeHtmlAttr($block->getProduct()->getSku()) ?>"
+            data-instant-producttype="<?= $block->escapeHtmlAttr($block->getProduct()->getTypeId()) ?>" type="button"
+            title="Instant Checkout" data-instant="true">
+        </div>
+        <div id="ic-pdp-btn-strike" class="ic-btn-strike">
+            <span>or</span>
+        </div>
+    </div>
+</div>
+
+<!-- INSTANT BUTTON START -->
+<div id="ic-cindex-btn-container" class="ic-btn-container" style="display: none">
+    <div id="ic-cindex-btn-wrapper" class="ic-btn-wrapper">
+        <div id="ic-cindex-btn" type="button" data-instant="true"></div>
+        <div id="ic-cindex-btn-strike" class="ic-btn-strike">
+            <span>or</span>
+        </div>
+    </div>
+</div>
+<!-- INSTANT BUTTON END -->
+
+<!-- INSTANT BUTTON START -->
+<div id="ic-cindex-btn-container" class="ic-btn-container" style="display: none">
+    <div id="ic-cindex-btn-wrapper" class="ic-btn-wrapper">
+        <div id="ic-cindex-btn" type="button" data-instant="true"></div>
+        <div id="ic-cindex-btn-strike" class="ic-btn-strike">
+            <span>or</span>
+        </div>
+    </div>
+</div>
+<!-- INSTANT BUTTON END -->
