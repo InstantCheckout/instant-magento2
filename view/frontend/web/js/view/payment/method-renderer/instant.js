@@ -60,25 +60,23 @@ define(
                 const shippingAddress = quote.shippingAddress();
                 const addressLines = this.consolidateArrayExceptLastElement(shippingAddress.street);
 
-                window.Instant.address = {
+                const address = {
                     address1: addressLines[0],
                     address2: addressLines[1],
                     city: shippingAddress.city,
                     regionCode: shippingAddress.regionCode,
                     postCode: shippingAddress.postcode,
-                    countryCode: shippingAddress.countryId
-                }
+                    countryCode: shippingAddress.countryId,
+                };
 
-                window.Instant.customer = {
+                const customer = {
                     firstName: shippingAddress.firstname,
                     lastName: shippingAddress.lastname,
                     phone: shippingAddress.telephone,
                     email: quote.guestEmail,
-                }
+                };
 
-                window.InstantJS.checkoutCart();
-
-                return false;
+                window.InstantM2.handleGenericCheckoutPaymentSectionButtonClicked(customer, address);
             },
         });
     }

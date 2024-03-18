@@ -241,7 +241,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getConfigField($key)
     {
         // Retrieve the field type from the $configFields array.
-        $fieldType = isset(self::CONFIG_PATHS[$key]) ? self::CONFIG_PATHS[$key]['type'] : 'string';
+        $fieldType = isset (self::CONFIG_PATHS[$key]) ? self::CONFIG_PATHS[$key]['type'] : 'string';
 
         // Get the value from the configuration.
         $fieldValue = $this->scopeConfig->getValue(
@@ -311,7 +311,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         try {
             $cartId = $this->checkoutSession->getQuote()->getEntityId();
 
-            if (empty($cartId)) {
+            if (empty ($cartId)) {
                 $customerId = -1;
                 if ($this->customerSession->isLoggedIn()) {
                     $customerId = $this->customerSession->getId();
@@ -370,7 +370,7 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         $match = $matches[2];
 
-        if (empty($match)) {
+        if (empty ($match)) {
             return '';
         }
 
@@ -381,8 +381,8 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         foreach ($array as $item) {
-            if (isset($item['type']) && $item['type'] === $type) {
-                return isset($item['data']) ? $item['data'] : '';
+            if (isset ($item['type']) && $item['type'] === $type) {
+                return isset ($item['data']) ? $item['data'] : '';
             }
         }
 
@@ -434,10 +434,8 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         $data['enableMulticurrencyOnSingleStore'] = $this->getConfigField(self::ENABLE_MULTICURRENCY_ON_SINGLE_STORE);
 
-        $data['test_test'] = $this->getConfigField(self::TEST_TEST_TEST);
-
         $sessionId = session_id();
-        if (!empty($sessionId)) {
+        if (!empty ($sessionId)) {
             $data['sessionId'] = session_id();
         }
 
