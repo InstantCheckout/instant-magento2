@@ -12,9 +12,9 @@
 
 namespace Instant\Checkout\Block;
 
-use Magento\Framework\Registry;
 use Instant\Checkout\Helper\InstantHelper;
 use Magento\Backend\Block\Template\Context;
+use Magento\Framework\Registry;
 
 class PdpBlock extends \Magento\Framework\View\Element\Template
 {
@@ -54,24 +54,6 @@ class PdpBlock extends \Magento\Framework\View\Element\Template
 
     public function _toHtml()
     {
-        $catalogPageBtnEnabled = $this->instantHelper->getInstantBtnCatalogPageEnabled();
-        $disabledForCustomerGroup = $this->instantHelper->getDisabledForCustomerGroup();
-        $disabledSkus = $this->instantHelper->getDisabledForSkusContaining();
-        $productSku = $this->getProduct()->getSku();
-
-        $isProductDisabled = false;
-
-        foreach ($disabledSkus as $disabledSku) {
-            if (!empty($disabledSku) && strpos($productSku, $disabledSku) !== false) {
-                $isProductDisabled = true;
-                break;
-            }
-        }
-
-        if ($catalogPageBtnEnabled && !$disabledForCustomerGroup && !$isProductDisabled) {
-            return parent::_toHtml();
-        }
-
-        return '';
+        return parent::_toHtml();
     }
 }

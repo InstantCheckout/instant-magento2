@@ -41,18 +41,6 @@
                                         </item>
                                     </item>
                                 </item>
-                                <item name="instant-pay" xsi:type="array">
-                                    <item name="displayArea" xsi:type="string">progressBar</item>
-                                    <item name="sortOrder" xsi:type="string">0</item>
-                                    <item name="component" xsi:type="string">
-                                        Instant_Checkout/js/ic-instant-pay-components</item>
-                                </item>
-                                <item name="cpage-btn" xsi:type="array">
-                                    <item name="displayArea" xsi:type="string">progressBar</item>
-                                    <item name="sortOrder" xsi:type="string">0</item>
-                                    <item name="component" xsi:type="string">
-                                        Instant_Checkout/js/ic-cpage-checkout</item>
-                                </item>
                             </item>
                         </item>
                     </item>

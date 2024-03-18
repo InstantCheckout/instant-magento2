@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Instant\Checkout\Model\Payment;
 
 use Instant\Checkout\Helper\InstantHelper;
+use Instant\Checkout\Service\DoRequest;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -30,8 +31,6 @@ use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Payment\Model\Method\Logger as PaymentLogger;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\OrderItemRepositoryInterface;
-use Instant\Checkout\Service\DoRequest;
-use Instant\Checkout\Helper\InstantPayHelper;
 
 /**
  * Payment Method for all orders placed through Instant
@@ -103,11 +102,6 @@ class InstantPayment extends AbstractMethod
     protected $doRequest;
 
     /**
-     * @var InstantPayHelper
-     */
-    protected $instantPayHelper;
-
-    /**
      * InstantPayment constructor.
      * @param Context $context
      * @param Registry $registry
@@ -132,14 +126,12 @@ class InstantPayment extends AbstractMethod
         PaymentLogger $logger,
         DoRequest $request,
         InstantHelper $instantHelper,
-        InstantPayHelper $instantPayHelper,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->doRequest = $request;
         $this->instantHelper = $instantHelper;
-        $this->instantPayHelper = $instantPayHelper;
 
         parent::__construct(
             $context,
@@ -222,9 +214,9 @@ class InstantPayment extends AbstractMethod
     {
         $payload = [
             'platformOrderId' => $order->getId(),
-            'amountToRefund' => (string)number_format($payment->getCreditMemo()->getBaseGrandTotal(), 2, '.', ''),
-            'taxAmount' => (string)number_format($payment->getCreditMemo()->getTaxAmount(), 2, '.', ''),
-            'shippingAmount' => (string)number_format($payment->getCreditMemo()->getShippingInclTax(), 2, '.', ''),
+            'amountToRefund' => (string) number_format($payment->getCreditMemo()->getBaseGrandTotal(), 2, '.', ''),
+            'taxAmount' => (string) number_format($payment->getCreditMemo()->getTaxAmount(), 2, '.', ''),
+            'shippingAmount' => (string) number_format($payment->getCreditMemo()->getShippingInclTax(), 2, '.', ''),
             'storeCode' => $order->getStore()->getCode(),
         ];
 
@@ -240,7 +232,6 @@ class InstantPayment extends AbstractMethod
 
     public function getTitle()
     {
-        $configTitle = $this->instantPayHelper->getGeneralConfig("title");
-        return $configTitle ? $configTitle : 'Instant Pay';
+        return 'Pay By Card';
     }
 }

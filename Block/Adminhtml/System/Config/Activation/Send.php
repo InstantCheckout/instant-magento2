@@ -18,13 +18,13 @@ use Instant\Checkout\Helper\InstantHelper;
 use Instant\Checkout\Service\InstantIntegrationService;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
-use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Integration\Model\IntegrationFactory;
 use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\OauthService;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Send
@@ -113,16 +113,6 @@ class Send extends Field
     }
 
     /**
-     * Local Magento API endpoint that sets a App ID and Access Token into the core config.
-     * 
-     * @return string
-     */
-    public function getSetAppIdAndTokenUrl(): string
-    {
-        return $this->getUrl('/index.php/rest/V1/instant/set-app-id-and-token');
-    }
-
-    /**
      * Gets the params we need to send to the Instant backend to create a Merchant and its Stores.
      * 
      * @return string
@@ -134,24 +124,24 @@ class Send extends Field
         $instantIntegration = $this->integrationFactory->create()->load('Instant Checkout', 'name')->getData();
         $consumer = $this->oAuthService->loadConsumer($instantIntegration['consumer_id']);
         $token = $this->oAuthToken->loadByConsumerIdAndUserType($consumer->getId(), 1);
-        $merchantId = $this->getUncachedMerchantId();
+        $merchantId = $this->instantHelper->getUncachedCoreConfigValue(InstantHelper::INSTANT_APP_ID_PATH);
+        $accessToken = $this->instantHelper->getUncachedCoreConfigValue(InstantHelper::ACCESS_TOKEN_PATH);
+        $storeEmail = $this->scopeConfig->getValue('trans_email/ident_support/email', ScopeInterface::SCOPE_STORE);
 
         $postData = [
-            'merchantName'      => $this->getStoreName(),
-            'email'             => $this->getStoreEmail(),
-            'platformData'      => [
-                'baseUrl'           => $this->storeManager->getStore()->getBaseUrl(),
-                'platform'          => 'MAGENTO',
-                'consumerKey'       => $consumer->getKey(),
-                'consumerSecret'    => $consumer->getSecret(),
-                'accessToken'       => $token->getToken(),
+            'merchantName' => $this->getStoreName(),
+            'email' => $storeEmail,
+            'merchantId' => $merchantId,
+            'accessToken' => $accessToken,
+            'platformData' => [
+                'baseUrl' => $this->storeManager->getStore()->getBaseUrl(),
+                'platform' => 'MAGENTO',
+                'consumerKey' => $consumer->getKey(),
+                'consumerSecret' => $consumer->getSecret(),
+                'accessToken' => $token->getToken(),
                 'accessTokenSecret' => $token->getSecret(),
             ],
         ];
-
-        if (!empty($merchantId)) {
-            $postData['merchantId'] = $merchantId;
-        }
 
         return json_encode($postData);
     }
@@ -170,17 +160,6 @@ class Send extends Field
         if (empty($consumer->getKey()) || empty($consumer->getSecret()) || empty($token->getToken()) || empty($token->getSecret())) {
             $this->integrationService->createInstantIntegration();
         }
-    }
-
-    private function getUncachedMerchantId()
-    {
-        return $this->instantHelper->getUncachedCoreConfigValue('instant/general/app_id');
-    }
-
-    private function getStoreEmail(): string
-    {
-        // TODO: Return an array for all stores?
-        return $this->scopeConfig->getValue('trans_email/ident_support/email', ScopeInterface::SCOPE_STORE);
     }
 
     private function getStoreName(): string

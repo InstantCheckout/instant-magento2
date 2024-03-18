@@ -17,38 +17,6 @@ namespace Instant\Checkout\Api;
  */
 interface CartsManagementInterface
 {
-    /**
-     * Merge two carts
-     *
-     * @param string $storeCode
-     * @param string $fromCartId
-     * @param string $targetCartId
-     * @return string
-     */
-    public function merge(
-        $storeCode,
-        $fromCartId,
-        $targetCartId
-    );
-
-    /**
-     * Set cart active status
-     *
-     * @param string $cartId
-     * @param bool $active
-     * @return string
-     */
-    public function setActive(
-        $cartId,
-        $active
-    );
-
-    /**
-     * Amend carts to ensure all guest carts do not have customer id associated
-     *
-     * @return string
-     */
-    public function amendCustomerIdNullForGuestCarts();
 
     /**
      * Get masked id for cart (quote) id

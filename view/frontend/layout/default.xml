@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
@@ -7,6 +6,9 @@
             type="text/javascript"></script>
     </head>
     <body>
+        <referenceBlock name="header.container">
+            <block class="Magento\Framework\View\Element\Template" name="instant-header" after="-" template="Instant_Checkout::ic-header.phtml"/>
+        </referenceBlock>
         <referenceBlock name="minicart">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">

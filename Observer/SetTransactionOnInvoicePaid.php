@@ -77,7 +77,7 @@ class SetTransactionOnInvoicePaid implements ObserverInterface
         $order = $invoice->getOrder();
 
         if ($order->getPayment()->getMethod() === "instant") {
-            $txId = $this->createTransaction($order, ['id' => $this->instantHelper->guid()]);
+            $txId = $this->createTransaction($order, ['id' => $this->instantHelper->createGuid()]);
             $invoice->setTransactionId($txId);
         }
     }

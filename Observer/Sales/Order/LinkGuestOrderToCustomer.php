@@ -4,15 +4,15 @@
 namespace Instant\Checkout\Observer\Sales\Order;
 
 use Exception;
+use Instant\Checkout\Helper\InstantHelper;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Model\AddressFactory;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Sales\Model\Order;
-use Instant\Checkout\Helper\InstantHelper;
 use Magento\Sales\Api\OrderCustomerManagementInterface;
-use Magento\Customer\Model\AddressFactory;
-use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Sales\Model\Order;
 
 class LinkGuestOrderToCustomer implements ObserverInterface
 {
@@ -110,7 +110,7 @@ class LinkGuestOrderToCustomer implements ObserverInterface
             $customer = false;
         }
 
-        $shouldConvertGuestToCustomer = $this->instantHelper->getShouldAutoConvertGuestToCustomer();
+        $shouldConvertGuestToCustomer = $this->instantHelper->getConfigField($this->instantHelper::AUTO_CONVERT_GUEST_TO_CUSTOMER);
         if ($shouldConvertGuestToCustomer && !$customer) {
             $this->instantHelper->addCommentToOrder($order, 'Customer for this order does not exist. Converting guest to customer.');
             $customer = $this->orderCustomerService->create($order->getId());

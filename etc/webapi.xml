@@ -1,43 +1,10 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
-    <route url="/V1/instant/:storeCode/cart/merge" method="POST">
-        <service class="Instant\Checkout\Api\CartsManagementInterface" method="merge" />
-        <resources>
-            <resource ref="Magento_Cart::manage" />
-        </resources>
-    </route>
-    <route url="/V1/instant/:storeCode/cart/set-active" method="POST">
-        <service class="Instant\Checkout\Api\CartsManagementInterface" method="setActive" />
-        <resources>
-            <resource ref="Magento_Cart::manage" />
-        </resources>
-    </route>
-    <route url="/V1/instant/:storeCode/cart/amend-cart-customer-id" method="POST">
-        <service class="Instant\Checkout\Api\CartsManagementInterface"
-            method="amendCustomerIdNullForGuestCarts" />
-        <resources>
-            <resource ref="Magento_Cart::manage" />
-        </resources>
-    </route>
     <route url="/V1/instant/:storeCode/cart/get-masked-id" method="POST">
         <service class="Instant\Checkout\Api\CartsManagementInterface" method="getMaskedIdForCartId" />
         <resources>
             <resource ref="Magento_Cart::manage" />
-        </resources>
-    </route>
-
-    <route url="/V1/instant/handle_failed_payment" method="POST">
-        <service class="Instant\Checkout\Api\ServiceInterface" method="handle_failed_payment" />
-        <resources>
-            <resource ref="anonymous" />
-        </resources>
-    </route>
-
-    <route url="/V1/instant/set-app-id-and-token" method="POST">
-        <service class="Instant\Checkout\Api\SetCoreConfigInterface" method="setMerchantIdAndAccessToken" />
-        <resources>
-            <resource ref="anonymous" />
         </resources>
     </route>
 </routes>

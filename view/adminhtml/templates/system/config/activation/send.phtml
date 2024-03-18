@@ -17,57 +17,38 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
 /** @var Send $block */
 ?>
 <script>
-    require(['prototype'], function() {
+    require(['prototype'], function () {
         const params = <?= $block->getPostParams() ?>;
         const activationMessage = $('activation_result');
         const appIdInput = document.getElementById("instant_general_app_id");
-
-        if (appIdInput.value.length > 0) {
-            showExtensionIsActivateMessage();
-        }
+        const accessTokenInput = document.getElementById("instant_general_api_access_token");
 
         function activateSend() {
+            if (appIdInput.value.length === 0 || accessTokenInput.value.length === 0) {
+                alert("Please provide both the Instant App ID and Instant Access Token to proceed with activation.");
+                return;
+            }
             jQuery.ajax({
-                    url: '<?= $block->getActivateExtensionEndpointUrl() ?>',
-                    data: JSON.stringify(params),
-                    processData: false,
-                    dataType: "json",
-                    contentType: "application/json",
-                    method: 'POST',
-                    beforeSend: () => {
-                        showSpinner();
-                    },
-                    error: () => {
-                        hideSpinner();
-                    },
-                    complete: () => {
-                        hideSpinner();
-                    }
-                })
-                .done((response) => {
-                    appIdInput.value = response['merchantId'];
-
-                    jQuery.ajax({
-                            url: '/index.php/rest/V1/instant/set-app-id-and-token',
-                            data: JSON.stringify({
-                                'merchantId': response['merchantId'],
-                                'accessToken': response['accessToken'],
-                            }),
-                            processData: false,
-                            dataType: "json",
-                            contentType: "application/json",
-                            method: 'POST',
-                            beforeSend: () => {},
-                        })
-                        .done((response) => showSuccessMessage())
-                        .error((error) => showErrorMessage(error?.responseJSON?.message));
-                }).fail((error) => {
-                    showErrorMessage(error?.responseJSON?.message);
-                });
+                url: '<?= $block->getActivateExtensionEndpointUrl() ?>',
+                data: JSON.stringify(params),
+                processData: false,
+                dataType: "json",
+                contentType: "application/json",
+                method: 'POST',
+                beforeSend: () => {
+                    showSpinner();
+                },
+                error: () => {
+                    hideSpinner();
+                },
+                complete: () => {
+                    hideSpinner();
+                }
+            }).done((response) => showSuccessMessage())
+                .error((error) => showErrorMessage(error?.responseJSON?.message));
         }
 
         function showSuccessMessage() {
-            showExtensionIsActivateMessage();
             activationMessage.update('Activation was successful!');
             activationMessage.removeClassName('hidden').removeClassName('admin__field-error').addClassName('note');
             activationMessage.setStyle({
@@ -110,7 +91,7 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
 
             spinner.setAttribute('id', 'spinner');
             spinner.setAttribute('style', spinnerStyle);
-            
+
             loader.classList.add('loader');
             loader.setAttribute('style', loaderStyle);
 
@@ -135,15 +116,6 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
             }
         }
 
-        function showExtensionIsActivateMessage() {
-            const messageElement = document.getElementById('activate-message');
-            messageElement.innerHTML = "Extension is active!";
-            messageElement.setStyle(`
-                margin-top: 12px;
-                color: green;
-            `);
-        }
-
         window.activateSend = activateSend;
     });
 </script>
@@ -151,8 +123,10 @@ use Instant\Checkout\Block\Adminhtml\System\Config\Activation\Send;
 <div class="actions actions-activation-send">
     <p class="admin__field-error hidden" id="activation_result" style="margin-bottom:10px;"></p>
     <button onclick="activateSend(); return false;" class="action-activate-send" type="button" id="<?= /* @noEscape */
-                                                                                                    $block->getHtmlId() ?>">
-        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
+        $block->getHtmlId() ?>">
+        <span>
+            <?= $block->escapeHtml($block->getButtonLabel()) ?>
+        </span>
     </button>
     <p id="activate-message"></p>
 </div>

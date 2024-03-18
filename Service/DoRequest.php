@@ -14,12 +14,12 @@ namespace Instant\Checkout\Service;
 
 use Exception;
 use Instant\Checkout\Api\Data\RequestLogInterface;
+use Instant\Checkout\Api\Data\RequestLogInterfaceFactory;
+use Instant\Checkout\Api\RequestLogRepositoryInterfaceFactory;
 use Instant\Checkout\Helper\InstantHelper;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
-use Instant\Checkout\Api\Data\RequestLogInterfaceFactory;
-use Instant\Checkout\Api\RequestLogRepositoryInterfaceFactory;
 
 /**
  * Class DoRequest sends an API request to Instant
@@ -111,17 +111,17 @@ class DoRequest
     ) {
         try {
             $requestBody = json_encode($body);
-            $requestId = $this->instantHelper->guid();
+            $requestId = $this->instantHelper->createGuid();
 
             if ($enableIdempotency && $idempotencyKey === -1) {
-                $idempotencyKey = $this->instantHelper->guid();
+                $idempotencyKey = $this->instantHelper->createGuid();
             }
 
             $headers = [
                 "Content-Type" => "application/json",
                 "User-Agent" => static::AGENT,
-                "X-Instant-App-Id" => $this->instantHelper->getInstantAppId(),
-                "X-Instant-App-Auth" => $this->instantHelper->getInstantApiAccessToken(),
+                "X-Instant-App-Id" => $this->instantHelper->getConfigField($this->instantHelper::INSTANT_APP_ID_PATH),
+                "X-Instant-App-Auth" => $this->instantHelper->getConfigField($this->instantHelper::ACCESS_TOKEN_PATH),
                 'Expect:' => '',
             ];
 

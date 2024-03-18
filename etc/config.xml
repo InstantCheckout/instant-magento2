@@ -14,25 +14,11 @@
         <payment>
             <instant>
                 <model>Instant\Checkout\Model\Payment\InstantPayment</model>
-
-                <general_enabled>0</general_enabled>
-                <general_verificationElementEnabled>1</general_verificationElementEnabled>
-                <general_bannerElementEnabled>1</general_bannerElementEnabled>
-
                 <general_title>Pay by Card</general_title>
-                <sort_order>1</sort_order>
-
-                <bannerElement_targetElementSelector>#shipping</bannerElement_targetElementSelector>
-                <bannerElement_shouldAppendToElement>prepend</bannerElement_shouldAppendToElement>
-                <bannerElement_theme>light</bannerElement_theme>
-
-                <verificationElement_emailFieldSelector>#shipping input#customer-email.input-text</verificationElement_emailFieldSelector>
-
-                <order_status>pending</order_status>
+                <sort_order>0</sort_order>
                 <allowspecific>0</allowspecific>
                 <can_use_checkout>0</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-
                 <title>Instant Pay</title>
                 <payment_action>authorize</payment_action>
                 <active>1</active>
@@ -43,19 +29,14 @@
                 <enable_catalog>0</enable_catalog>
                 <enable_minicart>0</enable_minicart>
                 <enable_checkout_summary>0</enable_checkout_summary>
+                <enable_checkout_page>0</enable_checkout_page>
                 <auto_convert_guest_to_customer>0</auto_convert_guest_to_customer>
                 <enable_multicurrency_on_single_store>0</enable_multicurrency_on_single_store>
-                <enable_checkout_page>0</enable_checkout_page>
                 <enable_sandbox>1</enable_sandbox>
-                <cpage_btn_width>60</cpage_btn_width>
-                <mc_btn_width>90</mc_btn_width>
-                <should_resize_cart_index_btn>1</should_resize_cart_index_btn>
-                <should_resize_pdp_btn>1</should_resize_pdp_btn>
-                <should_position_pdp_below_atc>1</should_position_pdp_below_atc>
-                <pdp_btn_custom_style></pdp_btn_custom_style>
                 <disabled_for_skus_containing></disabled_for_skus_containing>
                 <retry_failures_cron>*/5 * * * *</retry_failures_cron>
                 <retry_failures_count>3</retry_failures_count>
+                <auto_convert_guest_to_customer>0</auto_convert_guest_to_customer>
             </general>
         </instant>
     </default>
