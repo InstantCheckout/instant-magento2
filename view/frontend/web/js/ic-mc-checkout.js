@@ -13,9 +13,6 @@ define([
         initialize: function () {
             this._super();
             return this;
-        },
-
-        render: function () {
         }
     });
 });
