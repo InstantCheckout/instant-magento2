@@ -2,9 +2,25 @@
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <route url="/V1/instant/:storeCode/cart/get-masked-id" method="POST">
-        <service class="Instant\Checkout\Api\CartsManagementInterface" method="getMaskedIdForCartId" />
+        <service class="Instant\Checkout\Api\CartsManagementInterface" method="getMaskedIdForCartId"/>
         <resources>
-            <resource ref="Magento_Cart::manage" />
+            <resource ref="Magento_Cart::manage"/>
+        </resources>
+    </route>
+    
+    <!-- Apply rewards points to quote -->
+    <route url="/V1/rewards/apply" method="POST">
+        <service class="Instant\Checkout\Api\RewardServiceInterface" method="applyRewardPointsToQuote"/>
+        <resources>
+            <resource ref="Magento_Customer::customer"/>
+        </resources>
+    </route>
+    
+    <!--  Get rewards point balance -->
+    <route url="/V1/rewards/balance" method="GET">
+        <service class="Instant\Checkout\Api\RewardServiceInterface" method="getRewardPointsBalance"/>
+        <resources>
+            <resource ref="Magento_Customer::customer"/>
         </resources>
     </route>
 </routes>
