@@ -1,7 +1,8 @@
 <?php
 
-namespace Instant\Checkout\Model;
+namespace Instant\Checkout\Service;
 
+use Exception;
 use Magento\Framework\Exception\LocalizedException;
 use Instant\Checkout\Api\RewardServiceInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -86,7 +87,7 @@ class RewardService implements RewardServiceInterface
 			// Check if the customer has enough reward points
 			$availablePoints = $this->getRewardPointsBalance($customer);
 			if ($points > $availablePoints) {
-				throw new \Magento\Framework\Exception\LocalizedException(__('Insufficient reward points.'));
+				throw new LocalizedException(__('Insufficient reward points.'));
 			}
 	
 			// Convert reward points to currency amount
@@ -105,7 +106,7 @@ class RewardService implements RewardServiceInterface
 			$this->logInfo('Successfully applied ' . $points . ' reward points to quote ' . $quote->getId());
 		} catch (Exception $e) {
 			$this->logError('Error applying reward points to quote: ' . $e->getMessage());
-			throw new \Magento\Framework\Exception\LocalizedException(__('Could not apply reward points to the quote.'));
+			throw new LocalizedException(__('Could not apply reward points to the quote.'));
 		}
 	}
 	
