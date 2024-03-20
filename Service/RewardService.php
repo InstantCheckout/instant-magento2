@@ -113,6 +113,7 @@ class RewardService implements RewardServiceInterface
 	protected function convertPointsToAmount($points)
     {
         // Retrieve the points conversion rate from the Magento configuration
+        // TO-DO: Verify this path (reward/general/points_money) is correct once we have access to the dev environment. 
         $pointsValue = $this->scopeConfig->getValue(
             'reward/general/points_money',
             ScopeInterface::SCOPE_STORE
