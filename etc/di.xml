@@ -9,4 +9,9 @@
     <preference for="Instant\Checkout\Api\Data\RequestLogSearchResultsInterface"
         type="Magento\Framework\Api\SearchResults" />
     <!-- End request logger -->
+
+    <!-- Reward service -->
+    <preference for="Instant\Checkout\Api\RewardServiceInterface."
+        type="Instant\Checkout\Model\RewardService" />
+    <!-- End reward service -->
 </config>
