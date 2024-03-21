@@ -86,7 +86,7 @@ class RewardService implements RewardServiceInterface
      *
      * @param CartInterface $quote
      * @param int $customerId
-     * @return void
+     * @return bool
      */
 	public function applyRewardPointsToQuote(CartInterface $quote, int $customerId)
 	{
@@ -129,6 +129,8 @@ class RewardService implements RewardServiceInterface
             $quote->save();
 	
 			$this->logInfo('Successfully applied ' . $pointsToApply . ' reward points to quote ' . $quote->getId());
+            
+            return true;
 		} catch (Exception $e) {
 			$this->logError('Error applying reward points to quote: ' . $e->getMessage());
 			throw new LocalizedException(__('Could not apply reward points to the quote.'));
