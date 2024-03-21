@@ -8,19 +8,19 @@
         </resources>
     </route>
     
-    <!--  Get rewards point balance -->
+    <!--  Get rewards point balance. TO-DO: We need to look at acl.xml to see what resource to use with OAuth -->
     <route url="/V1/instant/:customerId/rewards/balance" method="GET">
         <service class="Instant\Checkout\Api\RewardServiceInterface" method="getRewardPointsBalance"/>
         <resources>
-            <resource ref="Magento_Customer::customer"/>
+            <resource ref="any"/>
         </resources>
     </route>
     
-    <!-- Apply rewards points to quote -->
+    <!-- Apply rewards points to quote. TO-DO: We need to look at acl.xml to see what resource to use with OAuth -->
     <route url="/V1/instant/:customerId/rewards/apply" method="POST">
         <service class="Instant\Checkout\Api\RewardServiceInterface" method="applyRewardPointsToQuote"/>
         <resources>
-            <resource ref="Magento_Customer::customer"/>
+            <resource ref="any"/>
         </resources>
     </route>
 </routes>
