@@ -13,18 +13,17 @@ interface RewardServiceInterface
     /**
      * Get the reward points balance for a customer.
      *
-     * @param CustomerInterface $customer
+     * @param int $customerId
      * @return int
      */
-    public function getRewardPointsBalance(CustomerInterface $customer): int;
+    public function getRewardPointsBalance(int $customerId): int;
 
     /**
      * Apply reward points to a quote.
      *
-     * @param int $points
      * @param CartInterface $quote
-     * @param CustomerInterface $customer
+     * @param int $customerId
      * @return void
      */
-    public function applyRewardPointsToQuote(int $points, CartInterface $quote, CustomerInterface $customer);
+    public function applyRewardPointsToQuote(CartInterface $quote, int $customerId);
 }

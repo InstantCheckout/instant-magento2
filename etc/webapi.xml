@@ -9,7 +9,7 @@
     </route>
     
     <!--  Get rewards point balance -->
-    <route url="/V1/instant/rewards/balance" method="GET">
+    <route url="/V1/instant/:customerId/rewards/balance" method="GET">
         <service class="Instant\Checkout\Api\RewardServiceInterface" method="getRewardPointsBalance"/>
         <resources>
             <resource ref="Magento_Customer::customer"/>
@@ -17,7 +17,7 @@
     </route>
     
     <!-- Apply rewards points to quote -->
-    <route url="/V1/instant/rewards/apply" method="POST">
+    <route url="/V1/instant/:customerId/rewards/apply" method="POST">
         <service class="Instant\Checkout\Api\RewardServiceInterface" method="applyRewardPointsToQuote"/>
         <resources>
             <resource ref="Magento_Customer::customer"/>
