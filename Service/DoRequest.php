@@ -34,6 +34,11 @@ class DoRequest
     private $instantHelper;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -62,7 +67,7 @@ class DoRequest
         RequestLogInterfaceFactory $requestLogInterfaceFactory,
         RequestLogRepositoryInterfaceFactory $requestLogRepositoryInterfaceFactory
     ) {
-        $this->storeMananger = $storeManager;
+        $this->storeManager = $storeManager;
         $this->instantHelper = $instantHelper;
         $this->logger = $logger;
         $this->requestLogInterfaceFactory = $requestLogInterfaceFactory;
