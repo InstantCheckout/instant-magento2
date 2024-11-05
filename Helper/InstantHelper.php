@@ -321,23 +321,23 @@ class InstantHelper extends \Magento\Framework\App\Helper\AbstractHelper
         try {
             $cartId = $this->checkoutSession->getQuote()->getEntityId();
 
-            if (empty($cartId)) {
-                $customerId = -1;
-                if ($this->customerSession->isLoggedIn()) {
-                    $customerId = $this->customerSession->getId();
-                }
+            // if (empty($cartId)) {
+            //     $customerId = -1;
+            //     if ($this->customerSession->isLoggedIn()) {
+            //         $customerId = $this->customerSession->getId();
+            //     }
 
-                $customerLoggedIn = $customerId && $customerId > -1;
+            //     $customerLoggedIn = $customerId && $customerId > -1;
 
-                $maskedQuoteId = $customerLoggedIn
-                    ? $this->createEmptyCartForCustomer->execute($customerId)
-                    : $this->createEmptyCartForGuest->execute();
-                $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
+            //     $maskedQuoteId = $customerLoggedIn
+            //         ? $this->createEmptyCartForCustomer->execute($customerId)
+            //         : $this->createEmptyCartForGuest->execute();
+            //     $cartId = $this->quoteIdMaskFactory->create()->load($maskedQuoteId, 'masked_id')->getQuoteId();
 
-                if (!$customerLoggedIn) {
-                    $this->checkoutSession->setQuoteId($cartId);
-                }
-            }
+            //     if (!$customerLoggedIn) {
+            //         $this->checkoutSession->setQuoteId($cartId);
+            //     }
+            // }
 
             return $cartId;
         } catch (Exception $e) {
